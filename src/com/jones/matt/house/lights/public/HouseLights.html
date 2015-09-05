@@ -1,0 +1,82 @@
+<!doctype html>
+<html >
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<link rel="apple-touch-startup-image" href="full.png">
+	<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+	<link rel="apple-touch-icon" sizes="114x114" href="apple-touch-icon-iphone4.png"/>
+	<link rel="icon" type="image/png" href="apple-touch-icon-iphone4.png"/>
+	<style type="text/css">
+		.gwt-Label
+		{
+			white-space: nowrap;
+			margin: 5px;
+			text-align: center;
+		}
+		.button-grow, .weather .gwt-Label
+		{
+			flex-grow:1;
+			-webkit-flex-grow:1;
+			padding:15px !important;
+		}
+		.header .gwt-Label, .header .RoomDetails
+		{
+			padding-top:20px !important;
+			padding-bottom:10px !important;
+		}
+		.weather .gwt-Label
+		{
+			font-weight: bold;
+			color:#ffffff;
+			border-radius: 6px;
+		}
+		.garage-button
+		{
+			padding:15px !important;
+		}
+		.RoomDetails
+		{
+			width:32px;
+			height:32px;
+			-webkit-align-self: center;
+			align-self: center;
+			cursor:pointer;
+		}
+		.fillWidth
+		{
+			width:100%;
+		}
+		.header
+		{
+			background-color: #69d040;
+			color:#fff;
+			font-weight: bold;
+		}
+		.RoomSlider
+		{
+			padding-top: 23px !important;
+			padding-bottom: 20px !important;
+		}
+		.com-googlecode-mgwt-ui-client-widget-animation-impl-AnimationWidgetKeyFrameImpl-DisplayCss-display.overflow,
+		.overflow .com-googlecode-mgwt-ui-client-widget-animation-impl-AnimationWidgetKeyFrameImpl-DisplayCss-displayContainer
+		{
+			overflow: auto;
+		}
+	</style>
+	<title>House Lights</title>
+	<script type="text/javascript" language="javascript" src="HouseLights.nocache.js"></script>
+	<script type="text/javascript">
+		window.LightData = {};
+		window.BaseURL = "";
+		window.CloseUrl = "S/Garage/Close";
+		window.OpenUrl = "S/Garage/Open";
+		window.StatusUrl = "S/Garage/Status";
+		window.WeatherUrl = "S/Garage/Weather";
+		window.PollDelay = 5000;
+	</script>
+</head>
+<body>
+</body>
+</html>
