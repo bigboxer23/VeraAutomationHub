@@ -7,7 +7,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPropertyHelper;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.RootFlexPanel;
 import com.jones.matt.house.lights.client.DefaultRequestBuilder;
-import com.jones.matt.house.lights.client.EventBusInstance;
+import com.jones.matt.house.lights.client.event.EventBusInstance;
 import com.jones.matt.house.lights.client.HouseLights;
 import com.jones.matt.house.lights.client.model.DeviceVO;
 import com.jones.matt.house.lights.client.model.RoomVO;

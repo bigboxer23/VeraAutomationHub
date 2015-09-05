@@ -12,7 +12,7 @@ import com.googlecode.mgwt.ui.client.widget.image.ImageHolder;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPanel;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPropertyHelper;
 import com.jones.matt.house.lights.client.DefaultRequestBuilder;
-import com.jones.matt.house.lights.client.EventBusInstance;
+import com.jones.matt.house.lights.client.event.EventBusInstance;
 import com.jones.matt.house.lights.client.HouseLights;
 import com.jones.matt.house.lights.client.animation.AnimationStack;
 import com.jones.matt.house.lights.client.model.DeviceVO;

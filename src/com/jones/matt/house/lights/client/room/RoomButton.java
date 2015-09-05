@@ -1,4 +1,4 @@
-package com.jones.matt.house.lights.client;
+package com.jones.matt.house.lights.client.room;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -11,9 +11,11 @@ import com.googlecode.mgwt.ui.client.widget.button.Button;
 import com.googlecode.mgwt.ui.client.widget.image.ImageHolder;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPanel;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPropertyHelper;
+import com.jones.matt.house.lights.client.DefaultRequestBuilder;
+import com.jones.matt.house.lights.client.event.EventBusInstance;
+import com.jones.matt.house.lights.client.HouseLights;
 import com.jones.matt.house.lights.client.animation.AnimationStack;
 import com.jones.matt.house.lights.client.model.RoomVO;
-import com.jones.matt.house.lights.client.room.RoomPanel;
 
 /**
  *
