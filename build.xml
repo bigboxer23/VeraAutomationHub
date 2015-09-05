@@ -1,0 +1,109 @@
+<project name="VeraAutomationHub" default="war" basedir=".">
+	<loadproperties srcFile="default.properties"/>
+	<property name="pi.host.dev" value="${pi.host.dev}"/>
+	<property name="pi.port.dev" value="22"/>
+	<property name="pi.user.dev" value="pi"/>
+	<property name="pi.password.dev" value="${pi.password.dev}"/>
+	<property name="pi.dirCopyTo.dev" value="/usr/share/jetty/webapps"/><!--/var/lib/tomcat7/webapps-->
+
+	<path id="compile.classpath">
+		<pathelement location="lib/sqlite-jdbc-3.7.2.jar"/>
+		<pathelement location="lib/servlet-api-3.1.jar"/>
+		<pathelement location="lib/guava-18.0.jar"/>
+		<pathelement location="lib/commons-logging-api-1.0.4.jar"/>
+		<pathelement location="lib/httpclient-4.1.2.jar"/>
+		<pathelement location="lib/httpcore-4.1.2.jar"/>
+		<pathelement location="lib/gson-2.3.1.jar"/>
+		<pathelement location="lib/huelocalsdk.jar"/>
+		<pathelement location="lib/huesdkresources.jar"/>
+		<pathelement location="./src"/>
+		<pathelement path="lib.gwt/gwt/gwt-user.jar"/>
+		<pathelement path="lib.gwt/gwt/gwt-dev.jar"/>
+		<pathelement path="lib.gwt/gwt/validation-api-1.0.0.GA-sources.jar"/>
+		<pathelement path="lib.gwt/gwt/validation-api-1.0.0.GA.jar"/>
+		<pathelement path="lib.gwt/mgwt/mgwt-2.0.0.jar"/>
+	</path>
+
+	<target name="_compile">
+		<mkdir dir="classes" />
+		<javac classpathref="compile.classpath" srcdir="src"  destdir="classes"/>
+	</target>
+
+	<target name="deploy" depends="war">
+		<scp file="Lights.war" todir="${pi.user.dev}:${pi.password.dev}@${pi.host.dev}:${pi.dirCopyTo.dev}" port="${pi.port.dev}" trust="true" verbose="true" failonerror="true"></scp>
+	</target>
+
+	<target name="_Lights.jar" depends="_compile" description="">
+		<jar basedir="classes" includes="**/*.class, META-INF/*" jarfile="Lights.jar">
+
+		</jar>
+	</target>
+
+	<target name="war" depends="_Lights.jar, compileGWT, manifest">
+		<war destfile="Lights.war" webxml="web/WEB-INF/web.xml" duplicate="preserve">
+			<zipfileset dir="web" includes="*.html,*.css,*.jsp,*.ico,*.png,*.appcache,*.js,*.gif"/>
+			<fileset dir="HouseLights">
+				<include name="**/*.*"/>
+			</fileset>
+			<lib dir="." includes="Lights.jar"/>
+			<lib dir="lib" includes="*"/>
+		</war>
+	</target>
+
+
+
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="lib.gwt/ant/ant-contrib-1.0b3.jar"/>
+		</classpath>
+	</taskdef>
+
+	<property file="default.properties"/>
+
+	<path id="gwt.path">
+		<pathelement location="./src"/>
+		<pathelement path="lib.gwt/gwt/gwt-user.jar"/>
+		<pathelement path="lib.gwt/gwt/gwt-dev.jar"/>
+		<pathelement path="lib.gwt/gwt/validation-api-1.0.0.GA-sources.jar"/>
+		<pathelement path="lib.gwt/gwt/validation-api-1.0.0.GA.jar"/>
+		<pathelement path="lib.gwt/mgwt/mgwt-2.0.0.jar"/>
+	</path>
+
+	<target name="compileGWT">
+		<java classpathref="gwt.path" classname="com.google.gwt.dev.Compiler" fork="true" maxmemory="1024M" failonerror="true">
+			<arg value="-localWorkers"/>
+			<arg value="8"/>
+			<arg value="-war"/>
+			<arg value="."/>
+			<arg value="com.jones.matt.house.lights.HouseLights"/>
+		</java>
+	</target>
+
+	<target name="manifest">
+		<echo message="copying manifest.appcache to HouseLights"/>
+		<copy file="resources/manifest.appcache" tofile="HouseLights/manifest.appcache" />
+
+		<echo message="manifest cleaning" />
+
+		<!-- update version -->
+		<echo message="Updating the site.manifest version date to today"/>
+		<tstamp>
+			<format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss"/>
+		</tstamp>
+		<replaceregexp match="# version .+" replace="# version ${TODAY}" file="HouseLights/manifest.appcache"/>
+
+		<!-- replace javascript files -->
+		<echo message="Updating the site.manifest with the new js"/>
+		<for param="file">
+			<path>
+				<fileset dir="HouseLights" includes="*.cache.js"/>
+			</path>
+			<sequential>
+				<basename property="filename.@{file}" file="@{file}" />
+				<echo message="${filename.@{file}}${line.separator}" file="HouseLights/manifest.appcache" append="true"/>
+			</sequential>
+		</for>
+		<echo message="FALLBACK:${line.separator}${line.separator}NETWORK:${line.separator}*" file="HouseLights/manifest.appcache" append="true"/>
+	</target>
+</project>
