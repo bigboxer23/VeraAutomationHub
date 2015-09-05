@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * single room data structure
  */
 public class VeraRoomVO
 {

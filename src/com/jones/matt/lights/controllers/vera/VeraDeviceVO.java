@@ -3,7 +3,7 @@ package com.jones.matt.lights.controllers.vera;
 import com.google.gson.annotations.SerializedName;
 
 /**
- *
+ * Device returned from Vera controller
  */
 public class VeraDeviceVO
 {
