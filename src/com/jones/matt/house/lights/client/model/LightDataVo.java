@@ -1,4 +1,4 @@
-package com.jones.matt.house.lights.client;
+package com.jones.matt.house.lights.client.model;
 
 /**
  *

@@ -1,4 +1,4 @@
-package com.jones.matt.house.lights.client;
+package com.jones.matt.house.lights.client.garage;
 
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
@@ -9,6 +9,9 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Label;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPanel;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPropertyHelper;
+import com.jones.matt.house.lights.client.DefaultRequestBuilder;
+import com.jones.matt.house.lights.client.HouseLights;
+import com.jones.matt.house.lights.client.model.WeatherData;
 
 /**
  * Panel to display temperature.  Changes color based on the temp retrieved from REST URL

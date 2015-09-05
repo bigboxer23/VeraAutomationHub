@@ -1,4 +1,4 @@
-package com.jones.matt.house.lights.client;
+package com.jones.matt.house.lights.client.event;
 
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;

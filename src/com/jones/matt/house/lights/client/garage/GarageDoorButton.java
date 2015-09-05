@@ -1,4 +1,4 @@
-package com.jones.matt.house.lights.client;
+package com.jones.matt.house.lights.client.garage;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
@@ -7,6 +7,8 @@ import com.google.gwt.user.client.Timer;
 import com.googlecode.mgwt.dom.client.event.tap.TapEvent;
 import com.googlecode.mgwt.dom.client.event.tap.TapHandler;
 import com.googlecode.mgwt.ui.client.widget.button.Button;
+import com.jones.matt.house.lights.client.DefaultRequestBuilder;
+import com.jones.matt.house.lights.client.HouseLights;
 
 /**
  * Button for garage door, displays Open or Closed based on status.  Queries server
