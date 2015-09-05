@@ -11,10 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Vera controller to make requests to a vera UI7 device
  */
 public class VeraController implements ISystemController, IStatusController
 {
+	/**
+	 * Location of Vera Hub, assume locally running on default port
+	 */
 	public static final String kVeraHubUrl = System.getProperty("vera.url", "http://localhost:3480");
 
 	private GsonBuilder myBuilder;
@@ -65,9 +68,7 @@ public class VeraController implements ISystemController, IStatusController
 			DefaultHttpClient aHttpClient = new DefaultHttpClient();
 			try
 			{
-				String aCommand = kVeraHubUrl + "/data_request?id=action&output_format=json&DeviceNum=" + aLight;
-				String aCommand2 = anIsDim ? "&serviceId=urn:upnp-org:serviceId:Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=" : "&serviceId=urn:upnp-org:serviceId:SwitchPower1&action=SetTarget&newTargetValue=";
-				HttpGet aGet = new HttpGet(aCommand + aCommand2 + anAction);
+				HttpGet aGet = new HttpGet(kVeraHubUrl + "/data_request?id=action&output_format=json&DeviceNum=" + aLight + "&serviceId=urn:upnp-org:serviceId:" + (anIsDim ? "Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=" : "SwitchPower1&action=SetTarget&newTargetValue=") + anAction);
 				aHttpClient.execute(aGet);
 			}
 			catch (IOException e)
@@ -78,6 +79,12 @@ public class VeraController implements ISystemController, IStatusController
 		return null;
 	}
 
+	/**
+	 * Find all the lights we need to do the action to, vera doesn't seem to have any API exposed to hit the room directly.
+	 *
+	 * @param theCommands
+	 * @return
+	 */
 	private List<Integer> findLights(List<String> theCommands)
 	{
 		List<Integer> aLights = new ArrayList<>();

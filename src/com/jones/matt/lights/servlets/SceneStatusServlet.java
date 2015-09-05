@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Status for all our known controllers returned from this servlet
+ * Get status from the vera controller for everything in the house
  */
 public class SceneStatusServlet extends AbstractServlet
 {

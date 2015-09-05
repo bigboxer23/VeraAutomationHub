@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Data structure returned from vera when status is requested
  */
 public class VeraHouseVO implements JsonDeserializer<VeraHouseVO>
 {
