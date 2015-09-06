@@ -16,11 +16,14 @@ public class Header extends FlexPanel
 {
 	public Header(String theHeaderText, boolean theBackButton)
 	{
-		addStyleName("header");
+		addStyleName("header fillWidth");
+		setOrientation(FlexPropertyHelper.Orientation.HORIZONTAL);
+		setAlignment(FlexPropertyHelper.Alignment.CENTER);
+		Image aBack = new Image(ImageHolder.get().previousItem());
+		aBack.addStyleName("RoomDetails");
+		aBack.getElement().getStyle().setOpacity(0);
 		if (theBackButton)
 		{
-			Image aBack = new Image(ImageHolder.get().previousItem());
-			aBack.addStyleName("RoomDetails");
 			aBack.addClickHandler(new ClickHandler()
 			{
 				@Override
@@ -29,14 +32,16 @@ public class Header extends FlexPanel
 					AnimationStack.getInstance().backward();
 				}
 			});
-			addStyleName("fillWidth");
-			setOrientation(FlexPropertyHelper.Orientation.HORIZONTAL);
-			setAlignment(FlexPropertyHelper.Alignment.CENTER);
-			add(aBack);
+			aBack.getElement().getStyle().clearOpacity();
 		}
+		add(aBack);
 		Label aRoomLabel = new Label(theHeaderText);
 		aRoomLabel.addStyleName("button-grow");
 		add(aRoomLabel);
+		aBack = new Image(ImageHolder.get().nextItem());
+		aBack.addStyleName("RoomDetails");
+		aBack.getElement().getStyle().setOpacity(0);
+		add(aBack);
 	}
 
 	public Header(String theHeaderText)
