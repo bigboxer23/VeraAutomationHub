@@ -1,12 +1,14 @@
-package com.jones.matt.house.lights.client.room;
+package com.jones.matt.house.lights.client.ui.room;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPropertyHelper;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.RootFlexPanel;
-import com.jones.matt.house.lights.client.DefaultRequestBuilder;
+import com.jones.matt.house.lights.client.utility.DefaultRequestBuilder;
 import com.jones.matt.house.lights.client.HouseLights;
 import com.jones.matt.house.lights.client.model.DeviceVO;
+import com.jones.matt.house.lights.client.ui.Header;
+import com.jones.matt.house.lights.client.ui.TimedSlider;
 
 /**
  *
@@ -17,16 +19,16 @@ public class DeviceDimPanel extends RootFlexPanel
 	{
 		setAlignment(FlexPropertyHelper.Alignment.CENTER);
 		add(new Header(theData.getName()));
-		final RoomSlider aRoomSlider = new RoomSlider();
-		aRoomSlider.setValue(Integer.parseInt(theData.getLevel()));
-		aRoomSlider.addChangeHandler(new ChangeHandler()
+		final TimedSlider aTimedSlider = new TimedSlider();
+		aTimedSlider.setValue(Integer.parseInt(theData.getLevel()));
+		aTimedSlider.addChangeHandler(new ChangeHandler()
 		{
 			@Override
 			public void onChange(ChangeEvent theEvent)
 			{
-				new DefaultRequestBuilder(HouseLights.getBaseUrl() + "S/Vera/" + aRoomSlider.getValue() + "/Device/" + theData.getID()).send();
+				new DefaultRequestBuilder(HouseLights.getBaseUrl() + "S/Vera/" + aTimedSlider.getValue() + "/Device/" + theData.getID()).send();
 			}
 		});
-		add(aRoomSlider);
+		add(aTimedSlider);
 	}
 }

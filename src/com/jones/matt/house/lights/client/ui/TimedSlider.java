@@ -1,4 +1,4 @@
-package com.jones.matt.house.lights.client.room;
+package com.jones.matt.house.lights.client.ui;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -10,16 +10,14 @@ import com.google.gwt.user.client.Timer;
 import com.googlecode.mgwt.ui.client.widget.input.slider.Slider;
 import com.jones.matt.house.lights.client.event.FireableChangeEvent;
 
-import java.util.logging.Logger;
-
 /**
- *
+ * Slider whcih only fires events after a period of inactivity so we don't do ludicrous actions
  */
-public class RoomSlider extends Slider implements ValueChangeHandler<Integer>, HasChangeHandlers
+public class TimedSlider extends Slider implements ValueChangeHandler<Integer>, HasChangeHandlers
 {
 	private Timer myTimer;
 
-	public RoomSlider()
+	public TimedSlider()
 	{
 		addStyleName("RoomSlider");
 		setMax(101);

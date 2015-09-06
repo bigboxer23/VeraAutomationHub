@@ -6,18 +6,17 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.storage.client.Storage;
 import com.google.gwt.user.client.Timer;
-import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPanel;
-import com.jones.matt.house.lights.client.event.EventBusInstance;
 import com.jones.matt.house.lights.client.event.FireableValueChangeEvent;
 import com.jones.matt.house.lights.client.model.HouseStatus;
-import com.jones.matt.house.lights.client.model.RoomVO;
-import com.jones.matt.house.lights.client.room.RoomButton;
+import com.jones.matt.house.lights.client.ui.HousePanel;
+import com.jones.matt.house.lights.client.ui.animation.AnimationStack;
+import com.jones.matt.house.lights.client.utility.DefaultRequestBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * timer to fetch new data from the server at specific interval
  */
 public class StatusTimer extends Timer
 {
@@ -25,16 +24,13 @@ public class StatusTimer extends Timer
 
 	private Storage myLightData;
 
-	private long myTime = -1;
+	private HousePanel myHousePanel;
 
-	private FlexPanel myContent;
-
-	private Map<String, RoomButton> myRoomButtons = new HashMap<>();
-
-	public StatusTimer(FlexPanel theContent)
+	public StatusTimer()
 	{
 		myLightData = Storage.getLocalStorageIfSupported();
-		myContent = theContent;
+		myHousePanel = new HousePanel();
+		AnimationStack.getInstance().forward(myHousePanel);
 		generateFromData(getHouseStatus());
 		run();
 	}
@@ -69,33 +65,7 @@ public class StatusTimer extends Timer
 
 	private void generateFromData(HouseStatus theData)
 	{
-		if (theData != null)
-		{
-			for (int ai = 0; ai < theData.getRooms().length(); ai++)
-			{
-				generateRow(theData.getRooms().get(ai));
-			}
-		}
-	}
-	/**
-	 * Generate a single row of controls
-	 *
-	 * @param theLabel label for the row
-	 * @param theLabel1 label for the first button
-	 * @param theTapHandler1 tap handler for the first button
-	 * @param theLabel2 label for the second button
-	 * @param theTapHandler2 tap handler for the second button
-	 */
-	private void generateRow(final RoomVO theData)
-	{
-		RoomButton aButton = myRoomButtons.get(theData.getName());
-		if (aButton == null)
-		{
-			aButton = new RoomButton(theData);
-			myContent.add(aButton);
-			myRoomButtons.put(theData.getName(), aButton);
-		}
-		EventBusInstance.getInstance().fireEvent(new FireableValueChangeEvent<>(theData));
+		myHousePanel.onValueChange(new FireableValueChangeEvent<>(theData));
 	}
 
 	private HouseStatus getHouseStatus()

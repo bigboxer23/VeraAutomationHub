@@ -1,4 +1,4 @@
-package com.jones.matt.house.lights.client.room;
+package com.jones.matt.house.lights.client.ui;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -7,10 +7,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.googlecode.mgwt.ui.client.widget.image.ImageHolder;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPanel;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPropertyHelper;
-import com.jones.matt.house.lights.client.animation.AnimationStack;
+import com.jones.matt.house.lights.client.ui.animation.AnimationStack;
 
 /**
- *
+ * Header for top of display
  */
 public class Header extends FlexPanel
 {
