@@ -7,7 +7,7 @@ import com.google.gwt.event.shared.*;
 import com.jones.matt.house.lights.client.model.RoomVO;
 
 /**
- *
+ * Event bus holder for firing data changes or events cross application
  */
 public class EventBusInstance implements HasValueChangeHandlers<RoomVO>
 {

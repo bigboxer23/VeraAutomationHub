@@ -1,8 +1,7 @@
-package com.jones.matt.house.lights.client.animation;
+package com.jones.matt.house.lights.client.ui.animation;
 
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.googlecode.mgwt.ui.client.widget.animation.AnimationEndCallback;
 import com.googlecode.mgwt.ui.client.widget.animation.AnimationWidget;
 import com.googlecode.mgwt.ui.client.widget.animation.Animations;
 
@@ -10,9 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
+ * keep track of a stack of panels so can navigate forward and back in an animated fashion.
  */
-public class AnimationStack implements AnimationEndCallback
+public class AnimationStack
 {
 	private static AnimationStack myInstance;
 
@@ -49,7 +48,7 @@ public class AnimationStack implements AnimationEndCallback
 		{
 			myAnimationWidget.setSecondWidget(theWidget);
 		}
-		myAnimationWidget.animate(Animations.SLIDE, myFirstWidget, this);
+		myAnimationWidget.animate(Animations.SLIDE, myFirstWidget, null);
 		myFirstWidget = !myFirstWidget;
 	}
 
@@ -69,13 +68,7 @@ public class AnimationStack implements AnimationEndCallback
 			myAnimationWidget.setSecondWidget(aWidget);
 		}
 		myWidgets.remove(myWidgets.size() - 1);
-		myAnimationWidget.animate(Animations.SLIDE_REVERSE, myFirstWidget, this);
+		myAnimationWidget.animate(Animations.SLIDE_REVERSE, myFirstWidget, null);
 		myFirstWidget = !myFirstWidget;
-	}
-
-	@Override
-	public void onAnimationEnd()
-	{
-		myAnimationWidget.addStyleName("overflow");
 	}
 }

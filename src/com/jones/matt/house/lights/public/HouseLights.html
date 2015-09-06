@@ -15,10 +15,13 @@
 			margin: 5px;
 			text-align: center;
 		}
-		.button-grow, .weather .gwt-Label
+		.garage-button, .button-grow, .weather .gwt-Label
 		{
 			flex-grow:1;
 			-webkit-flex-grow:1;
+		}
+		.button-grow, .weather .gwt-Label
+		{
 			padding:15px !important;
 		}
 		.header .gwt-Label, .header .RoomDetails
@@ -30,11 +33,18 @@
 		{
 			font-weight: bold;
 			color:#ffffff;
-			border-radius: 6px;
+			border-radius: 0 6px 6px 0;
+			position: absolute;
+			right:0;
+		}
+		.relative
+		{
+			position:relative;
 		}
 		.garage-button
 		{
 			padding:15px !important;
+			margin-right:37px !important;
 		}
 		.RoomDetails
 		{
@@ -58,11 +68,6 @@
 		{
 			padding-top: 23px !important;
 			padding-bottom: 20px !important;
-		}
-		.com-googlecode-mgwt-ui-client-widget-animation-impl-AnimationWidgetKeyFrameImpl-DisplayCss-display.overflow,
-		.overflow .com-googlecode-mgwt-ui-client-widget-animation-impl-AnimationWidgetKeyFrameImpl-DisplayCss-displayContainer
-		{
-			overflow: auto;
 		}
 	</style>
 	<title>House Lights</title>
