@@ -28,6 +28,22 @@ public class DeviceVO extends JavaScriptObject
 
 	public final native String getLevel() /*-{ return this.level; }-*/;
 
+	public final native String getFanMode() /*-{ return this.fanmode; }-*/;
+
+	public final native String getMode() /*-{ return this.mode; }-*/;
+
+	public final native String getBatteryLevel() /*-{ return this.batterylevel; }-*/;
+
+	public final native String getSetpoint() /*-{ return this.setpoint; }-*/;
+
+	public final native String getHeat() /*-{ return this.heat; }-*/;
+
+	public final native String getCool() /*-{ return this.cool; }-*/;
+
+	public final native String getHvacState() /*-{ return this.hvacstate; }-*/;
+
+	public final native String getTemperature() /*-{ return this.temperature; }-*/;
+
 	public final boolean isLight()
 	{
 		return getCategory() == 2 || getCategory() == 3;
