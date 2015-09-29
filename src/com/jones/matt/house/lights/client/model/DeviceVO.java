@@ -27,4 +27,9 @@ public class DeviceVO extends JavaScriptObject
 	public final native String getStatus() /*-{ return this.status; }-*/;
 
 	public final native String getLevel() /*-{ return this.level; }-*/;
+
+	public final boolean isLight()
+	{
+		return getCategory() == 2 || getCategory() == 3;
+	}
 }
