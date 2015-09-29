@@ -25,6 +25,30 @@ public class VeraDeviceVO
 	@SerializedName("level")
 	private String myLevel;
 
+	@SerializedName("fanmode")
+	private String myFanMode;
+
+	@SerializedName("mode")
+	private String myMode;
+
+	@SerializedName("batterylevel")
+	private String myBatteryLevel;
+
+	@SerializedName("setpoint")
+	private String mySetPoint;
+
+	@SerializedName("heat")
+	private String myHeat;
+
+	@SerializedName("cool")
+	private String myCool;
+
+	@SerializedName("hvacstate")
+	private String myHvacState;
+
+	@SerializedName("temperature")
+	private String myTemperature;
+
 	public String getName()
 	{
 		return myName;
@@ -48,6 +72,46 @@ public class VeraDeviceVO
 	public boolean getStatus()
 	{
 		return myStatus != null && myStatus.equalsIgnoreCase("1");
+	}
+
+	public String getFanMode()
+	{
+		return myFanMode;
+	}
+
+	public String getMode()
+	{
+		return myMode;
+	}
+
+	public String getBatteryLevel()
+	{
+		return myBatteryLevel;
+	}
+
+	public String getSetPoint()
+	{
+		return mySetPoint;
+	}
+
+	public String getHeat()
+	{
+		return myHeat;
+	}
+
+	public String getCool()
+	{
+		return myCool;
+	}
+
+	public String getHvacState()
+	{
+		return myHvacState;
+	}
+
+	public String getTemperature()
+	{
+		return myTemperature;
 	}
 
 	public int getLevel()
