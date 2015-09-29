@@ -39,7 +39,10 @@ public class RoomPanel extends RootFlexPanel implements ValueChangeHandler<RoomV
 		add(aTimedSlider);
 		for(DeviceVO aDevice : myData.getDevices())
 		{
-			add(new DevicePanel(myData, aDevice));
+			if(aDevice.isLight())
+			{
+				add(new DevicePanel(myData, aDevice));
+			}
 		}
 	}
 
