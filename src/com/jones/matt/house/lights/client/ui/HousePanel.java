@@ -23,17 +23,17 @@ public class HousePanel extends FlexPanel implements ValueChangeHandler<HouseSta
 	private Map<String, RoomButton> myRoomButtons = new HashMap<>();
 
 	private FlexPanel myContent;
-	private ScrollPanel aScroll;
+	private ScrollPanel myScrollPanel;
 
 	public HousePanel()
 	{
 		add(new Header("House Lights", false));
-		aScroll = new ScrollPanel();
+		myScrollPanel = new ScrollPanel();
 		myContent = new FlexPanel();
-		aScroll.setWidget(myContent);
-		add(aScroll);
-		aScroll.setHeight((Window.getClientHeight() - 60) + "px");//- header height
-		aScroll.refresh();
+		myScrollPanel.setWidget(myContent);
+		add(myScrollPanel);
+		myScrollPanel.setHeight((Window.getClientHeight() - 60) + "px");//- header height
+		myScrollPanel.refresh();
 		myContent.add(new GarageDoorButton());
 	}
 
@@ -67,7 +67,7 @@ public class HousePanel extends FlexPanel implements ValueChangeHandler<HouseSta
 			myContent.add(aButton);
 			myRoomButtons.put(theData.getName(), aButton);
 		}
-		aScroll.refresh();
+		myScrollPanel.refresh();
 		EventBusInstance.getInstance().fireEvent(new FireableValueChangeEvent<>(theData));
 	}
 }
