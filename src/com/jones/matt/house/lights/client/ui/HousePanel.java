@@ -60,14 +60,17 @@ public class HousePanel extends FlexPanel implements ValueChangeHandler<HouseSta
 	 */
 	private void generateRow(final RoomVO theData)
 	{
-		RoomButton aButton = myRoomButtons.get(theData.getName());
-		if (aButton == null)
+		if (theData.shouldDisplay())
 		{
-			aButton = new RoomButton(theData);
-			myContent.add(aButton);
-			myRoomButtons.put(theData.getName(), aButton);
+			RoomButton aButton = myRoomButtons.get(theData.getName());
+			if (aButton == null)
+			{
+				aButton = new RoomButton(theData);
+				myContent.add(aButton);
+				myRoomButtons.put(theData.getName(), aButton);
+			}
+			myScrollPanel.refresh();
+			EventBusInstance.getInstance().fireEvent(new FireableValueChangeEvent<>(theData));
 		}
-		myScrollPanel.refresh();
-		EventBusInstance.getInstance().fireEvent(new FireableValueChangeEvent<>(theData));
 	}
 }
