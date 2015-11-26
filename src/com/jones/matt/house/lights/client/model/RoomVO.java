@@ -44,4 +44,22 @@ public class RoomVO extends JavaScriptObject
 		}
 		return aList;
 	}
+
+	/**
+	 * If contains items we want to display a button for.  Return false
+	 * if no content matches anything we should do something with
+	 *
+	 * @return
+	 */
+	public final boolean shouldDisplay()
+	{
+		for (DeviceVO aDevice : getDevices())
+		{
+			if (aDevice.isLight())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }
