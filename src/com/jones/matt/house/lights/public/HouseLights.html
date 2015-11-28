@@ -1,5 +1,5 @@
 <!doctype html>
-<html >
+<html ><!--manifest="manifest.appcache"-->
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -74,11 +74,9 @@
 	<script type="text/javascript" language="javascript" src="HouseLights.nocache.js"></script>
 	<script type="text/javascript">
 		window.LightData = {};
-		window.BaseURL = "";
+		window.BaseURL = "";//"http://127.0.0.1:8080/Lights/";
 		window.CloseUrl = "S/Garage/Close";
 		window.OpenUrl = "S/Garage/Open";
-		window.StatusUrl = "S/Garage/Status";
-		window.WeatherUrl = "S/Garage/Weather";
 		window.PollDelay = 5000;
 	</script>
 </head>

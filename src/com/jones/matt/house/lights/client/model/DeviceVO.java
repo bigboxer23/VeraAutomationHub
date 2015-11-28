@@ -44,6 +44,12 @@ public class DeviceVO extends JavaScriptObject
 
 	public final native String getTemperature() /*-{ return this.temperature; }-*/;
 
+	public final native String getHumidity() /*-{ return this.humidity; }-*/;
+
+	public final native boolean getDoor() /*-{ return this.door; }-*/;
+
+	public final native int getAutoClose() /*-{ return this.autoClose; }-*/;
+
 	public final boolean isLight()
 	{
 		return getCategory() == 2 || getCategory() == 3;
