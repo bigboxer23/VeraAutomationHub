@@ -49,6 +49,30 @@ public class VeraDeviceVO
 	@SerializedName("temperature")
 	private String myTemperature;
 
+	@SerializedName("humidity")
+	private float myHumidity;
+
+	@SerializedName("door")
+	private boolean myDoor;
+
+	@SerializedName("autoClose")
+	private long myAutoClose;
+
+	public float getHumidity()
+	{
+		return myHumidity;
+	}
+
+	public boolean getDoor()
+	{
+		return myDoor;
+	}
+
+	public long getAutoClose()
+	{
+		return myAutoClose;
+	}
+
 	public String getName()
 	{
 		return myName;
@@ -112,6 +136,16 @@ public class VeraDeviceVO
 	public String getTemperature()
 	{
 		return myTemperature;
+	}
+
+	public void setName(String theName)
+	{
+		myName = theName;
+	}
+
+	public void setCategory(String theCategory)
+	{
+		myCategory = theCategory;
 	}
 
 	public int getLevel()
