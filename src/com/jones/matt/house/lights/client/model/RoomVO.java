@@ -19,7 +19,7 @@ public class RoomVO extends JavaScriptObject
 	{
 		for(DeviceVO aDevice : getDevices())
 		{
-			if (aDevice.isOn())
+			if (aDevice.isOn() && aDevice.isLight())
 			{
 				return true;
 			}
