@@ -29,6 +29,14 @@ public class DevicePanel extends FlexPanel implements ValueChangeHandler<RoomVO>
 
 	private Button myButton;
 
+	/**
+	 * We set status immediately of the button for light on/off.  Status can come back
+	 * before it's done however and cause a toggle of state display, which doesn't hurt anything
+	 * but is confusing to the user.  Don't pay attention to the initial status coming back (as it should match
+	 * or last button press) to eliminate the toggle
+	 */
+	private boolean mySetStatusInProgress = false;
+
 	public DevicePanel(RoomVO theRoomVO, DeviceVO theDeviceVO)
 	{
 		myButton = new Button(theDeviceVO.getName());
@@ -38,6 +46,8 @@ public class DevicePanel extends FlexPanel implements ValueChangeHandler<RoomVO>
 			@Override
 			public void onTap(TapEvent event)
 			{
+				myButton.setImportant(!myDeviceVO.isOn());
+				mySetStatusInProgress = true;
 				new DefaultRequestBuilder(HouseLights.getBaseUrl() + "S/Vera/" + !myDeviceVO.isOn() + "/Device/" + myDeviceVO.getID()).send();
 			}
 		});
@@ -63,7 +73,11 @@ public class DevicePanel extends FlexPanel implements ValueChangeHandler<RoomVO>
 	{
 		myRoomVO = theRoomVO;
 		myDeviceVO = theDeviceVO;
-		myButton.setImportant(myDeviceVO.isOn());
+		if (!mySetStatusInProgress)
+		{
+			myButton.setImportant(myDeviceVO.isOn());
+		}
+		mySetStatusInProgress = false;
 	}
 
 	@Override
