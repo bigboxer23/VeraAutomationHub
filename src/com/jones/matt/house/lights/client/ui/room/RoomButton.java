@@ -26,6 +26,8 @@ public class RoomButton extends FlexPanel implements ValueChangeHandler<RoomVO>
 
 	private Button myButton;
 
+	private boolean mySetStatusInProgress = false;
+
 	public RoomButton(RoomVO theData)
 	{
 		myButton = new Button(theData.getName());
@@ -35,6 +37,8 @@ public class RoomButton extends FlexPanel implements ValueChangeHandler<RoomVO>
 			@Override
 			public void onTap(TapEvent event)
 			{
+				myButton.setImportant(!myButton.isImportant());
+				mySetStatusInProgress = true;
 				new DefaultRequestBuilder(HouseLights.getBaseUrl() + "S/Vera/" + !myData.isOn() + "/Room/" + myData.getID()).send();
 			}
 		});
@@ -58,7 +62,11 @@ public class RoomButton extends FlexPanel implements ValueChangeHandler<RoomVO>
 	public void setData(RoomVO theData)
 	{
 		myData = theData;
-		myButton.setImportant(myData.isOn());
+		if (!mySetStatusInProgress)
+		{
+			myButton.setImportant(myData.isOn());
+		}
+		mySetStatusInProgress = false;
 	}
 
 	@Override
