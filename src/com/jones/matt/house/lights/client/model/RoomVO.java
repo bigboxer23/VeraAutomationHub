@@ -53,6 +53,10 @@ public class RoomVO extends JavaScriptObject
 	 */
 	public final boolean shouldDisplay()
 	{
+		if ("Garage".equals(getName()))
+		{
+			return false;
+		}
 		for (DeviceVO aDevice : getDevices())
 		{
 			if (aDevice.isLight())

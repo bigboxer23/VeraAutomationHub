@@ -1,5 +1,7 @@
 package com.jones.matt.house.lights.client.ui.garage;
 
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.Label;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPanel;
@@ -9,7 +11,7 @@ import com.jones.matt.house.lights.client.model.DeviceVO;
 /**
  * Panel to display temperature.  Changes color based on the temp retrieved from REST URL
  */
-public class WeatherLabel extends FlexPanel
+public class WeatherLabel extends FlexPanel implements ValueChangeHandler<DeviceVO>
 {
 	public WeatherLabel()
 	{
@@ -86,9 +88,13 @@ public class WeatherLabel extends FlexPanel
 		return "#6F0015";
 	}
 
-	public void update(DeviceVO theDeviceVO)
+	@Override
+	public void onValueChange(ValueChangeEvent<DeviceVO> theEvent)
 	{
-		clear();
-		add(getTemperature(Double.parseDouble(theDeviceVO.getTemperature())));
+		if (theEvent.getValue().getName().equals("Garage Opener"))
+		{
+			clear();
+			add(getTemperature(Double.parseDouble(theEvent.getValue().getTemperature())));
+		}
 	}
 }
