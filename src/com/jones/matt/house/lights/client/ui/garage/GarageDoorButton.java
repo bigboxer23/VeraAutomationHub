@@ -11,6 +11,7 @@ import com.googlecode.mgwt.ui.client.widget.button.Button;
 import com.googlecode.mgwt.ui.client.widget.image.ImageHolder;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPanel;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPropertyHelper;
+import com.jones.matt.house.lights.client.HouseLights;
 import com.jones.matt.house.lights.client.event.EventBusInstance;
 import com.jones.matt.house.lights.client.event.FireableValueChangeEvent;
 import com.jones.matt.house.lights.client.model.DeviceVO;
@@ -57,8 +58,8 @@ public class GarageDoorButton extends FlexPanel implements TapHandler, ValueChan
 
 	public void onTap(TapEvent theEvent)
 	{
-		String aUrl = myGarageButton.getText().equals("Close Garage") ? getClose() : getOpen();
-		new DefaultRequestBuilder(aUrl).send();
+		String anAction = myGarageButton.getText().equals("Close Garage") ? "Close" : "Open";
+		new DefaultRequestBuilder(HouseLights.getBaseUrl() + "S/Garage/" + anAction).send();
 	}
 
 	@Override
@@ -77,12 +78,4 @@ public class GarageDoorButton extends FlexPanel implements TapHandler, ValueChan
 			}
 		}
 	}
-
-	private static native String getClose() /*-{
-		return $wnd.BaseURL + $wnd.CloseUrl;
-	}-*/;
-
-	private static native String getOpen() /*-{
-		return $wnd.BaseURL + $wnd.OpenUrl;
-	}-*/;
 }
