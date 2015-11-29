@@ -70,7 +70,7 @@ public class HousePanel extends FlexPanel implements ValueChangeHandler<HouseSta
 				myRoomButtons.put(theData.getName(), aButton);
 			}
 			myScrollPanel.refresh();
-			EventBusInstance.getInstance().fireEvent(new FireableValueChangeEvent<>(theData));
 		}
+		EventBusInstance.getInstance().fireEvent(new FireableValueChangeEvent<>(theData));
 	}
 }
