@@ -8,10 +8,12 @@ import com.googlecode.mgwt.ui.client.widget.button.Button;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPanel;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPropertyHelper;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.RootFlexPanel;
+import com.jones.matt.house.lights.client.HouseLights;
 import com.jones.matt.house.lights.client.model.DeviceVO;
 import com.jones.matt.house.lights.client.model.RoomVO;
 import com.jones.matt.house.lights.client.ui.Header;
 import com.jones.matt.house.lights.client.ui.room.DevicePanel;
+import com.jones.matt.house.lights.client.utility.DefaultRequestBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +43,7 @@ public class GarageDetailPanel extends RootFlexPanel implements ValueChangeHandl
 			@Override
 			public void onTap(TapEvent event)
 			{
-				//TODO:new DefaultRequestBuilder(HouseLights.getBaseUrl() + "S/Vera/" + !myDeviceVO.isOn() + "/Device/" + myDeviceVO.getID()).send();
+				new DefaultRequestBuilder(HouseLights.getBaseUrl() + "S/Garage/DisableAutoClose").send();
 			}
 		});
 		aHolder.add(myAutoCloseButton);
@@ -82,10 +84,15 @@ public class GarageDetailPanel extends RootFlexPanel implements ValueChangeHandl
 		{
 			return "";
 		}
-		int aSecondsToClose = theDeviceVO.getAutoClose() / 1000;
-		int aSeconds = aSecondsToClose % 60;
-		int aMinutes = aSecondsToClose / 60;
-		return " (" + aMinutes + ":" + (aSeconds < 10 ? "0" : "") + aSeconds + ")";
+		int aSeconds = (theDeviceVO.getAutoClose() /1000 ) % 60;
+		int aMinutes=(theDeviceVO.getAutoClose() / (1000 * 60)) % 60;
+		int aHours=(theDeviceVO.getAutoClose() / (1000 * 60 * 60)) % 24;
+		StringBuilder aStringBuilder = new StringBuilder(" (");
+		if (aHours > 0)
+		{
+			aStringBuilder.append(aHours).append(":");
+		}
+		return aStringBuilder.toString() + (aMinutes < 10 ? "0" : "") + aMinutes + ":" + (aSeconds < 10 ? "0" : "") + aSeconds + ")";
 	}
 
 }
