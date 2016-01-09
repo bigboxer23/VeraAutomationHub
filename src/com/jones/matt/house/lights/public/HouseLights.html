@@ -20,7 +20,7 @@
 			flex-grow: inherit;
 			-webkit-flex-grow:inherit;
 		}
-		.garage-button, .button-grow, .weather .gwt-Label, .ClimateButton, .current
+		.garage-button, .button-grow, .weather .gwt-Label, .ClimateButton, .current, .ThermostatModePanel > *
 		{
 			flex-grow:1;
 			-webkit-flex-grow:1;
@@ -112,6 +112,22 @@
 			right:0;
 			top:0;
 			padding: 0 15px;
+		}
+		.ThermostatModePanel .Off
+		{
+			margin-right: 0;
+			border-radius: 6px 0 0 6px;
+		}
+		.ThermostatModePanel .Cool
+		{
+			margin-left: 0;
+			border-radius: 0 6px 6px 0;
+		}
+		.ThermostatModePanel .Heat
+		{
+			margin-right: 1px;
+			margin-left: 1px;
+			border-radius:0;
 		}
 	</style>
 	<title>House Lights</title>
