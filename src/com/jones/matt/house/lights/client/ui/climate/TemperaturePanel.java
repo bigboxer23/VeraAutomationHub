@@ -1,8 +1,10 @@
 package com.jones.matt.house.lights.client.ui.climate;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Label;
+import com.googlecode.mgwt.ui.client.widget.button.ButtonAppearance;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPanel;
 import com.jones.matt.house.lights.client.event.EventBusInstance;
 import com.jones.matt.house.lights.client.model.DeviceVO;
@@ -16,7 +18,7 @@ public class TemperaturePanel extends FlexPanel implements ValueChangeHandler<Ro
 {
 	public TemperaturePanel()
 	{
-		addStyleName("current com-googlecode-mgwt-ui-client-theme-platform-button-ButtonIOSAppearance-Css-mgwt-Button");
+		addStyleName("current " + GWT.<ButtonAppearance>create(ButtonAppearance.class).css().button());
 		EventBusInstance.getInstance().addValueChangeHandler(this);
 	}
 
