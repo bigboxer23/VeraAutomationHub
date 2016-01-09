@@ -20,6 +20,10 @@ public class VeraController implements ISystemController, IStatusController
 	 */
 	public static final String kVeraHubUrl = System.getProperty("vera.url", "http://localhost:3480");
 
+	private static final String kVeraRequest = "/data_request?id=action&output_format=json&DeviceNum=";
+
+	private static final String kVeraServiceUrn = "&serviceId=urn:upnp-org:serviceId:";
+
 	private GsonBuilder myBuilder;
 
 	private VeraHouseVO myStatus;
@@ -51,24 +55,14 @@ public class VeraController implements ISystemController, IStatusController
 		{
 			//TODO:fail, bad request
 		}
-		boolean anIsDim = true;
-		String anAction = theCommands.get(0);
-		try
-		{
-			Integer.parseInt(anAction);
-		} catch (NumberFormatException aNFE)
-		{
-			//not dim
-			anIsDim = false;
-			anAction = anAction.equalsIgnoreCase("false") ? "0" : "1";
-		}
+		String anAction = theCommands.get(2);
 		List<Integer> aLights = findLights(theCommands);
-		for (Integer aLight : aLights)
+		for (Integer aDeviceId : aLights)
 		{
 			DefaultHttpClient aHttpClient = new DefaultHttpClient();
 			try
 			{
-				HttpGet aGet = new HttpGet(kVeraHubUrl + "/data_request?id=action&output_format=json&DeviceNum=" + aLight + "&serviceId=urn:upnp-org:serviceId:" + (anIsDim ? "Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=" : "SwitchPower1&action=SetTarget&newTargetValue=") + anAction);
+				HttpGet aGet = new HttpGet(kVeraHubUrl + kVeraRequest + aDeviceId + kVeraServiceUrn + anAction);
 				aHttpClient.execute(aGet);
 			}
 			catch (IOException e)
@@ -88,13 +82,13 @@ public class VeraController implements ISystemController, IStatusController
 	private List<Integer> findLights(List<String> theCommands)
 	{
 		List<Integer> aLights = new ArrayList<>();
-		if (theCommands.get(1).equalsIgnoreCase("Room"))
+		if (theCommands.get(0).equalsIgnoreCase("Room"))
 		{
 			if (myStatus != null)
 			{
 				for (VeraRoomVO aVeraRoomVO : myStatus.getRooms())
 				{
-					if (aVeraRoomVO.getId() == Integer.parseInt(theCommands.get(2)))
+					if (aVeraRoomVO.getId() == Integer.parseInt(theCommands.get(1)))
 					{
 						for (VeraDeviceVO aDevice : aVeraRoomVO.getDevices())
 						{
@@ -105,7 +99,7 @@ public class VeraController implements ISystemController, IStatusController
 			}
 		} else
 		{
-			aLights.add(Integer.parseInt(theCommands.get(2)));
+			aLights.add(Integer.parseInt(theCommands.get(1)));
 		}
 		return aLights;
 	}

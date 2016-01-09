@@ -13,10 +13,10 @@ import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPanel;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPropertyHelper;
 import com.jones.matt.house.lights.client.utility.DefaultRequestBuilder;
 import com.jones.matt.house.lights.client.event.EventBusInstance;
-import com.jones.matt.house.lights.client.HouseLights;
 import com.jones.matt.house.lights.client.ui.animation.AnimationStack;
 import com.jones.matt.house.lights.client.model.DeviceVO;
 import com.jones.matt.house.lights.client.model.RoomVO;
+import com.jones.matt.house.lights.client.utility.VeraUrlUtility;
 
 /**
  *
@@ -48,7 +48,7 @@ public class DevicePanel extends FlexPanel implements ValueChangeHandler<RoomVO>
 			{
 				myButton.setImportant(!myDeviceVO.isOn());
 				mySetStatusInProgress = true;
-				new DefaultRequestBuilder(HouseLights.getBaseUrl() + "S/Vera/" + !myDeviceVO.isOn() + "/Device/" + myDeviceVO.getID()).send();
+				new DefaultRequestBuilder(VeraUrlUtility.getOnOffUrl(!myDeviceVO.isOn(), myDeviceVO.getID())).send();
 			}
 		});
 		setOrientation(FlexPropertyHelper.Orientation.HORIZONTAL);
