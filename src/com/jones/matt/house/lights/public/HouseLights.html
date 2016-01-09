@@ -46,7 +46,7 @@
 		{
 			padding-left:8px;
 		}
-		.ClimateDetailPanel > .relative
+		.ClimateDetailPanel > .relative, .ThermostatModePanel
 		{
 			height: 50px;
 		}
@@ -113,15 +113,19 @@
 			top:0;
 			padding: 0 15px;
 		}
-		.ThermostatModePanel .Off
+		.ThermostatModePanel .Off, .ThermostatModePanel .On
 		{
 			margin-right: 0;
 			border-radius: 6px 0 0 6px;
 		}
-		.ThermostatModePanel .Cool
+		.ThermostatModePanel .Cool, .ThermostatModePanel .Auto
 		{
 			margin-left: 0;
 			border-radius: 0 6px 6px 0;
+		}
+		.ThermostatModePanel .Auto
+		{
+			margin-left: 1px;
 		}
 		.ThermostatModePanel .Heat
 		{

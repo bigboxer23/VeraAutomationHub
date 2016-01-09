@@ -14,6 +14,7 @@ public class ClimateDetailPanel extends RootFlexPanel
 		add(new Header("Climate Control"));
 		add(new TemperaturePanel());
 		add(new ThermostatModePanel());
+		add(new FanChangePanel());
 		add(new ThermostatChangePanel());
 	}
 }

@@ -21,6 +21,8 @@ public class VeraUrlUtility
 
 	private static final String kSetThermostatMode = "/HVAC_UserOperatingMode1&action=SetModeTarget&NewModeTarget=";
 
+	private static final String kSetThermostatFanMode = "/HVAC_FanOperatingMode1&action=SetMode&NewMode=";
+
 	public static String getDimUrl(int theDim, int theDeviceId)
 	{
 		return getDimUrlInternal(theDim, theDeviceId, kDevice);
@@ -66,5 +68,10 @@ public class VeraUrlUtility
 	public static String getThermostatModeUrl(String theMode, int theDeviceId)
 	{
 		return HouseLights.getBaseUrl() + kVera + kDevice + theDeviceId + kSetThermostatMode + theMode;
+	}
+
+	public static String getFanModeUrl(String theMode, int theDeviceId)
+	{
+		return HouseLights.getBaseUrl() + kVera + kDevice + theDeviceId + kSetThermostatFanMode + theMode;
 	}
 }
