@@ -15,7 +15,12 @@
 			margin: 5px;
 			text-align: center;
 		}
-		.garage-button, .button-grow, .weather .gwt-Label
+		.ClimateDetailPanel .current
+		{
+			flex-grow: inherit;
+			-webkit-flex-grow:inherit;
+		}
+		.garage-button, .button-grow, .weather .gwt-Label, .ClimateButton, .current
 		{
 			flex-grow:1;
 			-webkit-flex-grow:1;
@@ -29,13 +34,21 @@
 			padding-top:20px !important;
 			padding-bottom:10px !important;
 		}
-		.weather .gwt-Label
+		.weather .gwt-Label, .thermostat
 		{
 			font-weight: bold;
 			color:#ffffff;
 			border-radius: 0 6px 6px 0;
 			position: absolute;
 			right:32px;
+		}
+		.ClimateDetailPanel .RoomSlider
+		{
+			padding-left:8px;
+		}
+		.ClimateDetailPanel > .relative
+		{
+			height: 50px;
 		}
 		.relative
 		{
@@ -68,9 +81,41 @@
 			padding-top: 23px !important;
 			padding-bottom: 20px !important;
 		}
+		.debugLabel
+		{
+			position:absolute;
+			right:8px;
+		}
+		.current
+		{
+			padding:0 !important;
+			color:#fff !important;
+			cursor:default !important;
+			height:50px;
+		}
+		.current .gwt-Label, .ClimateDetailPanel > .relative .thermostat
+		{
+			margin:0;
+			display: flex;
+			flex-flow: inherit;
+			align-self: center;
+			justify-content: center;
+			height: 100%;
+		}
+		.ClimateDetailPanel > .relative .thermostat
+		{
+			margin-right:5px;
+			flex-direction: column;
+		}
+		.thermostat
+		{
+			right:0;
+			top:0;
+			padding: 0 15px;
+		}
 	</style>
 	<title>House Lights</title>
-	<script type="text/javascript" language="javascript" src="HouseLights.nocache.js"></script>
+	<script type="text/javascript" language="javascript" src="HouseLights.nocache.js?noCache"></script>
 	<script type="text/javascript">
 		window.LightData = {};
 		window.BaseURL = "";//http://127.0.0.1:8080/Lights/";
