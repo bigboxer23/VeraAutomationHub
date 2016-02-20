@@ -24,40 +24,11 @@ public class ThermostatChangePanel extends FlexPanel implements ValueChangeHandl
 
 	private DeviceVO myThermostat;
 
-	private boolean myIsUserChanging = false;
-
 	public ThermostatChangePanel()
 	{
 		addStyleName("relative");
 		setOrientation(FlexPropertyHelper.Orientation.HORIZONTAL);
 		setAlignment(FlexPropertyHelper.Alignment.CENTER);
-		myTemperatureSlider = new TimedSlider();
-		myTemperatureSlider.setMax(16);
-		myTemperatureSlider.addValueChangeHandler(new ValueChangeHandler<Integer>()
-		{
-			@Override
-			public void onValueChange(ValueChangeEvent<Integer> theEvent)
-			{
-				myIsUserChanging = true;
-				clear();
-				add(myTemperatureSlider);
-				Label aHouseTemperature = WeatherLabel.getTemperature(theEvent.getValue() + 60);
-				aHouseTemperature.addStyleName("thermostat");
-				add(aHouseTemperature);
-			}
-		});
-		myTemperatureSlider.addChangeHandler(new ChangeHandler()
-		{
-			@Override
-			public void onChange(ChangeEvent theEvent)
-			{
-				if (myThermostat != null && Integer.parseInt(myThermostat.getSetpoint()) != (myTemperatureSlider.getValue() + 60))
-				{
-					new DefaultRequestBuilder(VeraUrlUtility.getThermostatSetUrl(myTemperatureSlider.getValue() + 60, myThermostat.getID())).send();
-				}
-				myIsUserChanging = false;
-			}
-		});
 		EventBusInstance.getInstance().addValueChangeHandler(this);
 	}
 
@@ -71,10 +42,37 @@ public class ThermostatChangePanel extends FlexPanel implements ValueChangeHandl
 				if (aDevice.getName().equals("Thermostat"))
 				{
 					myThermostat = aDevice;
-					if (!myIsUserChanging)
+					if (myTemperatureSlider == null)
 					{
+						myTemperatureSlider = new TimedSlider();
+						myTemperatureSlider.setMax(16);
+						myTemperatureSlider.addValueChangeHandler(new ValueChangeHandler<Integer>()
+						{
+							@Override
+							public void onValueChange(ValueChangeEvent<Integer> theEvent)
+							{
+								clear();
+								add(myTemperatureSlider);
+								Label aHouseTemperature = WeatherLabel.getTemperature(theEvent.getValue() + 60);
+								aHouseTemperature.addStyleName("thermostat");
+								add(aHouseTemperature);
+							}
+						});
 						myTemperatureSlider.setValue(Integer.parseInt(aDevice.getSetpoint()) - 60);
+						myTemperatureSlider.addChangeHandler(new ChangeHandler()
+						{
+							@Override
+							public void onChange(ChangeEvent theEvent)
+							{
+								if (myThermostat != null && Integer.parseInt(myThermostat.getSetpoint()) != (myTemperatureSlider.getValue() + 60))
+								{
+									new DefaultRequestBuilder(VeraUrlUtility.getThermostatSetUrl(myTemperatureSlider.getValue() + 60, myThermostat.getID())).send();
+								}
+							}
+						});
+						return;
 					}
+					myTemperatureSlider.setValue(Integer.parseInt(aDevice.getSetpoint()) - 60);
 				}
 			}
 		}

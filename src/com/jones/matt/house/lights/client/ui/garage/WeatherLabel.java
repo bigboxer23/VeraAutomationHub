@@ -26,7 +26,7 @@ public class WeatherLabel extends FlexPanel implements ValueChangeHandler<Device
 	 */
 	public static Label getTemperature(double theTemperature)
 	{
-		Label aLabel = new Label(NumberFormat.getFormat(".##").format(theTemperature) + "°F");
+		Label aLabel = new Label(NumberFormat.getFormat(".#").format(theTemperature) + "°F");
 		aLabel.getElement().getStyle().setBackgroundColor(getTemperatureColor(theTemperature));
 		if (theTemperature < -10)
 		{

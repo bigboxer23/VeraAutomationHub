@@ -4,7 +4,7 @@
 	<property name="pi.port.dev" value="22"/>
 	<property name="pi.user.dev" value="pi"/>
 	<property name="pi.password.dev" value="${pi.password.dev}"/>
-	<property name="pi.dirCopyTo.dev" value="/usr/share/jetty/webapps"/><!--/var/lib/tomcat7/webapps-->
+	<property name="pi.dirCopyTo.dev" value="/opt/web/mybase/webapps"/><!--/var/lib/tomcat7/webapps-->
 
 	<path id="compile.classpath">
 		<pathelement location="lib/sqlite-jdbc-3.7.2.jar"/>
