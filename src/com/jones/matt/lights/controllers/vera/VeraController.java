@@ -1,45 +1,60 @@
 package com.jones.matt.lights.controllers.vera;
 
-import com.google.gson.GsonBuilder;
+import com.google.common.base.Charsets;
+import com.google.common.io.ByteStreams;
+import com.jones.matt.lights.controllers.AbstractBaseController;
 import com.jones.matt.lights.controllers.IStatusController;
 import com.jones.matt.lights.controllers.ISystemController;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Vera controller to make requests to a vera UI7 device
  */
-public class VeraController implements ISystemController, IStatusController
+public class VeraController extends AbstractBaseController implements ISystemController, IStatusController
 {
 	/**
 	 * Location of Vera Hub, assume locally running on default port
 	 */
-	public static final String kVeraHubUrl = System.getProperty("vera.url", "http://localhost:3480");
+	private static final String kVeraHubUrl = System.getProperty("vera.url", "http://localhost:3480");
 
 	private static final String kVeraRequest = "/data_request?id=action&output_format=json&DeviceNum=";
 
 	private static final String kVeraServiceUrn = "&serviceId=urn:upnp-org:serviceId:";
 
-	private GsonBuilder myBuilder;
-
 	private VeraHouseVO myStatus;
 
 	public static final String kControllerEndpoint = "Vera";
-
-	public VeraController()
-	{
-		myBuilder = new GsonBuilder();
-		myBuilder.registerTypeAdapter(VeraHouseVO.class, new VeraHouseVO());
-	}
 
 	@Override
 	public boolean getStatus(int theLightId)
 	{
 		return false;
+	}
+
+	public VeraHouseVO getStatus()
+	{
+		myLogger.info("Getting Vera Status");
+		try
+		{
+			HttpResponse aResponse = getHttpClient().execute(new HttpGet(VeraController.kVeraHubUrl + "/data_request?id=sdata"));
+			String aStatusString = new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8);
+			VeraHouseVO aHouseStatus = getBuilder().create().fromJson(aStatusString, VeraHouseVO.class);
+			setStatus(aHouseStatus);
+			myLogger.info("Got Vera Status");
+			return aHouseStatus;
+		}
+		catch (IOException theE)
+		{
+			myLogger.log(Level.WARNING, "getStatus", theE);
+		}
+		return new VeraHouseVO();
 	}
 
 	/**

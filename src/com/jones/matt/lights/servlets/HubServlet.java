@@ -27,7 +27,7 @@ public class HubServlet extends AbstractServlet
 			theResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Malformed input " + anArgs.length);
 			return;
 		}
-		ISystemController aController = HubContext.getInstance().getControllers().get(anArgs[1]);
+		ISystemController aController = HubContext.getInstance().getController(anArgs[1], ISystemController.class);
 		if (aController == null)
 		{
 			theResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "No controller specified");

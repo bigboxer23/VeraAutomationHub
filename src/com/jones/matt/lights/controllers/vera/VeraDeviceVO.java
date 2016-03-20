@@ -158,4 +158,14 @@ public class VeraDeviceVO
 			return 0;
 		}
 	}
+
+	public void setTemperature(String theTemperature)
+	{
+		myTemperature = theTemperature;
+	}
+
+	public void setStatus(String theStatus)
+	{
+		myStatus = theStatus;
+	}
 }
