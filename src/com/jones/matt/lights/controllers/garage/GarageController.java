@@ -4,6 +4,8 @@ import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.jones.matt.lights.controllers.*;
+import com.jones.matt.lights.controllers.vera.VeraDeviceVO;
+import com.jones.matt.lights.controllers.vera.VeraHouseVO;
 import com.jones.matt.lights.data.WeatherData;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -12,8 +14,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -21,13 +23,15 @@ import java.util.logging.Level;
  */
 public class GarageController extends AbstractBaseController implements ISystemController, IStatusController, ITemperatureController
 {
-	public static String kGarageURL = System.getProperty("garageURL", "http://192.168.0.8");
+	private static String kGarageURL = System.getProperty("garageURL", "http://192.168.0.8");
 
 	public static final String kControllerEndpoint = "Garage";
 
+	private VeraDeviceVO myGarageData;
+
 	public GarageController()
 	{
-
+		new Timer().scheduleAtFixedRate(new Task(), 0, 5000);
 	}
 
 	@Override
@@ -79,5 +83,49 @@ public class GarageController extends AbstractBaseController implements ISystemC
 		List<String> aList = new ArrayList<>();
 		aList.add("Status");
 		return Boolean.parseBoolean(doAction(aList));
+	}
+
+	public void getStatus(VeraHouseVO theHouseStatus)
+	{
+		if (myGarageData != null)
+		{
+			theHouseStatus.getRooms().stream().filter(aRoom -> aRoom.getName().equals("Garage")).forEach(aRoom -> aRoom.addDevice(myGarageData));
+		}
+	}
+
+	private String myFailTime;
+
+	private class Task extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			try
+			{
+				long aStartTime = System.currentTimeMillis();
+				HttpResponse aResponse = getHttpClient().execute(new HttpGet(GarageController.kGarageURL + "/Status2"));
+				myGarageData = getBuilder().create().fromJson(new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8), VeraDeviceVO.class);
+				myGarageData.setName("Garage Opener");
+				myGarageData.setCategory("99");
+				if (System.currentTimeMillis() - aStartTime > 4000)
+				{
+					throw new IOException();
+				}
+				myFailTime = null;
+			}
+			catch (IOException theE)
+			{
+				myLogger.log(Level.WARNING, "getStatus", theE);
+				if (myFailTime == null)
+				{
+					myFailTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date());
+				}
+				myGarageData = new VeraDeviceVO();
+				myGarageData.setName("Garage Opener");
+				myGarageData.setCategory("99");
+				myGarageData.setStatus(myFailTime);
+				myGarageData.setTemperature("99");
+			}
+		}
 	}
 }

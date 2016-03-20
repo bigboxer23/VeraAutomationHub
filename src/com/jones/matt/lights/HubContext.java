@@ -69,6 +69,16 @@ public class HubContext
 		return myControllers;
 	}
 
+	public <D> D getController(String theControllerKey, Class<D> theControllerClass)
+	{
+		ISystemController aSystemController = getControllers().get(theControllerKey);
+		if (theControllerClass != null && theControllerClass.isInstance(aSystemController))
+		{
+			return (D) aSystemController;
+		}
+		return null;
+	}
+
 	/**
 	 * Make us re-initialize
 	 */

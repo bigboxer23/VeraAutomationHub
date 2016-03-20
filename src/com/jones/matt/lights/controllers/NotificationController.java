@@ -22,7 +22,7 @@ public class NotificationController implements ISystemController
 			{
 				theCommands = new ArrayList<>();
 				theCommands.add("alert");
-				HubContext.getInstance().getControllers().get(aScene.getSceneUrl()).doAction(theCommands);
+				HubContext.getInstance().getController(aScene.getSceneUrl(), ISystemController.class).doAction(theCommands);
 			}
 		}
 		return null;
