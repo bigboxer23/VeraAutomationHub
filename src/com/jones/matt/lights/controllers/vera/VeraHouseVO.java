@@ -19,6 +19,9 @@ public class VeraHouseVO implements JsonDeserializer<VeraHouseVO>
 	@SerializedName("devices")
 	private List<VeraDeviceVO> myDevices;
 
+	@SerializedName("scenes")
+	private List<VeraSceneVO> myScenes;
+
 	public List<VeraRoomVO> getRooms()
 	{
 		return myRooms;
@@ -27,6 +30,11 @@ public class VeraHouseVO implements JsonDeserializer<VeraHouseVO>
 	public List<VeraDeviceVO> getDevices()
 	{
 		return myDevices;
+	}
+
+	public List<VeraSceneVO> getScenes()
+	{
+		return myScenes;
 	}
 
 	@Override
@@ -46,7 +54,22 @@ public class VeraHouseVO implements JsonDeserializer<VeraHouseVO>
 				aRoom.addDevice(aDevice);
 			}
 		}
+		for (VeraSceneVO aScene : anInstance.getScenes())
+		{
+			VeraRoomVO aRoom = aRooms.get(aScene.getRoom());
+			if (aRoom == null)
+			{
+				aRoom = new VeraRoomVO("Scenes", 0);
+				aRooms.put(0, aRoom);
+				anInstance.getRooms().add(aRoom);
+			}
+			if (aRoom != null)
+			{
+				aRoom.addScene(aScene);
+			}
+		}
 		anInstance.getDevices().clear();
+		anInstance.getScenes().clear();
 		return anInstance;
 	}
 }

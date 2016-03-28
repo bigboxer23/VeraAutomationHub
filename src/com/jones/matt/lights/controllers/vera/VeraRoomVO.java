@@ -22,6 +22,15 @@ public class VeraRoomVO
 	@SerializedName("devices")
 	private List<VeraDeviceVO> myDevices;
 
+	@SerializedName("scenes")
+	private List<VeraSceneVO> myScenes;
+
+	public VeraRoomVO(String theName, int theId)
+	{
+		myName = theName;
+		myId = theId;
+	}
+
 	public List<VeraDeviceVO> getDevices()
 	{
 		return myDevices;
@@ -49,5 +58,14 @@ public class VeraRoomVO
 			myDevices = new ArrayList<>();
 		}
 		myDevices.add(theDevice);
+	}
+
+	public void addScene(VeraSceneVO theScene)
+	{
+		if (myScenes == null)
+		{
+			myScenes = new ArrayList<>();
+		}
+		myScenes.add(theScene);
 	}
 }
