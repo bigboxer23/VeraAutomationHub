@@ -24,9 +24,15 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 	 */
 	private static final String kVeraHubUrl = System.getProperty("vera.url", "http://localhost:3480");
 
-	private static final String kVeraRequest = "/data_request?id=action&output_format=json&DeviceNum=";
+	private static final String kVeraBaseRequest = "/data_request?id=action&output_format=json";
+
+	private static final String kVeraRequest = kVeraBaseRequest + "&DeviceNum=";
+
+	private static final String kVeraSceneRequest = kVeraBaseRequest + "&SceneNum=";
 
 	private static final String kVeraServiceUrn = "&serviceId=urn:upnp-org:serviceId:";
+
+	private static final String kSceneUrn = "&serviceId=urn:micasaverde-com:serviceId:";
 
 	private VeraHouseVO myStatus;
 
@@ -54,7 +60,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		{
 			myLogger.log(Level.WARNING, "getStatus", theE);
 		}
-		return new VeraHouseVO();
+		return null;
 	}
 
 	/**
@@ -72,12 +78,13 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		}
 		String anAction = theCommands.get(2);
 		List<Integer> aLights = findLights(theCommands);
+		boolean aScene = theCommands.get(0).equalsIgnoreCase("scene");
 		for (Integer aDeviceId : aLights)
 		{
 			DefaultHttpClient aHttpClient = new DefaultHttpClient();
 			try
 			{
-				HttpGet aGet = new HttpGet(kVeraHubUrl + kVeraRequest + aDeviceId + kVeraServiceUrn + anAction);
+				HttpGet aGet = new HttpGet(kVeraHubUrl + (aScene ? kVeraSceneRequest : kVeraRequest) + aDeviceId + (aScene ? kSceneUrn : kVeraServiceUrn) + anAction);
 				aHttpClient.execute(aGet);
 			}
 			catch (IOException e)

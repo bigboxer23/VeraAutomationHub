@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -19,26 +20,41 @@ public class HubServlet extends AbstractServlet
 	@Override
 	public void process(HttpServletRequest theRequest, HttpServletResponse theResponse) throws ServletException, IOException
 	{
-		String aURI = theRequest.getRequestURI();
-		aURI = aURI.substring(aURI.indexOf(kServletPrefix) + kServletPrefix.length());
-		String[] anArgs = aURI.split("/");
+		String[] anArgs = processUrl(theRequest.getRequestURI());
 		if(anArgs.length < 2)
 		{
 			theResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Malformed input " + anArgs.length);
 			return;
 		}
-		ISystemController aController = HubContext.getInstance().getController(anArgs[1], ISystemController.class);
+		ISystemController aController = getController(theRequest.getRequestURI());
 		if (aController == null)
 		{
 			theResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "No controller specified");
 			return;
 		}
-		String aJsonResponse = aController.doAction(Arrays.<String>asList(Arrays.copyOfRange(anArgs, 2, anArgs.length)));
+		String aJsonResponse = aController.doAction(getCommands(theRequest.getRequestURI()));
 		if (aJsonResponse != null)
 		{
 			theResponse.setContentType("application/json; charset=utf-8");
 			theResponse.getWriter().print(aJsonResponse);
 		}
 		theResponse.setStatus(HttpServletResponse.SC_OK);
+	}
+
+	public static String[] processUrl(String theUrl)
+	{
+		theUrl = theUrl.substring(theUrl.indexOf(kServletPrefix) + kServletPrefix.length());
+		return theUrl.split("/");
+	}
+
+	public static List<String> getCommands(String theUrl)
+	{
+		String[] aProcessedUrl = processUrl(theUrl);
+		return Arrays.asList(Arrays.copyOfRange(aProcessedUrl, 2, aProcessedUrl.length));
+	}
+
+	public static ISystemController getController(String theUrl)
+	{
+		return HubContext.getInstance().getController(processUrl(theUrl)[1], ISystemController.class);
 	}
 }
