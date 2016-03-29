@@ -38,9 +38,27 @@ public class RoomVO extends JavaScriptObject
 	public final List<DeviceVO> getDevices()
 	{
 		List<DeviceVO> aList = new ArrayList<>();
-		for (int ai = 0; ai < getDevicesNative().length(); ai++)
+		if (getDevicesNative() != null)
 		{
-			aList.add(getDevicesNative().get(ai));
+			for (int ai = 0; ai < getDevicesNative().length(); ai++)
+			{
+				aList.add(getDevicesNative().get(ai));
+			}
+		}
+		return aList;
+	}
+
+	private final native JsArray<SceneVO> getScenesNative() /*-{ return this["scenes"]; }-*/;
+
+	public final List<SceneVO> getScenes()
+	{
+		List<SceneVO> aList = new ArrayList<>();
+		if (getScenesNative() != null)
+		{
+			for (int ai = 0; ai < getScenesNative().length(); ai++)
+			{
+				aList.add(getScenesNative().get(ai));
+			}
 		}
 		return aList;
 	}
@@ -64,6 +82,6 @@ public class RoomVO extends JavaScriptObject
 				return true;
 			}
 		}
-		return false;
+		return !getScenes().isEmpty();
 	}
 }

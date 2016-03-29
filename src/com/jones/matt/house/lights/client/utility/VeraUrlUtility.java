@@ -11,7 +11,11 @@ public class VeraUrlUtility
 
 	private static final String kDevice = "/Device/";
 
+	public static final String kScene = "/Scene/";
+
 	private static final String kRoom = "/Room/";
+
+	public static final String kSceneUrl = "/HomeAutomationGateway1&action=RunScene";
 
 	private static final String kDim = "/Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=";
 
@@ -36,6 +40,11 @@ public class VeraUrlUtility
 	private static String getDimUrlInternal(int theDim, int theDeviceId, String theSubject)
 	{
 		return HouseLights.getBaseUrl() + kVera + theSubject + theDeviceId + kDim + theDim;
+	}
+
+	public static String getSceneUrl(int theId)
+	{
+		return HouseLights.getBaseUrl() + kVera + kScene + theId + kSceneUrl;
 	}
 
 	public static String getOnOffUrl(boolean theTurnOn, int theDeviceId)
