@@ -6,6 +6,8 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPropertyHelper;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.RootFlexPanel;
+import com.jones.matt.house.lights.client.model.ScenePanel;
+import com.jones.matt.house.lights.client.model.SceneVO;
 import com.jones.matt.house.lights.client.utility.DefaultRequestBuilder;
 import com.jones.matt.house.lights.client.event.EventBusInstance;
 import com.jones.matt.house.lights.client.model.DeviceVO;
@@ -43,6 +45,10 @@ public class RoomPanel extends RootFlexPanel implements ValueChangeHandler<RoomV
 			{
 				add(new DevicePanel(myData, aDevice));
 			}
+		}
+		for (SceneVO aSceneVO : myData.getScenes())
+		{
+			add(new ScenePanel(aSceneVO));
 		}
 	}
 

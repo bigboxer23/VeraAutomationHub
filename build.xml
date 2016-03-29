@@ -39,7 +39,7 @@
 		</jar>
 	</target>
 
-	<target name="war" depends="_Lights.jar, compileGWT, manifest">
+	<target name="war" depends="_Lights.jar, compileGWT, manifest, __insertCacheKill">
 		<war destfile="Lights.war" webxml="web/WEB-INF/web.xml" duplicate="preserve">
 			<zipfileset dir="web" includes="*.html,*.css,*.jsp,*.ico,*.png,*.appcache,*.js,*.gif"/>
 			<fileset dir="HouseLights">
@@ -51,7 +51,13 @@
 	</target>
 
 
+	<tstamp>
+		<format property="time.stamp" pattern="yyyy-MM-dd_HH-mm-ss"/>
+	</tstamp>
 
+	<target name="__insertCacheKill">
+		<replace file="HouseLights/HouseLights.html" token="nocache.js" value="nocache.js?ck=${time.stamp}"/>
+	</target>
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
