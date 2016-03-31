@@ -63,6 +63,18 @@ public class RoomVO extends JavaScriptObject
 		return aList;
 	}
 
+	public final boolean hasLights()
+	{
+		for (DeviceVO aDevice : getDevices())
+		{
+			if (aDevice.isLight())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * If contains items we want to display a button for.  Return false
 	 * if no content matches anything we should do something with
@@ -71,17 +83,6 @@ public class RoomVO extends JavaScriptObject
 	 */
 	public final boolean shouldDisplay()
 	{
-		if ("Garage".equals(getName()))
-		{
-			return false;
-		}
-		for (DeviceVO aDevice : getDevices())
-		{
-			if (aDevice.isLight())
-			{
-				return true;
-			}
-		}
-		return !getScenes().isEmpty();
+		return !"Garage".equals(getName()) && (hasLights() || !getScenes().isEmpty());
 	}
 }

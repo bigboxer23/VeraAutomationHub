@@ -32,17 +32,21 @@ public class RoomButton extends FlexPanel implements ValueChangeHandler<RoomVO>
 	{
 		myButton = new Button(theData.getName());
 		myButton.addStyleName("button-grow");
-		myButton.addTapHandler(new TapHandler()
+		if (theData.hasLights())
 		{
-			@Override
-			public void onTap(TapEvent event)
+			myButton.addTapHandler(new TapHandler()
 			{
-				myButton.setImportant(!myButton.isImportant());
-				mySetStatusInProgress = true;
-				new DefaultRequestBuilder(VeraUrlUtility.getRoomOnOffUrl(!myData.isOn(), myData.getID())).send();
-			}
-		});
+				@Override
+				public void onTap(TapEvent event)
+				{
+					myButton.setImportant(!myButton.isImportant());
+					mySetStatusInProgress = true;
+					new DefaultRequestBuilder(VeraUrlUtility.getRoomOnOffUrl(!myData.isOn(), myData.getID())).send();
+				}
+			});
+		}
 		setData(theData);
+		//myButton.setDisabled(!myData.hasLights());
 		setOrientation(FlexPropertyHelper.Orientation.HORIZONTAL);
 		add(myButton);
 		Image aRoomDetails = new Image(ImageHolder.get().nextItem());
