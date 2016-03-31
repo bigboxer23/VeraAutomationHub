@@ -29,16 +29,19 @@ public class RoomPanel extends RootFlexPanel implements ValueChangeHandler<RoomV
 		EventBusInstance.getInstance().addValueChangeHandler(this);
 		setAlignment(FlexPropertyHelper.Alignment.CENTER);
 		add(new Header(theData.getName()));
-		final TimedSlider aTimedSlider = new TimedSlider();
-		aTimedSlider.addChangeHandler(new ChangeHandler()
+		if (myData.hasLights())
 		{
-			@Override
-			public void onChange(ChangeEvent theEvent)
+			final TimedSlider aTimedSlider = new TimedSlider();
+			aTimedSlider.addChangeHandler(new ChangeHandler()
 			{
-				new DefaultRequestBuilder(VeraUrlUtility.getRoomDimUrl(aTimedSlider.getValue(), myData.getID())).send();
-			}
-		});
-		add(aTimedSlider);
+				@Override
+				public void onChange(ChangeEvent theEvent)
+				{
+					new DefaultRequestBuilder(VeraUrlUtility.getRoomDimUrl(aTimedSlider.getValue(), myData.getID())).send();
+				}
+			});
+			add(aTimedSlider);
+		}
 		for(DeviceVO aDevice : myData.getDevices())
 		{
 			if(aDevice.isLight())
