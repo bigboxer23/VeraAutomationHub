@@ -4,9 +4,7 @@ import com.google.gson.*;
 import com.google.gson.annotations.SerializedName;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Data structure returned from vera when status is requested
@@ -68,6 +66,8 @@ public class VeraHouseVO implements JsonDeserializer<VeraHouseVO>
 				aRoom.addScene(aScene);
 			}
 		}
+		//Sort scene to top of list so displayed first in UI
+		Collections.sort(anInstance.getRooms(), (theRoomVO, theRoomVO2) -> theRoomVO.getName().equalsIgnoreCase("scenes") ? -1 : theRoomVO.getName().compareToIgnoreCase(theRoomVO2.getName()));
 		anInstance.getDevices().clear();
 		anInstance.getScenes().clear();
 		return anInstance;
