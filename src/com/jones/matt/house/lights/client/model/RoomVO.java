@@ -27,6 +27,16 @@ public class RoomVO extends JavaScriptObject
 		return false;
 	}
 
+	/**
+	 * Is special "scene" room
+	 *
+	 * @return
+	 */
+	public final boolean isScenesList()
+	{
+		return getName().toLowerCase().equals("scenes");
+	}
+
 	public final native String getName() /*-{ return this.name; }-*/;
 
 	public final native int getID() /*-{ return this.id; }-*/;

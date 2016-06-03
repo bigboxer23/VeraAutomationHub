@@ -51,7 +51,10 @@ public class RoomPanel extends RootFlexPanel implements ValueChangeHandler<RoomV
 		}
 		for (SceneVO aSceneVO : myData.getScenes())
 		{
-			add(new ScenePanel(aSceneVO));
+			if (!aSceneVO.getName().toLowerCase().contains("motion"))
+			{
+				add(new ScenePanel(aSceneVO));
+			}
 		}
 	}
 

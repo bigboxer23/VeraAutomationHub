@@ -60,6 +60,18 @@ public class RoomButton extends FlexPanel implements ValueChangeHandler<RoomVO>
 		});
 		aRoomDetails.addStyleName("RoomDetails");
 		add(aRoomDetails);
+		if (myData.isScenesList())
+		{
+			aRoomDetails.addStyleName("transparent");
+			myButton.addTapHandler(new TapHandler()
+			{
+				@Override
+				public void onTap(TapEvent event)
+				{
+					AnimationStack.getInstance().forward(new RoomPanel(myData));
+				}
+			});
+		}
 		EventBusInstance.getInstance().addValueChangeHandler(this);
 	}
 
