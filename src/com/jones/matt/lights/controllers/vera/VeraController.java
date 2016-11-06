@@ -8,6 +8,7 @@ import com.jones.matt.lights.controllers.ISystemController;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.hue.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,6 +45,26 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		return false;
 	}
 
+	/**
+	 * Query particular scene id to get data about that scene
+	 * @param theSceneID
+	 * @return
+	 */
+	public JSONObject getSceneInformation(int theSceneID)
+	{
+		myLogger.info("Getting Vera Level");
+		try
+		{
+			HttpResponse aResponse = getHttpClient().execute(new HttpGet(VeraController.kVeraHubUrl + "/data_request?id=scene&action=list&scene=" + theSceneID));
+			return new JSONObject(new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8));
+		}
+		catch (IOException theE)
+		{
+			myLogger.log(Level.WARNING, "getRoomLevels", theE);
+		}
+		return null;
+	}
+
 	public VeraHouseVO getStatus()
 	{
 		myLogger.info("Getting Vera Status");
@@ -76,23 +97,22 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		{
 			//TODO:fail, bad request
 		}
-		String anAction = theCommands.get(2);
-		List<Integer> aLights = findLights(theCommands);
-		boolean aScene = theCommands.get(0).equalsIgnoreCase("scene");
-		for (Integer aDeviceId : aLights)
-		{
-			DefaultHttpClient aHttpClient = new DefaultHttpClient();
-			try
-			{
-				HttpGet aGet = new HttpGet(kVeraHubUrl + (aScene ? kVeraSceneRequest : kVeraRequest) + aDeviceId + (aScene ? kSceneUrn : kVeraServiceUrn) + anAction);
-				aHttpClient.execute(aGet);
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-		}
+		findLights(theCommands).forEach(theDeviceAction -> doDeviceAction(theDeviceAction, theCommands.get(0).equalsIgnoreCase("scene")));
 		return null;
+	}
+
+	private void doDeviceAction(DeviceAction theAction, boolean theScene)
+	{
+		DefaultHttpClient aHttpClient = new DefaultHttpClient();
+		try
+		{
+			HttpGet aGet = new HttpGet(kVeraHubUrl + (theScene ? kVeraSceneRequest : kVeraRequest) + theAction.getId() + (theScene ? kSceneUrn : kVeraServiceUrn) + theAction.getAction());
+			aHttpClient.execute(aGet);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -101,9 +121,9 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 	 * @param theCommands
 	 * @return
 	 */
-	private List<Integer> findLights(List<String> theCommands)
+	private List<DeviceAction> findLights(List<String> theCommands)
 	{
-		List<Integer> aLights = new ArrayList<>();
+		List<DeviceAction> aLights = new ArrayList<>();
 		if (theCommands.get(0).equalsIgnoreCase("Room"))
 		{
 			if (myStatus != null)
@@ -112,16 +132,24 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 				{
 					if (aVeraRoomVO.getId() == Integer.parseInt(theCommands.get(1)))
 					{
-						for (VeraDeviceVO aDevice : aVeraRoomVO.getDevices())
+						aVeraRoomVO.getDevices().stream().filter(VeraDeviceVO::isLight).forEach(theVeraDeviceVO ->
 						{
-							aLights.add(aDevice.getId());
-						}
+							String anAction = theCommands.get(2);
+							if (theVeraDeviceVO.getDefinedDim() > 0 && theVeraDeviceVO.getDefinedDim() < 100 && !anAction.endsWith("0"))
+							{
+								anAction = "Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=" + theVeraDeviceVO.getDefinedDim();
+							}
+							if (theVeraDeviceVO.getDefinedDim() != 0 || anAction.endsWith("0"))
+							{
+								aLights.add(new DeviceAction(anAction, theVeraDeviceVO.getId()));
+							}
+						});
 					}
 				}
 			}
 		} else
 		{
-			aLights.add(Integer.parseInt(theCommands.get(1)));
+			aLights.add(new DeviceAction(theCommands.get(2), Integer.parseInt(theCommands.get(1))));
 		}
 		return aLights;
 	}
@@ -129,5 +157,31 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 	public void setStatus(VeraHouseVO theStatus)
 	{
 		myStatus = theStatus;
+	}
+
+	/**
+	 * Encapsulate the action to run (dim or on/off) and the device id
+	 */
+	private class DeviceAction
+	{
+		private String myAction;
+
+		private int myId;
+
+		public DeviceAction(String theAction, int theId)
+		{
+			myAction = theAction;
+			myId = theId;
+		}
+
+		public int getId()
+		{
+			return myId;
+		}
+
+		public String getAction()
+		{
+			return myAction;
+		}
 	}
 }

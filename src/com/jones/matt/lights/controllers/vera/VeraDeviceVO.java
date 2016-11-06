@@ -13,6 +13,13 @@ public class VeraDeviceVO
 	@SerializedName("id")
 	private int myId;
 
+	/**
+	 * If set to value other than -1, use this value if a room control is requested.  IE
+	 * load is 0, don't turn this light on if room light is requested.  If set to 50, dim and turn on to 50%
+	 * Leaving at 100 or -1 means turn on as normal
+	 */
+	private int myDefinedDim = -1;
+
 	@SerializedName("category")
 	private String myCategory;
 
@@ -167,5 +174,20 @@ public class VeraDeviceVO
 	public void setStatus(String theStatus)
 	{
 		myStatus = theStatus;
+	}
+
+	public int getDefinedDim()
+	{
+		return myDefinedDim;
+	}
+
+	public void setDefinedDim(int theDefinedDim)
+	{
+		myDefinedDim = theDefinedDim;
+	}
+
+	public final boolean isLight()
+	{
+		return getCategory().equals("2") || getCategory().equalsIgnoreCase("3");
 	}
 }

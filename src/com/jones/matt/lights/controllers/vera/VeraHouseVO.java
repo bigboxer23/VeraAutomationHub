@@ -68,8 +68,6 @@ public class VeraHouseVO implements JsonDeserializer<VeraHouseVO>
 		}
 		//Sort scene to top of list so displayed first in UI
 		Collections.sort(anInstance.getRooms(), (theRoomVO, theRoomVO2) -> theRoomVO.getName().equalsIgnoreCase("scenes") ? -1 : theRoomVO.getName().compareToIgnoreCase(theRoomVO2.getName()));
-		anInstance.getDevices().clear();
-		anInstance.getScenes().clear();
 		return anInstance;
 	}
 }
