@@ -9,6 +9,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  *
@@ -16,6 +20,20 @@ import java.util.List;
 public class HubServlet extends AbstractServlet
 {
 	private static String kServletPrefix = "Lights/";
+
+	private ThreadPoolExecutor myExecutor;
+
+	private static Logger myLogger = Logger.getLogger("com.jones");
+
+	@Override
+	public void init() throws ServletException
+	{
+		myExecutor = new ThreadPoolExecutor(5,
+				5,
+				1,
+				TimeUnit.SECONDS,
+				new ArrayBlockingQueue<>(5));
+	}
 
 	@Override
 	public void process(HttpServletRequest theRequest, HttpServletResponse theResponse) throws ServletException, IOException
@@ -32,12 +50,19 @@ public class HubServlet extends AbstractServlet
 			theResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "No controller specified");
 			return;
 		}
-		String aJsonResponse = aController.doAction(getCommands(theRequest.getRequestURI()));
-		if (aJsonResponse != null)
+		myExecutor.execute(new Runnable()
 		{
-			theResponse.setContentType("application/json; charset=utf-8");
-			theResponse.getWriter().print(aJsonResponse);
-		}
+			@Override
+			public void run()
+			{
+				String aJsonResponse = aController.doAction(getCommands(theRequest.getRequestURI()));
+				if (aJsonResponse != null)
+				{
+					myLogger.warning("Error running request: " + theRequest.getRequestURI());
+					myLogger.warning("Message: " + aJsonResponse);
+				}
+			}
+		});
 		theResponse.setStatus(HttpServletResponse.SC_OK);
 	}
 
