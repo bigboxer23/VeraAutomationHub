@@ -50,17 +50,14 @@ public class HubServlet extends AbstractServlet
 			theResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "No controller specified");
 			return;
 		}
-		myExecutor.execute(new Runnable()
+		List<String> aCommands = getCommands(theRequest.getRequestURI());
+		myExecutor.execute(() ->
 		{
-			@Override
-			public void run()
+			String aJsonResponse = aController.doAction(aCommands);
+			if (aJsonResponse != null)
 			{
-				String aJsonResponse = aController.doAction(getCommands(theRequest.getRequestURI()));
-				if (aJsonResponse != null)
-				{
-					myLogger.warning("Error running request: " + theRequest.getRequestURI());
-					myLogger.warning("Message: " + aJsonResponse);
-				}
+				myLogger.warning("Error running request: " + theRequest.getRequestURI());
+				myLogger.warning("Message: " + aJsonResponse);
 			}
 		});
 		theResponse.setStatus(HttpServletResponse.SC_OK);

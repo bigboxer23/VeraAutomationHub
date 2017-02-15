@@ -23,7 +23,7 @@ import java.util.logging.Level;
  */
 public class GarageController extends AbstractBaseController implements ISystemController, IStatusController, ITemperatureController
 {
-	private static String kGarageURL = System.getProperty("garageURL", "http://192.168.0.8");
+	private static String kGarageURL = System.getProperty("garageURL", "https://192.168.0.8");
 
 	public static final String kControllerEndpoint = "Garage";
 
