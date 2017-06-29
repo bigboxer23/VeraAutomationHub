@@ -18,6 +18,7 @@
           </element>
           <element id="directory" name="lib">
             <element id="dir-copy" path="$PROJECT_DIR$/lib" />
+            <element id="file-copy" path="$PROJECT_DIR$/lib/mgwt/mgwt-2.0.0.jar" />
           </element>
         </element>
         <element id="javaee-facet-resources" facet="VeraAutomationHub/web/Web" />
@@ -25,8 +26,6 @@
     </artifact>
   </component>
   <component name="CompilerConfiguration">
-    <option name="DEFAULT_COMPILER" value="Javac" />
-    <resourceExtensions />
     <wildcardResourcePatterns>
       <entry name="!?*.java" />
       <entry name="!?*.form" />
@@ -37,15 +36,10 @@
       <entry name="!?*.kt" />
       <entry name="!?*.clj" />
     </wildcardResourcePatterns>
-    <annotationProcessing>
-      <profile default="true" name="Default" enabled="false">
-        <processorPath useClasspath="true" />
-      </profile>
-    </annotationProcessing>
   </component>
   <component name="CopyrightManager" default="" />
-  <component name="EntryPointsManager">
-    <entry_points version="2.0" />
+  <component name="Encoding">
+    <file url="PROJECT" charset="UTF-8" />
   </component>
   <component name="InspectionProjectProfileManager">
     <profile version="1.0">
@@ -59,8 +53,6 @@
       <inspection_tool class="NonSerializableServiceParameters" enabled="false" level="ERROR" enabled_by_default="false" />
       <inspection_tool class="ValidExternallyBoundObject" enabled="false" level="ERROR" enabled_by_default="false" />
     </profile>
-    <option name="PROJECT_PROFILE" value="Project Default" />
-    <option name="USE_PROJECT_PROFILE" value="true" />
     <version value="1.0" />
   </component>
   <component name="Palette2">
@@ -199,7 +191,7 @@
       <module fileurl="file://$PROJECT_DIR$/VeraAutomationHub.iml" filepath="$PROJECT_DIR$/VeraAutomationHub.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="VcsDirectoryMappings">

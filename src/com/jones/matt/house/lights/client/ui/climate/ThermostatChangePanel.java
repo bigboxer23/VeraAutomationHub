@@ -58,13 +58,13 @@ public class ThermostatChangePanel extends FlexPanel implements ValueChangeHandl
 								add(aHouseTemperature);
 							}
 						});
-						myTemperatureSlider.setValue(Integer.parseInt(aDevice.getSetpoint()) - 60);
+						myTemperatureSlider.setValue((int)aDevice.getSetpoint() - 60);
 						myTemperatureSlider.addChangeHandler(new ChangeHandler()
 						{
 							@Override
 							public void onChange(ChangeEvent theEvent)
 							{
-								if (myThermostat != null && Integer.parseInt(myThermostat.getSetpoint()) != (myTemperatureSlider.getValue() + 60))
+								if (myThermostat != null && (int)myThermostat.getSetpoint() != (myTemperatureSlider.getValue() + 60))
 								{
 									new DefaultRequestBuilder(VeraUrlUtility.getThermostatSetUrl(myTemperatureSlider.getValue() + 60, myThermostat.getID())).send();
 								}
@@ -72,7 +72,7 @@ public class ThermostatChangePanel extends FlexPanel implements ValueChangeHandl
 						});
 						return;
 					}
-					myTemperatureSlider.setValue(Integer.parseInt(aDevice.getSetpoint()) - 60);
+					myTemperatureSlider.setValue((int)aDevice.getSetpoint() - 60);
 				}
 			}
 		}

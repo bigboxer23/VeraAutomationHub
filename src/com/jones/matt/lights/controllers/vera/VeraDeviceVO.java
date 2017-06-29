@@ -42,7 +42,7 @@ public class VeraDeviceVO
 	private String myBatteryLevel;
 
 	@SerializedName("setpoint")
-	private String mySetPoint;
+	private float mySetPoint;
 
 	@SerializedName("heat")
 	private String myHeat;
@@ -120,7 +120,7 @@ public class VeraDeviceVO
 		return myBatteryLevel;
 	}
 
-	public String getSetPoint()
+	public float getSetPoint()
 	{
 		return mySetPoint;
 	}

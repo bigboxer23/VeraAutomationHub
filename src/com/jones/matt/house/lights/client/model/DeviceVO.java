@@ -34,7 +34,7 @@ public class DeviceVO extends JavaScriptObject
 
 	public final native String getBatteryLevel() /*-{ return this.batterylevel; }-*/;
 
-	public final native String getSetpoint() /*-{ return this.setpoint; }-*/;
+	public final native float getSetpoint() /*-{ return this.setpoint; }-*/;
 
 	public final native String getHeat() /*-{ return this.heat; }-*/;
 
