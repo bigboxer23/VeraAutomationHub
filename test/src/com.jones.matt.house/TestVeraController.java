@@ -1,10 +1,10 @@
 package com.jones.matt.house;
 
-import com.jones.matt.lights.controllers.vera.VeraController;
-import com.jones.matt.lights.controllers.vera.VeraDeviceVO;
-import com.jones.matt.lights.controllers.vera.VeraHouseVO;
-import com.jones.matt.lights.controllers.vera.VeraRoomVO;
-import com.jones.matt.lights.servlets.HubServlet;
+import lights.controllers.vera.VeraController;
+import lights.controllers.vera.VeraDeviceVO;
+import lights.controllers.vera.VeraHouseVO;
+import lights.controllers.vera.VeraRoomVO;
+import lights.servlets.HubServlet;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

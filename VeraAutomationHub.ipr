@@ -18,11 +18,21 @@
           </element>
           <element id="directory" name="lib">
             <element id="dir-copy" path="$PROJECT_DIR$/lib" />
+            <element id="file-copy" path="$PROJECT_DIR$/lib.gwt/mgwt/mgwt-2.0.0.jar" />
+            <element id="file-copy" path="$PROJECT_DIR$/lib.gwt/ant/ant-contrib-1.0b3.jar" />
           </element>
         </element>
         <element id="javaee-facet-resources" facet="VeraAutomationHub/web/Web" />
       </root>
     </artifact>
+  </component>
+  <component name="CheckStyle-IDEA">
+    <option name="configuration">
+      <map>
+        <entry key="location-0" value="CLASSPATH:/sun_checks.xml:The default Checkstyle rules" />
+        <entry key="scan-before-checkin" value="false" />
+      </map>
+    </option>
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
@@ -44,6 +54,9 @@
     </annotationProcessing>
   </component>
   <component name="CopyrightManager" default="" />
+  <component name="Encoding">
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>

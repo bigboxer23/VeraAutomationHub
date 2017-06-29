@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.philips.lighting:huesdkresources:1.8.3-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/philips/lighting/huesdkresources/1.8.3-SNAPSHOT/huesdkresources-1.8.3-20151013.100803-5.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/philips/lighting/huesdkresources/1.8.3-SNAPSHOT/huesdkresources-1.8.3-20151013.100803-5-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/philips/lighting/huesdkresources/1.8.3-SNAPSHOT/huesdkresources-1.8.3-20151013.100803-5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
