@@ -1,6 +1,5 @@
 package lights.servlets;
 
-import lights.HubContext;
 import lights.controllers.ISystemController;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @EnableAutoConfiguration
-public class HubServlet
+public class HubServlet extends AbstractControllerServlet
 {
 	private ThreadPoolExecutor myExecutor;
 
@@ -77,8 +76,8 @@ public class HubServlet
 		return aProcessedUrl;
 	}
 
-	public static ISystemController getController(String theUrl)
+	public ISystemController getController(String theUrl)
 	{
-		return HubContext.getInstance().getController(processUrl(theUrl).get(1), ISystemController.class);
+		return getController(processUrl(theUrl).get(1), ISystemController.class);
 	}
 }

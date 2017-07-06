@@ -14,10 +14,10 @@ import org.junit.Test;
  */
 public class TestVeraController
 {
-	private VeraController myController;
+	private static VeraController myController;
 
 	@BeforeClass
-	public void setup()
+	public static void setup()
 	{
 		myController = new VeraController();
 		myController.getStatus();

@@ -2,7 +2,6 @@ package lights.servlets;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import lights.HubContext;
 import lights.controllers.garage.GarageController;
 import lights.controllers.vera.VeraController;
 import lights.controllers.vera.VeraHouseVO;
@@ -22,7 +21,7 @@ import java.util.Map;
  */
 @RestController
 @EnableAutoConfiguration
-public class SceneStatusServlet
+public class SceneStatusServlet extends AbstractControllerServlet
 {
 	private static final String kLevelSetSceneName = System.getProperty("level.set.scene.name", "LevelSet");
 
@@ -35,9 +34,8 @@ public class SceneStatusServlet
 	@RequestMapping("/SceneStatus")
 	public VeraHouseVO getStatus(HttpServletResponse theResponse) throws ServletException, IOException
 	{
-		theResponse.setContentType("application/json");
-		VeraHouseVO aHouseStatus = HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).getStatus();
-		HubContext.getInstance().getController(GarageController.kControllerEndpoint, GarageController.class).getStatus(aHouseStatus);
+		VeraHouseVO aHouseStatus = getController(VeraController.kControllerEndpoint, VeraController.class).getStatus();
+		getController(GarageController.kControllerEndpoint, GarageController.class).getStatus(aHouseStatus);
 		aHouseStatus.getScenes().stream().filter(theScene -> theScene.getName().equalsIgnoreCase(kLevelSetSceneName)).findAny().ifPresent(this::setupLevels);
 		fillLevels(aHouseStatus);
 		aHouseStatus.getScenes().clear();
@@ -72,7 +70,7 @@ public class SceneStatusServlet
 				mySpecificDimLevels = new HashMap<>();
 			}
 			mySpecificDimLevels.clear();
-			JsonObject anElement = HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).getSceneInformation(theVO.getId());
+			JsonObject anElement = getController(VeraController.kControllerEndpoint, VeraController.class).getSceneInformation(theVO.getId());
 			JsonArray aDevices = anElement.get("groups").getAsJsonArray().get(0).getAsJsonObject().get("actions").getAsJsonArray();
 			aDevices.forEach(theDevice ->
 			{

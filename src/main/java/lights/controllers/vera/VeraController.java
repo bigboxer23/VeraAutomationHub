@@ -10,6 +10,8 @@ import lights.controllers.ISystemController;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,12 +21,14 @@ import java.util.logging.Level;
 /**
  * Vera controller to make requests to a vera UI7 device
  */
+@Component
 public class VeraController extends AbstractBaseController implements ISystemController, IStatusController
 {
 	/**
 	 * Location of Vera Hub, assume locally running on default port
 	 */
-	private static final String kVeraHubUrl = System.getProperty("vera.url", "http://localhost:3480");
+	@Value("${VeraUrl}")
+	private String kVeraHubUrl;// = System.getProperty("vera.url", "http://localhost:3480");
 
 	private static final String kVeraBaseRequest = "/data_request?id=action&output_format=json";
 
@@ -56,7 +60,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		myLogger.info("Getting Vera Level");
 		try
 		{
-			HttpResponse aResponse = getHttpClient().execute(new HttpGet(VeraController.kVeraHubUrl + "/data_request?id=scene&action=list&scene=" + theSceneID));
+			HttpResponse aResponse = getHttpClient().execute(new HttpGet(kVeraHubUrl + "/data_request?id=scene&action=list&scene=" + theSceneID));
 			return new JsonParser().parse(new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8)).getAsJsonObject();
 		}
 		catch (IOException theE)
@@ -71,7 +75,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		myLogger.info("Getting Vera Status");
 		try
 		{
-			HttpResponse aResponse = getHttpClient().execute(new HttpGet(VeraController.kVeraHubUrl + "/data_request?id=sdata"));
+			HttpResponse aResponse = getHttpClient().execute(new HttpGet(kVeraHubUrl + "/data_request?id=sdata"));
 			String aStatusString = new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8);
 			VeraHouseVO aHouseStatus = getBuilder().create().fromJson(aStatusString, VeraHouseVO.class);
 			setStatus(aHouseStatus);
