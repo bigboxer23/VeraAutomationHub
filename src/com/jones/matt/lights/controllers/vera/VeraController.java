@@ -23,17 +23,19 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 	/**
 	 * Location of Vera Hub, assume locally running on default port
 	 */
-	private static final String kVeraHubUrl = System.getProperty("vera.url", "http://localhost:3480");
+	public static final String kVeraHubUrl = System.getProperty("vera.url", "http://localhost:3480");
 
 	private static final String kVeraBaseRequest = "/data_request?id=action&output_format=json";
 
-	private static final String kVeraRequest = kVeraBaseRequest + "&DeviceNum=";
+	public static final String kVeraRequest = kVeraBaseRequest + "&DeviceNum=";
 
 	private static final String kVeraSceneRequest = kVeraBaseRequest + "&SceneNum=";
 
-	private static final String kVeraServiceUrn = "&serviceId=urn:upnp-org:serviceId:";
+	public static final String kVeraServiceUrn = "&serviceId=urn:upnp-org:serviceId:";
 
 	private static final String kSceneUrn = "&serviceId=urn:micasaverde-com:serviceId:";
+
+	public static final String kDimmingCommand = "Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=";
 
 	private VeraHouseVO myStatus;
 
@@ -137,7 +139,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 							String anAction = theCommands.get(2);
 							if (theVeraDeviceVO.getDefinedDim() > 0 && theVeraDeviceVO.getDefinedDim() < 100 && !anAction.endsWith("0"))
 							{
-								anAction = "Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=" + theVeraDeviceVO.getDefinedDim();
+								anAction = kDimmingCommand + theVeraDeviceVO.getDefinedDim();
 							}
 							if (theVeraDeviceVO.getDefinedDim() != 0 || anAction.endsWith("0"))
 							{

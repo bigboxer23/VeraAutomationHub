@@ -10,24 +10,16 @@ import com.jones.matt.lights.controllers.vera.VeraController;
 import com.jones.matt.lights.data.SceneVO;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * Config controlling class.  Reads JSON data from file, initializes scenes from file's contents
  */
 public class HubContext
 {
-	private static Logger myLogger = Logger.getLogger("com.jones");
-
 	private static HubContext myInstance;
 
 	private Map<String, ISystemController> myControllers;
-
-	private List<SceneVO> mySceneVOs;
-
-	private static final String kJSONSource = System.getProperty("scenes.location", "/home/pi/Scenes.json");
 
 	private HubContext()
 	{
@@ -55,10 +47,6 @@ public class HubContext
 		{
 			myControllers = new HashMap<>();
 			SceneVO aGarage = new SceneVO(GarageController.kControllerEndpoint);
-			if (mySceneVOs != null)
-			{
-				mySceneVOs.add(aGarage);
-			}
 			GarageController aGarageController = new GarageController();
 			myControllers.put(aGarage.getSceneUrl(), aGarageController);
 			myControllers.put(WeatherController.kControllerEndpoint, new WeatherController(new HueController(), aGarageController));
@@ -87,9 +75,4 @@ public class HubContext
 		myControllers = null;
 	}
 
-	public List<SceneVO> getScenes()
-	{
-		getControllers();//make sure we're initialized
-		return mySceneVOs;
-	}
 }
