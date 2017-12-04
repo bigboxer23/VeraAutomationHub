@@ -94,10 +94,9 @@ public class NotificationController implements ISystemController
 	{
 		return HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).
 				getStatus().
-				getDevices().stream().filter(theDevice ->
-					{
-						return myNotificationDeviceIds.contains(theDevice.getId());
-					}).
+				getDevices().
+				stream().
+				filter(theDevice -> myNotificationDeviceIds.contains(theDevice.getId())).
 				collect(Collectors.toList());
 	}
 
@@ -105,6 +104,7 @@ public class NotificationController implements ISystemController
 	{
 		JSONObject anElement = HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).getSceneInformation(myNotificationScene.getId());
 		JSONArray aDevices = anElement.getJSONArray("groups").getJSONObject(0).getJSONArray("actions");
+		myNotificationDeviceIds.clear();
 		for (int ai = 0; ai < aDevices.length(); ai++)
 		{
 			myNotificationDeviceIds.add(aDevices.getJSONObject(ai).getInt("device"));
@@ -131,14 +131,16 @@ public class NotificationController implements ISystemController
 
 	private static void doRequest(String theUrl, int theLevel)
 	{
-		DefaultHttpClient aHttpClient = new DefaultHttpClient();
-		try
-		{
-			aHttpClient.execute(new HttpGet(theUrl + theLevel));
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		new Thread(() -> {
+			DefaultHttpClient aHttpClient = new DefaultHttpClient();
+			try
+			{
+				aHttpClient.execute(new HttpGet(theUrl + theLevel));
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}).start();
 	}
 }
