@@ -6,11 +6,11 @@
            version="2.5">
     <servlet>
         <servlet-name>LightServlet</servlet-name>
-        <servlet-class>com.jones.matt.lights.servlets.HubServlet</servlet-class>
+        <servlet-class>com.bigboxer23.lights.servlets.HubServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>SceneStatusServlet</servlet-name>
-        <servlet-class>com.jones.matt.lights.servlets.SceneStatusServlet</servlet-class>
+        <servlet-class>com.bigboxer23.lights.servlets.SceneStatusServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LightServlet</servlet-name>
