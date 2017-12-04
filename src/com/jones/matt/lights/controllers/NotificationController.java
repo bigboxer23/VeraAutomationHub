@@ -23,7 +23,7 @@ public class NotificationController implements ISystemController
 
 	private static final String kNotificationSceneName = System.getProperty("notification.scene", "Notify");
 
-	private static final int kZWaveTiming = 1500;
+	private static final int kZWaveTiming = 2000;
 
 	private static final int kHueTiming = 400;
 
@@ -54,40 +54,29 @@ public class NotificationController implements ISystemController
 	 */
 	private void doPulseNotification(List<VeraDeviceVO> theDevices)
 	{
-		new Thread(() -> {
-			try
-			{
-				doNotification(theDevices, 3);
-				Thread.sleep(kZWaveTiming);
-				doNotification(theDevices, 1);
-				Thread.sleep(kZWaveTiming);
-				doNotification(theDevices, 3);
-				Thread.sleep(kZWaveTiming);
-				doNotification(theDevices, 1);
-			}
-			catch (InterruptedException theE)
-			{
-				//theE.printStackTrace();
-			}
-		}).start();
-	}
-
-	/**
-	 * Set a specific level for devices.
-	 *
-	 * @param theDevices
-	 * @param theLevelDivisor  Takes device current level and divides by this value to set a new level
-	 */
-	private void doNotification(List<VeraDeviceVO> theDevices, int theLevelDivisor)
-	{
 		theDevices.
-				stream().
-				filter(theVeraDeviceVO -> theVeraDeviceVO.getLevel() > 0).
-				forEach(theDevice ->
-				{
+			stream().
+			filter(theVeraDeviceVO -> theVeraDeviceVO.getLevel() > 0).
+			forEach(theDevice ->
+			{
+				new Thread(() -> {
 					String aGetUrl = VeraController.kVeraHubUrl + VeraController.kVeraRequest + theDevice.getId() + VeraController.kVeraServiceUrn + VeraController.kDimmingCommand;
-					doRequest(aGetUrl, theDevice.getLevel() / theLevelDivisor);
-				});
+					try
+					{
+						doRequest(aGetUrl, theDevice.getLevel() / 3);
+						Thread.sleep(kZWaveTiming);
+						doRequest(aGetUrl, theDevice.getLevel());
+						Thread.sleep(kZWaveTiming);
+						doRequest(aGetUrl, theDevice.getLevel() / 3);
+						Thread.sleep(kZWaveTiming);
+						doRequest(aGetUrl, theDevice.getLevel());
+					}
+					catch (InterruptedException theE)
+					{
+						theE.printStackTrace();
+					}
+				}).start();
+			});
 	}
 
 	private List<VeraDeviceVO> getDeviceInfo()
@@ -131,16 +120,14 @@ public class NotificationController implements ISystemController
 
 	private static void doRequest(String theUrl, int theLevel)
 	{
-		new Thread(() -> {
-			DefaultHttpClient aHttpClient = new DefaultHttpClient();
-			try
-			{
-				aHttpClient.execute(new HttpGet(theUrl + theLevel));
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-		}).start();
+		DefaultHttpClient aHttpClient = new DefaultHttpClient();
+		try
+		{
+			aHttpClient.execute(new HttpGet(theUrl + theLevel));
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 }
