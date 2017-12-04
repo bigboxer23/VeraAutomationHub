@@ -82,7 +82,7 @@
 			<arg value="8"/>
 			<arg value="-war"/>
 			<arg value="."/>
-			<arg value="com.jones.matt.house.lights.HouseLights"/>
+			<arg value="com.bigboxer23.house.lights.HouseLights"/>
 		</java>
 	</target>
 
