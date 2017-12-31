@@ -5,10 +5,11 @@ import com.bigboxer23.lights.controllers.IStatusController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.hue.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,13 +53,13 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 	 * @param theSceneID
 	 * @return
 	 */
-	public JSONObject getSceneInformation(int theSceneID)
+	public JsonObject getSceneInformation(int theSceneID)
 	{
 		myLogger.info("Getting Vera Level");
 		try
 		{
 			HttpResponse aResponse = getHttpClient().execute(new HttpGet(VeraController.kVeraHubUrl + "/data_request?id=scene&action=list&scene=" + theSceneID));
-			return new JSONObject(new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8));
+			return new JsonParser().parse(new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8)).getAsJsonObject();
 		}
 		catch (IOException theE)
 		{

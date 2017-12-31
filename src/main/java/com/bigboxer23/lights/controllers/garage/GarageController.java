@@ -8,7 +8,6 @@ import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
-import com.jones.matt.lights.controllers.*;
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.data.WeatherData;
 import org.apache.http.HttpResponse;

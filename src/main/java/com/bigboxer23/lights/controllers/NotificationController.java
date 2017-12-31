@@ -4,10 +4,10 @@ import com.bigboxer23.lights.controllers.vera.VeraSceneVO;
 import com.bigboxer23.lights.HubContext;
 import com.bigboxer23.lights.controllers.vera.VeraController;
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.hue.JSONArray;
-import org.json.hue.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -91,12 +91,12 @@ public class NotificationController implements ISystemController
 
 	private void updateNotificationSceneContents()
 	{
-		JSONObject anElement = HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).getSceneInformation(myNotificationScene.getId());
-		JSONArray aDevices = anElement.getJSONArray("groups").getJSONObject(0).getJSONArray("actions");
+		JsonObject anElement = HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).getSceneInformation(myNotificationScene.getId());
+		JsonArray aDevices = anElement.getAsJsonArray("groups").get(0).getAsJsonObject().getAsJsonArray("actions");
 		myNotificationDeviceIds.clear();
-		for (int ai = 0; ai < aDevices.length(); ai++)
+		for (int ai = 0; ai < aDevices.size(); ai++)
 		{
-			myNotificationDeviceIds.add(aDevices.getJSONObject(ai).getInt("device"));
+			myNotificationDeviceIds.add(aDevices.get(ai).getAsJsonObject().get("device").getAsInt());
 		}
 	}
 

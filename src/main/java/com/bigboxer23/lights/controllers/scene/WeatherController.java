@@ -4,7 +4,6 @@ import com.bigboxer23.lights.controllers.garage.GarageController;
 import com.bigboxer23.lights.controllers.hue.HueController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.lights.data.WeatherData;
-import com.philips.lighting.hue.sdk.utilities.PHUtilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +53,7 @@ public class WeatherController implements ISystemController
 		aCommands.add(theCommands.get(0));
 		aCommands.add("xy");
 		int[] aColor = getColor(aData.getTemperature(), kMinTemp, kMaxTemp);
-		float[] aXY = PHUtilities.calculateXYFromRGB(aColor[0], aColor[1], aColor[2], kLightModel);
+		float[] aXY = new float[]{0f,0f};//TODO: this is totally non-functional PHUtilities.calculateXYFromRGB(aColor[0], aColor[1], aColor[2], kLightModel);
 		aCommands.add("" + aXY[0]);
 		aCommands.add("" + aXY[1]);
 		return myHueController.doAction(aCommands);

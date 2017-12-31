@@ -7,13 +7,11 @@
 	<property name="pi.dirCopyTo.dev" value="/opt/web/mybase/webapps"/><!--/var/lib/tomcat7/webapps-->
 
 	<path id="compile.classpath">
-		<pathelement location="lib/sqlite-jdbc-3.7.2.jar"/>
-		<pathelement location="lib/servlet-api-3.1.jar"/>
 		<pathelement location="lib/guava-18.0.jar"/>
 		<pathelement location="lib/commons-logging-api-1.0.4.jar"/>
 		<pathelement location="lib/httpclient-4.1.2.jar"/>
 		<pathelement location="lib/httpcore-4.1.2.jar"/>
-		<pathelement location="lib/gson-2.3.1.jar"/>
+		<pathelement location="lib/gson-2.8.1.jar"/>
 		<pathelement location="lib/huelocalsdk.jar"/>
 		<pathelement location="lib/huesdkresources.jar"/>
 		<pathelement location="./src"/>
@@ -26,7 +24,7 @@
 
 	<target name="_compile">
 		<mkdir dir="classes" />
-		<javac classpathref="compile.classpath" srcdir="src"  destdir="classes"/>
+		<javac classpathref="compile.classpath" srcdir="src/main/java"  destdir="classes"/>
 	</target>
 
 	<target name="deploy" depends="war">
@@ -68,7 +66,7 @@
 	<property file="default.properties"/>
 
 	<path id="gwt.path">
-		<pathelement location="./src"/>
+		<pathelement location="./src/main/java"/>
 		<pathelement path="lib/gwt/gwt-user.jar"/>
 		<pathelement path="lib/gwt/gwt-dev.jar"/>
 		<pathelement path="lib/gwt/validation-api-1.0.0.GA-sources.jar"/>
@@ -88,7 +86,7 @@
 
 	<target name="manifest">
 		<echo message="copying manifest.appcache to HouseLights"/>
-		<copy file="resources/manifest.appcache" tofile="HouseLights/manifest.appcache" />
+		<copy file="src/main/resources/manifest.appcache" tofile="HouseLights/manifest.appcache" />
 
 		<echo message="manifest cleaning" />
 

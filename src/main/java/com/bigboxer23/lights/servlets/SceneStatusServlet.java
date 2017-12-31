@@ -6,8 +6,8 @@ import com.bigboxer23.lights.controllers.garage.GarageController;
 import com.bigboxer23.lights.controllers.vera.VeraController;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.lights.controllers.vera.VeraSceneVO;
-import org.json.hue.JSONArray;
-import org.json.hue.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -65,12 +65,12 @@ public class SceneStatusServlet extends AbstractServlet
 		{
 			myLastUpdate = System.currentTimeMillis();
 			Map<Integer, Integer> aLevels = new HashMap<>();
-			JSONObject anElement = HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).getSceneInformation(theVO.getId());
-			JSONArray aDevices = anElement.getJSONArray("groups").getJSONObject(0).getJSONArray("actions");
-			for (int ai = 0; ai < aDevices.length(); ai++)
+			JsonObject anElement = HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).getSceneInformation(theVO.getId());
+			JsonArray aDevices = anElement.getAsJsonArray("groups").get(0).getAsJsonObject().getAsJsonArray("actions");
+			for (int ai = 0; ai < aDevices.size(); ai++)
 			{
-				JSONObject aDevice = aDevices.getJSONObject(ai);
-				aLevels.put(aDevice.getInt("device"), aDevice.getJSONArray("arguments").getJSONObject(0).getInt("value"));
+				JsonObject aDevice = aDevices.get(ai).getAsJsonObject();
+				aLevels.put(aDevice.get("device").getAsInt(), aDevice.get("arguments").getAsJsonArray().get(0).getAsJsonObject().get("value").getAsInt());
 			}
 			mySpecificDimLevels = aLevels;
 		}

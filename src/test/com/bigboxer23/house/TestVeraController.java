@@ -1,4 +1,4 @@
-package com.jones.matt.house;
+package com.bigboxer23.house;
 
 import com.jones.matt.lights.controllers.vera.VeraController;
 import com.jones.matt.lights.controllers.vera.VeraDeviceVO;
