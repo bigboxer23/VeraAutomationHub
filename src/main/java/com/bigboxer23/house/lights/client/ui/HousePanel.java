@@ -52,7 +52,7 @@ public class HousePanel extends FlexPanel implements ValueChangeHandler<HouseSta
 	public void onValueChange(ValueChangeEvent<HouseStatus> theEvent)
 	{
 		myUpdateLabel.setText(DateTimeFormat.getFormat("hh:mm:ss a").format(new Date(System.currentTimeMillis())));
-		if (theEvent.getValue() != null)
+		if (theEvent.getValue() != null && theEvent.getValue().getRooms() != null)
 		{
 			for (int ai = 0; ai < theEvent.getValue().getRooms().length(); ai++)
 			{

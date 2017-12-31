@@ -45,8 +45,11 @@ public class StatusTimer extends Timer
 					public void onResponseReceived(Request theRequest, Response theResponse)
 					{
 						HouseStatus aStatus = JsonUtils.safeEval(theResponse.getText());
-						myLightData.setItem(kLightDataKey, JsonUtils.stringify(aStatus));
-						generateFromData(getHouseStatus());
+						if (myLightData != null)
+						{
+							myLightData.setItem(kLightDataKey, JsonUtils.stringify(aStatus));
+						}
+						generateFromData(aStatus);
 						schedule(HouseLights.getPollingDelay());
 					}
 
@@ -62,11 +65,14 @@ public class StatusTimer extends Timer
 
 	private void generateFromData(HouseStatus theData)
 	{
-		myHousePanel.onValueChange(new FireableValueChangeEvent<>(theData));
+		if (theData != null)
+		{
+			myHousePanel.onValueChange(new FireableValueChangeEvent<>(theData));
+		}
 	}
 
 	private HouseStatus getHouseStatus()
 	{
-		return JsonUtils.safeEval(myLightData.getItem(kLightDataKey));
+		return myLightData != null ? (HouseStatus)JsonUtils.safeEval(myLightData.getItem(kLightDataKey)) : null;
 	}
 }

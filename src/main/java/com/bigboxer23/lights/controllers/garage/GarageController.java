@@ -111,11 +111,11 @@ public class GarageController extends AbstractBaseController implements ISystemC
 				HttpResponse aResponse = getHttpClient().execute(new HttpGet(GarageController.kGarageURL + "/Status2"));
 				myGarageData = getBuilder().create().fromJson(new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8), VeraDeviceVO.class);
 				myGarageData.setName("Garage Opener");
-				myGarageData.setCategory("99");
+				/*myGarageData.setCategory("99");
 				if (System.currentTimeMillis() - aStartTime > 4000)
 				{
 					throw new IOException();
-				}
+				}*/
 				myFailTime = null;
 			}
 			catch (IOException theE)
