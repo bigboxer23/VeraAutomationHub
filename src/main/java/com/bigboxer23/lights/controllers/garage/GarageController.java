@@ -13,6 +13,7 @@ import com.bigboxer23.lights.data.WeatherData;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URL;
@@ -24,6 +25,7 @@ import java.util.logging.Level;
 /**
  * Control garage pi
  */
+@Component
 public class GarageController extends AbstractBaseController implements ISystemController, IStatusController, ITemperatureController
 {
 	private static String kGarageURL = System.getProperty("garageURL", "https://192.168.0.8");

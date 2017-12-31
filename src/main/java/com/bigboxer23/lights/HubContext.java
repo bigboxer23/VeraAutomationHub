@@ -1,13 +1,13 @@
 package com.bigboxer23.lights;
 
 import com.bigboxer23.lights.controllers.NotificationController;
-import com.bigboxer23.lights.controllers.hue.HueController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.lights.controllers.garage.GarageController;
 import com.bigboxer23.lights.controllers.scene.DaylightController;
 import com.bigboxer23.lights.controllers.scene.WeatherController;
 import com.bigboxer23.lights.controllers.vera.VeraController;
 import com.bigboxer23.lights.data.SceneVO;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,62 +17,65 @@ import java.util.Map;
  */
 public class HubContext
 {
-	private static HubContext myInstance;
-
 	private Map<String, ISystemController> myControllers;
 
-	private HubContext()
-	{
+	protected GarageController myGarageController;
 
+	protected WeatherController myWeatherController;
+
+	protected DaylightController myDaylightController;
+
+	protected NotificationController myNotificationController;
+
+	protected VeraController myVeraController;
+
+	@Autowired
+	public void setGarageController(GarageController theGarageController)
+	{
+		myGarageController = theGarageController;
 	}
 
-	public static HubContext getInstance()
+	@Autowired
+	public void setWeatherController(WeatherController theWeatherController)
 	{
-		if (myInstance == null)
-		{
-			myInstance = new HubContext();
-		}
-		return myInstance;
+		myWeatherController = theWeatherController;
 	}
 
+	@Autowired
+	public void setDaylightController(DaylightController theDaylightController)
+	{
+		myDaylightController = theDaylightController;
+	}
+
+	@Autowired
+	public void setNotificationController(NotificationController theNotificationController)
+	{
+		myNotificationController = theNotificationController;
+	}
+
+	@Autowired
+	public void setVeraController(VeraController theVeraController)
+	{
+		myVeraController = theVeraController;
+	}
 	/**
 	 * Get our mapping of URL's to controllers
 	 * If not initialized, trigger that here
 	 *
 	 * @return
 	 */
+
 	public Map<String, ISystemController> getControllers()
 	{
 		if (myControllers == null)
 		{
 			myControllers = new HashMap<>();
-			SceneVO aGarage = new SceneVO(GarageController.kControllerEndpoint);
-			GarageController aGarageController = new GarageController();
-			myControllers.put(aGarage.getSceneUrl(), aGarageController);
-			myControllers.put(WeatherController.kControllerEndpoint, new WeatherController(new HueController(), aGarageController));
-			myControllers.put(DaylightController.kControllerEndpoint, new DaylightController());
-			myControllers.put(NotificationController.kControllerEndpoint, new NotificationController());
-			myControllers.put(VeraController.kControllerEndpoint, new VeraController());
+			myControllers.put(new SceneVO(GarageController.kControllerEndpoint).getSceneUrl(), myGarageController);
+			myControllers.put(WeatherController.kControllerEndpoint, myWeatherController);
+			myControllers.put(DaylightController.kControllerEndpoint, myDaylightController);
+			myControllers.put(NotificationController.kControllerEndpoint, myNotificationController);
+			myControllers.put(VeraController.kControllerEndpoint, myVeraController);
 		}
 		return myControllers;
 	}
-
-	public <D> D getController(String theControllerKey, Class<D> theControllerClass)
-	{
-		ISystemController aSystemController = getControllers().get(theControllerKey);
-		if (theControllerClass != null && theControllerClass.isInstance(aSystemController))
-		{
-			return (D) aSystemController;
-		}
-		return null;
-	}
-
-	/**
-	 * Make us re-initialize
-	 */
-	public void reset()
-	{
-		myControllers = null;
-	}
-
 }

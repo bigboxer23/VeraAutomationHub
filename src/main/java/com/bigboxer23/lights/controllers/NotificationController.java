@@ -8,6 +8,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,7 +18,8 @@ import java.util.stream.Collectors;
 /**
  * controller for receiving a notification from some source and triggering an alert to scenes that care about it
  */
-public class NotificationController implements ISystemController
+@Component
+public class NotificationController extends HubContext implements ISystemController
 {
 	public static final String kControllerEndpoint = "Notification";
 
@@ -34,7 +36,7 @@ public class NotificationController implements ISystemController
 	@Override
 	public String doAction(List<String> theCommands)
 	{
-		if (HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).getStatus() == null)
+		if (myVeraController.getStatus() == null)
 		{
 			return null;
 		}
@@ -60,7 +62,7 @@ public class NotificationController implements ISystemController
 			forEach(theDevice ->
 			{
 				new Thread(() -> {
-					String aGetUrl = VeraController.kVeraHubUrl + VeraController.kVeraRequest + theDevice.getId() + VeraController.kVeraServiceUrn + VeraController.kDimmingCommand;
+					String aGetUrl = "";//TODO://VeraController.kVeraHubUrl + VeraController.kVeraRequest + theDevice.getId() + VeraController.kVeraServiceUrn + VeraController.kDimmingCommand;
 					try
 					{
 						doRequest(aGetUrl, theDevice.getLevel() / 3);
@@ -81,7 +83,7 @@ public class NotificationController implements ISystemController
 
 	private List<VeraDeviceVO> getDeviceInfo()
 	{
-		return HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).
+		return myVeraController.
 				getStatus().
 				getDevices().
 				stream().
@@ -91,7 +93,7 @@ public class NotificationController implements ISystemController
 
 	private void updateNotificationSceneContents()
 	{
-		JsonObject anElement = HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).getSceneInformation(myNotificationScene.getId());
+		JsonObject anElement = myVeraController.getSceneInformation(myNotificationScene.getId());
 		JsonArray aDevices = anElement.getAsJsonArray("groups").get(0).getAsJsonObject().getAsJsonArray("actions");
 		myNotificationDeviceIds.clear();
 		for (int ai = 0; ai < aDevices.size(); ai++)
@@ -107,7 +109,7 @@ public class NotificationController implements ISystemController
 	 */
 	private boolean updateNotificationSceneId()
 	{
-		HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class)
+		myVeraController
 				.getStatus().
 				getScenes().
 				stream().

@@ -4,6 +4,8 @@ import com.bigboxer23.lights.controllers.garage.GarageController;
 import com.bigboxer23.lights.controllers.hue.HueController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.lights.data.WeatherData;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.List;
  * We use the GarageController object which is a RPi located in the garage which has a restful
  * service to return a JSON object with temperature and humidity returned
  */
+@Component
 public class WeatherController implements ISystemController
 {
 	private static final String kLightModel = "LCT001";
@@ -28,10 +31,16 @@ public class WeatherController implements ISystemController
 
 	public static final String kControllerEndpoint = "Weather";
 
-	public WeatherController(HueController theHueController, GarageController theGarageController)
+	@Autowired
+	public void setGarageController(GarageController theGarageController)
+	{
+		myGarageController = theGarageController;
+	}
+
+	@Autowired
+	public void setHueController(HueController theHueController)
 	{
 		myHueController = theHueController;
-		myGarageController = theGarageController;
 	}
 
 	/**

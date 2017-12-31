@@ -10,6 +10,8 @@ import com.google.gson.JsonParser;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,24 +21,26 @@ import java.util.logging.Level;
 /**
  * Vera controller to make requests to a vera UI7 device
  */
+@Component
 public class VeraController extends AbstractBaseController implements ISystemController, IStatusController
 {
 	/**
 	 * Location of Vera Hub, assume locally running on default port
 	 */
-	public static final String kVeraHubUrl = System.getProperty("vera.url", "http://localhost:3480");
+	@Value("${veraUrl}")
+	private String kVeraHubUrl;
 
 	private static final String kVeraBaseRequest = "/data_request?id=action&output_format=json";
 
-	public static final String kVeraRequest = kVeraBaseRequest + "&DeviceNum=";
+	private static final String kVeraRequest = kVeraBaseRequest + "&DeviceNum=";
 
 	private static final String kVeraSceneRequest = kVeraBaseRequest + "&SceneNum=";
 
-	public static final String kVeraServiceUrn = "&serviceId=urn:upnp-org:serviceId:";
+	private static final String kVeraServiceUrn = "&serviceId=urn:upnp-org:serviceId:";
 
 	private static final String kSceneUrn = "&serviceId=urn:micasaverde-com:serviceId:";
 
-	public static final String kDimmingCommand = "Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=";
+	private static final String kDimmingCommand = "Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=";
 
 	private VeraHouseVO myStatus;
 
@@ -58,7 +62,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		myLogger.info("Getting Vera Level");
 		try
 		{
-			HttpResponse aResponse = getHttpClient().execute(new HttpGet(VeraController.kVeraHubUrl + "/data_request?id=scene&action=list&scene=" + theSceneID));
+			HttpResponse aResponse = getHttpClient().execute(new HttpGet(kVeraHubUrl + "/data_request?id=scene&action=list&scene=" + theSceneID));
 			return new JsonParser().parse(new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8)).getAsJsonObject();
 		}
 		catch (IOException theE)
@@ -73,7 +77,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		myLogger.info("Getting Vera Status");
 		try
 		{
-			HttpResponse aResponse = getHttpClient().execute(new HttpGet(VeraController.kVeraHubUrl + "/data_request?id=sdata"));
+			HttpResponse aResponse = getHttpClient().execute(new HttpGet(kVeraHubUrl + "/data_request?id=sdata"));
 			String aStatusString = new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8);
 			VeraHouseVO aHouseStatus = getBuilder().create().fromJson(aStatusString, VeraHouseVO.class);
 			setStatus(aHouseStatus);

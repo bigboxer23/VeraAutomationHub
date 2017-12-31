@@ -2,46 +2,49 @@ package com.bigboxer23.lights.servlets;
 
 import com.google.gson.Gson;
 import com.bigboxer23.lights.HubContext;
-import com.bigboxer23.lights.controllers.garage.GarageController;
-import com.bigboxer23.lights.controllers.vera.VeraController;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.lights.controllers.vera.VeraSceneVO;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Get status from the vera controller for everything in the house
  */
-public class SceneStatusServlet extends AbstractServlet
+
+@RestController
+@EnableAutoConfiguration
+public class SceneStatusServlet extends HubContext
 {
 	private static final String kLevelSetSceneName = System.getProperty("level.set.scene.name", "LevelSet");
 
 	private long myLastUpdate = -1;
+
+	@Value("${scene.update.interval}")
+	private long myUpdateInterval;
+
 	/**
 	 * Device id, load level
 	 */
 	private Map<Integer, Integer> mySpecificDimLevels;
 
-	@Override
-	public void process(HttpServletRequest theRequest, HttpServletResponse theResponse) throws ServletException, IOException
+	@RequestMapping(value = "/SceneStatus", produces = {MediaType.APPLICATION_JSON_VALUE})
+	public String getHouseStatus()
 	{
-		theResponse.setContentType("application/json");
-		VeraHouseVO aHouseStatus = HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).getStatus();
-		HubContext.getInstance().getController(GarageController.kControllerEndpoint, GarageController.class).getStatus(aHouseStatus);
+		VeraHouseVO aHouseStatus = myVeraController.getStatus();
+		myGarageController.getStatus(aHouseStatus);
 		aHouseStatus.getScenes().stream().filter(theScene -> theScene.getName().equalsIgnoreCase(kLevelSetSceneName)).findAny().ifPresent(this::setupLevels);
 		fillLevels(aHouseStatus);
 		aHouseStatus.getScenes().clear();
 		aHouseStatus.getDevices().clear();
-		theResponse.getOutputStream().print(new Gson().toJson(aHouseStatus));
-		theResponse.getOutputStream().flush();
-		theResponse.getOutputStream().close();
+		return new Gson().toJson(aHouseStatus);
 	}
 
 	private void fillLevels(VeraHouseVO theHouse)
@@ -61,11 +64,11 @@ public class SceneStatusServlet extends AbstractServlet
 	 */
 	private void setupLevels(VeraSceneVO theVO)
 	{
-		if (myLastUpdate < System.currentTimeMillis() - 1000 * 60)
+		if (myLastUpdate < System.currentTimeMillis() - myUpdateInterval)
 		{
 			myLastUpdate = System.currentTimeMillis();
 			Map<Integer, Integer> aLevels = new HashMap<>();
-			JsonObject anElement = HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).getSceneInformation(theVO.getId());
+			JsonObject anElement = myVeraController.getSceneInformation(theVO.getId());
 			JsonArray aDevices = anElement.getAsJsonArray("groups").get(0).getAsJsonObject().getAsJsonArray("actions");
 			for (int ai = 0; ai < aDevices.size(); ai++)
 			{

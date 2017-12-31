@@ -8,6 +8,7 @@ import com.google.gson.JsonParser;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.logging.Logger;
 /**
  * Get value from hue bridge
  */
+@Component
 public class DaylightController extends HueController
 {
 	private static Logger myLogger = Logger.getLogger("com.jones");

@@ -2,6 +2,10 @@ package com.bigboxer23.lights.servlets;
 
 import com.bigboxer23.lights.HubContext;
 import com.bigboxer23.lights.controllers.ISystemController;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,45 +17,43 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  *
  */
-public class HubServlet extends AbstractServlet
+@RestController
+@EnableAutoConfiguration
+public class HubServlet extends HubContext
 {
-	private static String kServletPrefix = "Lights/";
-
 	private ThreadPoolExecutor myExecutor;
 
 	private static Logger myLogger = Logger.getLogger("com.jones");
 
-	@Override
-	public void init() throws ServletException
+	private ThreadPoolExecutor getExecutors()
 	{
-		myExecutor = new ThreadPoolExecutor(5,
-				5,
-				1,
-				TimeUnit.SECONDS,
-				new ArrayBlockingQueue<>(5));
+		if (myExecutor == null)
+		{
+			myExecutor = new ThreadPoolExecutor(5, 5, 1, TimeUnit.SECONDS, new ArrayBlockingQueue<>(5));
+		}
+		return myExecutor;
 	}
 
-	@Override
-	public void process(HttpServletRequest theRequest, HttpServletResponse theResponse) throws ServletException, IOException
+	@RequestMapping(value = "/S/**", produces = {MediaType.APPLICATION_JSON_VALUE})
+	public void process(HttpServletRequest theRequest)
 	{
-		String[] anArgs = processUrl(theRequest.getRequestURI());
-		if(anArgs.length < 2)
+		List<String> anArgs = processUrl(theRequest.getRequestURI());
+		if(anArgs.size() < 2)
 		{
-			theResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Malformed input " + anArgs.length);
-			return;
+			throw new RuntimeException("Malformed input " + anArgs.size());
 		}
-		ISystemController aController = getController(theRequest.getRequestURI());
+		ISystemController aController = getControllers().get(anArgs.get(1));
 		if (aController == null)
 		{
-			theResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "No controller specified");
-			return;
+			throw new RuntimeException("No controller specified");
 		}
 		List<String> aCommands = getCommands(theRequest.getRequestURI());
-		myExecutor.execute(() ->
+		getExecutors().execute(() ->
 		{
 			String aJsonResponse = aController.doAction(aCommands);
 			if (aJsonResponse != null)
@@ -60,23 +62,16 @@ public class HubServlet extends AbstractServlet
 				myLogger.warning("Message: " + aJsonResponse);
 			}
 		});
-		theResponse.setStatus(HttpServletResponse.SC_OK);
 	}
 
-	public static String[] processUrl(String theUrl)
+	private static List<String> processUrl(String theUrl)
 	{
-		theUrl = theUrl.substring(theUrl.indexOf(kServletPrefix) + kServletPrefix.length());
-		return theUrl.split("/");
+		return Arrays.stream(theUrl.split("/")).filter(theS -> !theS.isEmpty()).collect(Collectors.toList());
 	}
 
-	public static List<String> getCommands(String theUrl)
+	private static List<String> getCommands(String theUrl)
 	{
-		String[] aProcessedUrl = processUrl(theUrl);
-		return Arrays.asList(Arrays.copyOfRange(aProcessedUrl, 2, aProcessedUrl.length));
-	}
-
-	public static ISystemController getController(String theUrl)
-	{
-		return HubContext.getInstance().getController(processUrl(theUrl)[1], ISystemController.class);
+		List<String> aProcessedUrl = processUrl(theUrl);
+		return aProcessedUrl.subList(2, aProcessedUrl.size());
 	}
 }
