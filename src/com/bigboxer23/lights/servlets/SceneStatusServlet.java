@@ -27,7 +27,7 @@ public class SceneStatusServlet extends AbstractServlet
 	/**
 	 * Device id, load level
 	 */
-	private final Map<Integer, Integer> mySpecificDimLevels = new HashMap<>();
+	private Map<Integer, Integer> mySpecificDimLevels;
 
 	@Override
 	public void process(HttpServletRequest theRequest, HttpServletResponse theResponse) throws ServletException, IOException
@@ -46,12 +46,10 @@ public class SceneStatusServlet extends AbstractServlet
 
 	private void fillLevels(VeraHouseVO theHouse)
 	{
-		synchronized (mySpecificDimLevels)
-		{
+		Map<Integer, Integer> aLevels = mySpecificDimLevels;
 			theHouse.getDevices().stream().
-					filter(theDeviceVO -> mySpecificDimLevels.containsKey(theDeviceVO.getId())).
-					forEach(theDeviceVO -> theDeviceVO.setDefinedDim(mySpecificDimLevels.get(theDeviceVO.getId())));
-		}
+					filter(theDeviceVO -> aLevels.containsKey(theDeviceVO.getId())).
+					forEach(theDeviceVO -> theDeviceVO.setDefinedDim(aLevels.get(theDeviceVO.getId())));
 	}
 
 	/**
@@ -65,18 +63,16 @@ public class SceneStatusServlet extends AbstractServlet
 	{
 		if (myLastUpdate < System.currentTimeMillis() - 1000 * 60)
 		{
-			synchronized (mySpecificDimLevels)
+			myLastUpdate = System.currentTimeMillis();
+			Map<Integer, Integer> aLevels = new HashMap<>();
+			JSONObject anElement = HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).getSceneInformation(theVO.getId());
+			JSONArray aDevices = anElement.getJSONArray("groups").getJSONObject(0).getJSONArray("actions");
+			for (int ai = 0; ai < aDevices.length(); ai++)
 			{
-				myLastUpdate = System.currentTimeMillis();
-				mySpecificDimLevels.clear();
-				JSONObject anElement = HubContext.getInstance().getController(VeraController.kControllerEndpoint, VeraController.class).getSceneInformation(theVO.getId());
-				JSONArray aDevices = anElement.getJSONArray("groups").getJSONObject(0).getJSONArray("actions");
-				for (int ai = 0; ai < aDevices.length(); ai++)
-				{
-					JSONObject aDevice = aDevices.getJSONObject(ai);
-					mySpecificDimLevels.put(aDevice.getInt("device"), aDevice.getJSONArray("arguments").getJSONObject(0).getInt("value"));
-				}
+				JSONObject aDevice = aDevices.getJSONObject(ai);
+				aLevels.put(aDevice.getInt("device"), aDevice.getJSONArray("arguments").getJSONObject(0).getInt("value"));
 			}
+			mySpecificDimLevels = aLevels;
 		}
 	}
 }
