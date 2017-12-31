@@ -21,6 +21,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
+		<outputFolder>${project.build.directory}/${artifactId}</outputFolder>
 	</properties>
 
 	<dependencies>
@@ -50,6 +51,12 @@
 			<version>2.8.2</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-dev</artifactId>
+			<version>2.8.2</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.googlecode.mgwt/mgwt -->
 		<dependency>
 			<groupId>com.googlecode.mgwt</groupId>
@@ -75,6 +82,33 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>net.ltgt.gwt.maven</groupId>
+				<artifactId>gwt-maven-plugin</artifactId>
+				<version>1.0-rc-9</version>
+				<extensions>true</extensions>
+				<configuration>
+					<moduleName>com.bigboxer23.house.lights.HouseLights</moduleName>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.coderplus.maven.plugins</groupId>
+				<artifactId>copy-rename-maven-plugin</artifactId>
+				<version>1.0</version>
+				<executions>
+					<execution>
+						<id>copy-and-rename-file</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>rename</goal>
+						</goals>
+						<configuration>
+							<sourceFile>${project.build.directory}/${artifactId}-${version}/HouseLights</sourceFile>
+							<destinationFile>${project.build.directory}/public</destinationFile>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<extensions>
