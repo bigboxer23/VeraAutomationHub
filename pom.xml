@@ -95,24 +95,6 @@
 					<moduleName>com.bigboxer23.house.lights.HouseLights</moduleName>
 				</configuration>
 			</plugin>
-			<!--<plugin>
-				<groupId>com.coderplus.maven.plugins</groupId>
-				<artifactId>copy-rename-maven-plugin</artifactId>
-				<version>1.0</version>
-				<executions>
-					<execution>
-						<id>copy-and-rename-file</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>rename</goal>
-						</goals>
-						<configuration>
-							<sourceFile>${project.build.directory}/${project.artifactId}-${project.version}/HouseLights</sourceFile>
-							<destinationFile>${project.build.directory}/public</destinationFile>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>-->
 		</plugins>
 		<extensions>
 			<!-- Enabling the use of SSH -->

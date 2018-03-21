@@ -32,15 +32,15 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 
 	private static final String kVeraBaseRequest = "/data_request?id=action&output_format=json";
 
-	private static final String kVeraRequest = kVeraBaseRequest + "&DeviceNum=";
+	public static final String kVeraRequest = kVeraBaseRequest + "&DeviceNum=";
 
 	private static final String kVeraSceneRequest = kVeraBaseRequest + "&SceneNum=";
 
-	private static final String kVeraServiceUrn = "&serviceId=urn:upnp-org:serviceId:";
+	public static final String kVeraServiceUrn = "&serviceId=urn:upnp-org:serviceId:";
 
 	private static final String kSceneUrn = "&serviceId=urn:micasaverde-com:serviceId:";
 
-	private static final String kDimmingCommand = "Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=";
+	public static final String kDimmingCommand = "Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=";
 
 	private VeraHouseVO myStatus;
 

@@ -8,11 +8,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +23,11 @@ import java.util.stream.Collectors;
 @Component
 public class NotificationController extends HubContext implements ISystemController
 {
+	protected static Logger myLogger = Logger.getLogger("com.jones");
+
+	@Value("${veraUrl}")
+	private String kVeraHubUrl;
+
 	public static final String kControllerEndpoint = "Notification";
 
 	private static final String kNotificationSceneName = System.getProperty("notification.scene", "Notify");
@@ -33,6 +40,11 @@ public class NotificationController extends HubContext implements ISystemControl
 
 	private List<Integer> myNotificationDeviceIds = new ArrayList<>();
 
+	@Value("${notificationGap}")
+	private long myNotificationGap;
+
+	private long myLastNotification = -1;
+
 	@Override
 	public String doAction(List<String> theCommands)
 	{
@@ -42,6 +54,11 @@ public class NotificationController extends HubContext implements ISystemControl
 		}
 		if (!updateNotificationSceneId())
 		{
+			return null;
+		}
+		if ((System.currentTimeMillis() - myNotificationGap * 1000 * 60) < myLastNotification)
+		{
+			myLogger.info("Not triggering notification, not enough gap yet.");
 			return null;
 		}
 		doPulseNotification(getDeviceInfo());
@@ -61,8 +78,10 @@ public class NotificationController extends HubContext implements ISystemControl
 			filter(theVeraDeviceVO -> theVeraDeviceVO.getLevel() > 0).
 			forEach(theDevice ->
 			{
+				myLastNotification = System.currentTimeMillis();
+				myLogger.info(theDevice.getName() + " " + theDevice.getLevel());
 				new Thread(() -> {
-					String aGetUrl = "";//TODO://VeraController.kVeraHubUrl + VeraController.kVeraRequest + theDevice.getId() + VeraController.kVeraServiceUrn + VeraController.kDimmingCommand;
+					String aGetUrl = kVeraHubUrl + VeraController.kVeraRequest + theDevice.getId() + VeraController.kVeraServiceUrn + VeraController.kDimmingCommand;
 					try
 					{
 						doRequest(aGetUrl, theDevice.getLevel() / 3);
