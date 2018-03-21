@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  */
 public class AbstractBaseController
 {
-	protected static Logger myLogger = Logger.getLogger("com.jones");
+	protected static Logger myLogger = Logger.getLogger("com.bigboxer23");
 
 	private DefaultHttpClient myHttpClient;
 

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Component
 public class NotificationController extends HubContext implements ISystemController
 {
-	protected static Logger myLogger = Logger.getLogger("com.jones");
+	protected static Logger myLogger = Logger.getLogger("com.bigboxer23");
 
 	@Value("${veraUrl}")
 	private String kVeraHubUrl;

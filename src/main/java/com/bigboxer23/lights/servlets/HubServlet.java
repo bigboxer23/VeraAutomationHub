@@ -28,7 +28,7 @@ public class HubServlet extends HubContext
 {
 	private ThreadPoolExecutor myExecutor;
 
-	private static Logger myLogger = Logger.getLogger("com.jones");
+	private static Logger myLogger = Logger.getLogger("com.bigboxer23");
 
 	private ThreadPoolExecutor getExecutors()
 	{

@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 @Component
 public class DaylightController extends HueController
 {
-	private static Logger myLogger = Logger.getLogger("com.jones");
+	private static Logger myLogger = Logger.getLogger("com.bigboxer23");
 
 	public static final String kControllerEndpoint = "Daylight";
 

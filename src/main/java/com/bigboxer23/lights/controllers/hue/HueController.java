@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  */
 public class HueController implements ISystemController, IStatusController
 {
-	private static Logger myLogger = Logger.getLogger("com.jones");
+	private static Logger myLogger = Logger.getLogger("com.bigboxer23");
 
 	/**
 	 * Username to access lights with
