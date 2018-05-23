@@ -87,10 +87,10 @@ public class NotificationController extends HubContext implements ISystemControl
 						doRequest(aGetUrl, theDevice.getLevel() / 3);
 						Thread.sleep(kZWaveTiming);
 						doRequest(aGetUrl, theDevice.getLevel());
-						Thread.sleep(kZWaveTiming);
+						/*Thread.sleep(kZWaveTiming);
 						doRequest(aGetUrl, theDevice.getLevel() / 3);
 						Thread.sleep(kZWaveTiming);
-						doRequest(aGetUrl, theDevice.getLevel());
+						doRequest(aGetUrl, theDevice.getLevel());*/
 					}
 					catch (InterruptedException theE)
 					{
