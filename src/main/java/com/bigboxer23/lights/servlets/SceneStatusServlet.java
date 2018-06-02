@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Get status from the vera controller for everything in the house
@@ -25,6 +26,8 @@ public class SceneStatusServlet extends HubContext
 {
 	private static final String kLevelSetSceneName = System.getProperty("level.set.scene.name", "LevelSet");
 
+	private static Logger myLogger = Logger.getLogger("com.bigboxer23.SceneStatusServlet");
+
 	private long myLastUpdate = -1;
 
 	@Value("${scene.update.interval}")
@@ -33,7 +36,7 @@ public class SceneStatusServlet extends HubContext
 	/**
 	 * Device id, load level
 	 */
-	private Map<Integer, Integer> mySpecificDimLevels;
+	private Map<Integer, Integer> mySpecificDimLevels = new HashMap<>();
 
 	@RequestMapping(value = "/SceneStatus", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public String getHouseStatus()
@@ -49,10 +52,9 @@ public class SceneStatusServlet extends HubContext
 
 	private void fillLevels(VeraHouseVO theHouse)
 	{
-		Map<Integer, Integer> aLevels = mySpecificDimLevels;
 			theHouse.getDevices().stream().
-					filter(theDeviceVO -> aLevels.containsKey(theDeviceVO.getId())).
-					forEach(theDeviceVO -> theDeviceVO.setDefinedDim(aLevels.get(theDeviceVO.getId())));
+					filter(theDeviceVO -> mySpecificDimLevels.containsKey(theDeviceVO.getId())).
+					forEach(theDeviceVO -> theDeviceVO.setDefinedDim(mySpecificDimLevels.get(theDeviceVO.getId())));
 	}
 
 	/**
@@ -66,16 +68,22 @@ public class SceneStatusServlet extends HubContext
 	{
 		if (myLastUpdate < System.currentTimeMillis() - myUpdateInterval)
 		{
+			myLogger.warning("Fetching new levels---------------------");
 			myLastUpdate = System.currentTimeMillis();
-			Map<Integer, Integer> aLevels = new HashMap<>();
 			JsonObject anElement = myVeraController.getSceneInformation(theVO.getId());
 			JsonArray aDevices = anElement.getAsJsonArray("groups").get(0).getAsJsonObject().getAsJsonArray("actions");
 			for (int ai = 0; ai < aDevices.size(); ai++)
 			{
 				JsonObject aDevice = aDevices.get(ai).getAsJsonObject();
-				aLevels.put(aDevice.get("device").getAsInt(), aDevice.get("arguments").getAsJsonArray().get(0).getAsJsonObject().get("value").getAsInt());
+				int aDeviceId = aDevice.get("device").getAsInt();
+				int aDimLevel = aDevice.get("arguments").getAsJsonArray().get(0).getAsJsonObject().get("value").getAsInt();
+				int aPrevious = mySpecificDimLevels.getOrDefault(aDeviceId, -1);
+				if (aPrevious != aDimLevel)
+				{
+					myLogger.warning("device: " + aDeviceId + "being set from " + aPrevious + " to " + aDimLevel);
+					mySpecificDimLevels.put(aDeviceId, aDimLevel);
+				}
 			}
-			mySpecificDimLevels = aLevels;
 		}
 	}
 }

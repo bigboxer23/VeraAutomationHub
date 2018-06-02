@@ -142,7 +142,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 						aVeraRoomVO.getDevices().stream().filter(VeraDeviceVO::isLight).forEach(theVeraDeviceVO ->
 						{
 							String anAction = theCommands.get(2);
-							if (theVeraDeviceVO.getDefinedDim() > 0 && theVeraDeviceVO.getDefinedDim() < 100 && !anAction.endsWith("0"))
+							if (theVeraDeviceVO.getDefinedDim() > 0 && theVeraDeviceVO.getDefinedDim() <= 100 && !anAction.endsWith("0"))
 							{
 								anAction = kDimmingCommand + theVeraDeviceVO.getDefinedDim();
 							}
