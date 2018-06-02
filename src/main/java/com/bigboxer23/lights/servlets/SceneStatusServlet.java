@@ -80,7 +80,7 @@ public class SceneStatusServlet extends HubContext
 				int aPrevious = mySpecificDimLevels.getOrDefault(aDeviceId, -1);
 				if (aPrevious != aDimLevel)
 				{
-					myLogger.warning("device: " + aDeviceId + "being set from " + aPrevious + " to " + aDimLevel);
+					myLogger.warning("device: " + aDeviceId + " set from " + aPrevious + " to " + aDimLevel);
 					mySpecificDimLevels.put(aDeviceId, aDimLevel);
 				}
 			}
