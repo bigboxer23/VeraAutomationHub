@@ -65,6 +65,7 @@ public class TokenDistributionServlet
 			Cookie anAuthCookie = new Cookie("t", myToken);
 			anAuthCookie.setHttpOnly(true);
 			anAuthCookie.setSecure(true);
+			anAuthCookie.setMaxAge(60*60*24*365*5); //Store cookie for 5 year
 			theResponse.addCookie(anAuthCookie); //put cookie in response
 			myTokenValidTime = -1;
 			return "{t:" + myToken + "}";
