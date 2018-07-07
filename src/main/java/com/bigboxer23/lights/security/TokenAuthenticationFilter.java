@@ -8,11 +8,12 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
-import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -28,13 +29,13 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest theRequest, HttpServletResponse theResponse)
 	{
-		String aTokenParam = ofNullable(theRequest.getHeader(AUTHORIZATION))
-				.orElse(theRequest.getParameter("t"));
-		//TODO handle getting from cookie
-		String aToken = ofNullable(aTokenParam)
-				.map(String::trim)
-				.orElseThrow(() -> new BadCredentialsException("Missing Token"));
-		return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(aToken, aToken));
+		String aToken = ofNullable(theRequest.getParameter("t"))
+				.orElse(getTokenFromCookie(theRequest));
+		if (aToken == null)
+		{
+			throw new BadCredentialsException("Missing Token");
+		}
+		return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(aToken.trim(), aToken.trim()));
 	}
 
 	@Override
@@ -42,5 +43,18 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
 	{
 		super.successfulAuthentication(theRequest, theResponse, theChain, theAuthResult);
 		theChain.doFilter(theRequest, theResponse);
+	}
+
+	private String getTokenFromCookie(HttpServletRequest theRequest)
+	{
+		if (theRequest.getCookies() == null)
+		{
+			return null;
+		}
+		return Arrays.stream(theRequest.getCookies())
+				.filter(theCookie -> theCookie.getName().equalsIgnoreCase("t"))
+				.map(Cookie::getValue)
+				.findAny()
+				.orElse(null);
 	}
 }

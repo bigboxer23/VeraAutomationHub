@@ -24,7 +24,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 {
 	private static final RequestMatcher kProtectedUrls = new OrRequestMatcher(
 			new AntPathRequestMatcher("/SceneStatus"),
-			new AntPathRequestMatcher("/S/**")
+			new AntPathRequestMatcher("/S/**"),
+			new AntPathRequestMatcher("/enableTokenFetch/**")
 	);
 	private TokenAuthenticationProvider myProvider;
 
@@ -53,7 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 				.authorizeRequests()
 				.anyRequest().
 				permitAll().
-				antMatchers("/SceneStatus", "/S/**")
+				antMatchers("/SceneStatus", "/S/**", "/enableTokenFetch/**")
 				.authenticated()
 				.and()
 				/*.csrf().disable()*/

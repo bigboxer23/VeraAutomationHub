@@ -92,7 +92,7 @@ public class GarageController extends AbstractBaseController implements ISystemC
 
 	public void getStatus(VeraHouseVO theHouseStatus)
 	{
-		if (myGarageData != null)
+		if (myGarageData != null && theHouseStatus != null && theHouseStatus.getRooms() != null)
 		{
 			theHouseStatus.getRooms().stream().filter(aRoom -> aRoom.getName().equals("Garage")).forEach(aRoom -> aRoom.addDevice(myGarageData));
 		}
