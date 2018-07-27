@@ -188,6 +188,6 @@ public class VeraDeviceVO
 
 	public final boolean isLight()
 	{
-		return getCategory().equals("2") || getCategory().equalsIgnoreCase("3");
+		return getCategory() != null && (getCategory().equals("2") || getCategory().equalsIgnoreCase("3"));
 	}
 }

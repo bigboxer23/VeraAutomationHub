@@ -1,14 +1,17 @@
 package com.bigboxer23.lights.servlets;
 
+import com.bigboxer23.lights.controllers.elastic.ElasticAnalyticsController;
 import com.google.gson.Gson;
 import com.bigboxer23.lights.HubContext;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.lights.controllers.vera.VeraSceneVO;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,13 +36,26 @@ public class SceneStatusServlet extends HubContext
 	@Value("${scene.update.interval}")
 	private long myUpdateInterval;
 
+	private ElasticAnalyticsController myElasticAnalyticsController;
+
+	@Autowired
+	public void setGarageController(ElasticAnalyticsController theElasticAnalyticsController)
+	{
+		myElasticAnalyticsController = theElasticAnalyticsController;
+	}
+
 	/**
 	 * Device id, load level
 	 */
 	private Map<Integer, Integer> mySpecificDimLevels = new HashMap<>();
 
 	@RequestMapping(value = "/SceneStatus", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public String getHouseStatus()
+	public String getHouseStatusJson()
+	{
+		return new Gson().toJson(getHouseStatus());
+	}
+
+	private VeraHouseVO getHouseStatus()
 	{
 		VeraHouseVO aHouseStatus = myVeraController.getStatus();
 		myGarageController.getStatus(aHouseStatus);
@@ -47,7 +63,7 @@ public class SceneStatusServlet extends HubContext
 		fillLevels(aHouseStatus);
 		aHouseStatus.getScenes().clear();
 		aHouseStatus.getDevices().clear();
-		return new Gson().toJson(aHouseStatus);
+		return aHouseStatus;
 	}
 
 	private void fillLevels(VeraHouseVO theHouse)
@@ -85,5 +101,14 @@ public class SceneStatusServlet extends HubContext
 				}
 			}
 		}
+	}
+
+	/**
+	 * Send to elastic every 5 min
+	 */
+	@Scheduled(fixedDelay = 300000)
+	private void updateStatus()
+	{
+		myElasticAnalyticsController.logStatusEvent(getHouseStatus());
 	}
 }
