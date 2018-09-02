@@ -3,6 +3,7 @@ package com.bigboxer23.lights.controllers.vera;
 import com.bigboxer23.lights.controllers.AbstractBaseController;
 import com.bigboxer23.lights.controllers.IStatusController;
 import com.bigboxer23.lights.controllers.ISystemController;
+import com.bigboxer23.util.http.HttpClientUtils;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import com.google.gson.JsonObject;
@@ -62,11 +63,12 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		myLogger.info("Getting Vera Level");
 		try
 		{
-			HttpResponse aResponse = getHttpClient().execute(new HttpGet(kVeraHubUrl + "/data_request?id=scene&action=list&scene=" + theSceneID));
+			HttpResponse aResponse = HttpClientUtils.getInstance().execute(new HttpGet(kVeraHubUrl + "/data_request?id=scene&action=list&scene=" + theSceneID));
 			return new JsonParser().parse(new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8)).getAsJsonObject();
 		}
 		catch (IOException theE)
 		{
+			HttpClientUtils.reset();
 			myLogger.log(Level.WARNING, "getRoomLevels", theE);
 		}
 		return null;
@@ -77,7 +79,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		myLogger.info("Getting Vera Status");
 		try
 		{
-			HttpResponse aResponse = getHttpClient().execute(new HttpGet(kVeraHubUrl + "/data_request?id=sdata"));
+			HttpResponse aResponse = HttpClientUtils.getInstance().execute(new HttpGet(kVeraHubUrl + "/data_request?id=sdata"));
 			String aStatusString = new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8);
 			VeraHouseVO aHouseStatus = getBuilder().create().fromJson(aStatusString, VeraHouseVO.class);
 			setStatus(aHouseStatus);
@@ -86,6 +88,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		}
 		catch (IOException theE)
 		{
+			HttpClientUtils.reset();
 			myLogger.log(Level.WARNING, "getStatus", theE);
 		}
 		return null;

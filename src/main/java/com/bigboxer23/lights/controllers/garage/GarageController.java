@@ -5,6 +5,7 @@ import com.bigboxer23.lights.controllers.IStatusController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.lights.controllers.ITemperatureController;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
+import com.bigboxer23.util.http.HttpClientUtils;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
@@ -108,7 +109,7 @@ public class GarageController extends AbstractBaseController implements ISystemC
 			try
 			{
 				long aStartTime = System.currentTimeMillis();
-				HttpResponse aResponse = getHttpClient().execute(new HttpGet(GarageController.kGarageURL + "/Status2"));
+				HttpResponse aResponse = HttpClientUtils.getInstance().execute(new HttpGet(GarageController.kGarageURL + "/Status2"));
 				myGarageData = getBuilder().create().fromJson(new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8), VeraDeviceVO.class);
 				myGarageData.setName("Garage Opener");
 				/*myGarageData.setCategory("99");
@@ -120,6 +121,7 @@ public class GarageController extends AbstractBaseController implements ISystemC
 			}
 			catch (IOException theE)
 			{
+				HttpClientUtils.reset();
 				myLogger.log(Level.WARNING, "getStatus", theE);
 				if (myFailTime == null)
 				{
