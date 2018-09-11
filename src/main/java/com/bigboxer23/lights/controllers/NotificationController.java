@@ -8,13 +8,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 @Component
 public class NotificationController extends HubContext implements ISystemController
 {
-	protected static Logger myLogger = Logger.getLogger("com.bigboxer23");
+	protected static final Logger myLogger = LoggerFactory.getLogger(NotificationController.class);
 
 	@Value("${veraUrl}")
 	private String kVeraHubUrl;

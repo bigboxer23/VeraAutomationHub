@@ -12,18 +12,18 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * controller for a philips hue light system
  */
 public class HueController implements ISystemController, IStatusController
 {
-	private static Logger myLogger = Logger.getLogger("com.bigboxer23");
+	private static final Logger myLogger = LoggerFactory.getLogger(HueController.class);
 
 	/**
 	 * Username to access lights with
@@ -155,14 +155,14 @@ public class HueController implements ISystemController, IStatusController
 	{
 		if (myStatusObject == null || (System.currentTimeMillis() - myStatusTime) > kCachingDelay)
 		{
-			myLogger.config("Getting new status");
+			myLogger.trace("Getting new status");
 			myStatusTime = System.currentTimeMillis();
 			try
 			{
 				DefaultHttpClient aHttpClient = new DefaultHttpClient();
 				HttpResponse aResponse = aHttpClient.execute(new HttpGet(getBaseUrl() + "/lights/"));
 				String aStatusString = new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8);
-				myLogger.config("Status: " + aStatusString);
+				myLogger.trace("Status: " + aStatusString);
 				myStatusObject = new JsonParser().parse(aStatusString);
 			}
 			catch (IOException | JsonSyntaxException e)

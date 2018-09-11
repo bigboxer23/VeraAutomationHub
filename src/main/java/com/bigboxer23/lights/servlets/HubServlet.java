@@ -2,21 +2,19 @@ package com.bigboxer23.lights.servlets;
 
 import com.bigboxer23.lights.HubContext;
 import com.bigboxer23.lights.controllers.ISystemController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -28,7 +26,7 @@ public class HubServlet extends HubContext
 {
 	private ThreadPoolExecutor myExecutor;
 
-	private static Logger myLogger = Logger.getLogger("com.bigboxer23");
+	private static final Logger myLogger = LoggerFactory.getLogger(HubServlet.class);
 
 	private ThreadPoolExecutor getExecutors()
 	{
@@ -58,8 +56,8 @@ public class HubServlet extends HubContext
 			String aJsonResponse = aController.doAction(aCommands);
 			if (aJsonResponse != null)
 			{
-				myLogger.warning("Error running request: " + theRequest.getRequestURI());
-				myLogger.warning("Message: " + aJsonResponse);
+				myLogger.error("Error running request: " + theRequest.getRequestURI());
+				myLogger.error("Message: " + aJsonResponse);
 			}
 		});
 	}

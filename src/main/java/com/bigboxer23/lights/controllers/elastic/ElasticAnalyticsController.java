@@ -8,14 +8,14 @@ import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Send statistics about house status to an elasticsearch backend
@@ -32,7 +32,7 @@ public class ElasticAnalyticsController
 
 	private RestHighLevelClient myClient;
 
-	private static Logger myLogger = Logger.getLogger("com.bigboxer23.ElasticAnalyticsController");
+	private static final Logger myLogger = LoggerFactory.getLogger(ElasticAnalyticsController.class);
 
 	public void logStatusEvent(VeraHouseVO theVeraHouseVO)
 	{
@@ -43,19 +43,19 @@ public class ElasticAnalyticsController
 		{
 			if (aBulkRequest.numberOfActions() > 0)
 			{
-				myLogger.fine("Sending Request to elastic");
+				myLogger.debug("Sending Request to elastic");
 				getClient().bulk(aBulkRequest);
 			}
 		}
 		catch (IOException theE)
 		{
-			myLogger.log(Level.WARNING, "logStatusEvent:", theE);
+			myLogger.error("logStatusEvent:", theE);
 		}
 	}
 
 	private void handleLightsData(VeraHouseVO theVeraHouseVO, BulkRequest theRequest)
 	{
-		myLogger.fine("handleLightsData");
+		myLogger.debug("handleLightsData");
 		theVeraHouseVO
 				.getRooms()
 				.stream()
@@ -91,7 +91,7 @@ public class ElasticAnalyticsController
 
 	private void handleClimateData(VeraHouseVO theVeraHouseVO, BulkRequest theRequest)
 	{
-		myLogger.fine("handleClimateData");
+		myLogger.debug("handleClimateData");
 		theVeraHouseVO.getRooms()
 				.stream()
 				.filter(theRoom -> theRoom.getName().equalsIgnoreCase("climate control"))
@@ -142,7 +142,7 @@ public class ElasticAnalyticsController
 	{
 		if (myClient != null)
 		{
-			myLogger.fine("closing elastic client");
+			myLogger.debug("closing elastic client");
 			myClient.close();
 		}
 	}

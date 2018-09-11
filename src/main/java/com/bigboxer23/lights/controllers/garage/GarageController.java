@@ -21,7 +21,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
 
 /**
  * Control garage pi
@@ -54,7 +53,7 @@ public class GarageController extends AbstractBaseController implements ISystemC
 		}
 		catch (Throwable e)
 		{
-			myLogger.log(Level.WARNING, "GarageController: ", e);
+			myLogger.error("GarageController: ", e);
 		}
 		return null;
 	}
@@ -122,7 +121,7 @@ public class GarageController extends AbstractBaseController implements ISystemC
 			catch (IOException theE)
 			{
 				HttpClientUtils.reset();
-				myLogger.log(Level.WARNING, "getStatus", theE);
+				myLogger.error("getStatus", theE);
 				if (myFailTime == null)
 				{
 					myFailTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date());

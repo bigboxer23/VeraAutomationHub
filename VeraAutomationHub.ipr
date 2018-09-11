@@ -568,6 +568,17 @@
         <root url="jar://$MAVEN_REPOSITORY$/net/bytebuddy/byte-buddy/1.7.11/byte-buddy-1.7.11-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: net.logstash.logback:logstash-logback-encoder:5.2">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/net/logstash/logback/logstash-logback-encoder/5.2/logstash-logback-encoder-5.2.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/net/logstash/logback/logstash-logback-encoder/5.2/logstash-logback-encoder-5.2-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/net/logstash/logback/logstash-logback-encoder/5.2/logstash-logback-encoder-5.2-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Maven: net.minidev:accessors-smart:1.2">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/net/minidev/accessors-smart/1.2/accessors-smart-1.2.jar!/" />

@@ -2,15 +2,16 @@ package com.bigboxer23.lights.controllers;
 
 import com.google.gson.GsonBuilder;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.logging.Logger;
 
 /**
  * encapsulate common logging code
  */
 public class AbstractBaseController
 {
-	protected static Logger myLogger = Logger.getLogger("com.bigboxer23");
+	protected static final Logger myLogger = LoggerFactory.getLogger(AbstractBaseController.class);
 
 	private GsonBuilder myBuilder;
 

@@ -69,7 +69,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		catch (IOException theE)
 		{
 			HttpClientUtils.reset();
-			myLogger.log(Level.WARNING, "getRoomLevels", theE);
+			myLogger.error("getRoomLevels", theE);
 		}
 		return null;
 	}
@@ -89,7 +89,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		catch (IOException theE)
 		{
 			HttpClientUtils.reset();
-			myLogger.log(Level.WARNING, "getStatus", theE);
+			myLogger.error("getStatus", theE);
 		}
 		return null;
 	}

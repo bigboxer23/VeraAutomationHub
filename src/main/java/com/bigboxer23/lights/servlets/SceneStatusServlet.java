@@ -7,6 +7,8 @@ import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.lights.controllers.vera.VeraSceneVO;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * Get status from the vera controller for everything in the house
@@ -29,7 +30,7 @@ public class SceneStatusServlet extends HubContext
 {
 	private static final String kLevelSetSceneName = System.getProperty("level.set.scene.name", "LevelSet");
 
-	private static Logger myLogger = Logger.getLogger("com.bigboxer23.SceneStatusServlet");
+	private static final Logger myLogger = LoggerFactory.getLogger(SceneStatusServlet.class);
 
 	private long myLastUpdate = -1;
 
@@ -84,7 +85,7 @@ public class SceneStatusServlet extends HubContext
 	{
 		if (myLastUpdate < System.currentTimeMillis() - myUpdateInterval)
 		{
-			myLogger.warning("Fetching new levels---------------------");
+			myLogger.error("Fetching new levels---------------------");
 			myLastUpdate = System.currentTimeMillis();
 			JsonObject anElement = myVeraController.getSceneInformation(theVO.getId());
 			JsonArray aDevices = anElement.getAsJsonArray("groups").get(0).getAsJsonObject().getAsJsonArray("actions");
@@ -96,7 +97,7 @@ public class SceneStatusServlet extends HubContext
 				int aPrevious = mySpecificDimLevels.getOrDefault(aDeviceId, -1);
 				if (aPrevious != aDimLevel)
 				{
-					myLogger.warning("device: " + aDeviceId + " set from " + aPrevious + " to " + aDimLevel);
+					myLogger.error("device: " + aDeviceId + " set from " + aPrevious + " to " + aDimLevel);
 					mySpecificDimLevels.put(aDeviceId, aDimLevel);
 				}
 			}

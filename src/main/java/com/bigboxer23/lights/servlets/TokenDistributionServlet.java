@@ -1,5 +1,7 @@
 package com.bigboxer23.lights.servlets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.MediaType;
@@ -10,7 +12,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 /**
  * Servlet has two endpoints used for distributing the token, and enabling access to distribute.  Workflow surrounding
@@ -38,7 +39,7 @@ public class TokenDistributionServlet
 	@Value("${auth.token.window}")
 	private long kTokenValidTime;
 
-	private static Logger myLogger = Logger.getLogger("com.bigboxer23");
+	private static final Logger myLogger = LoggerFactory.getLogger(TokenDistributionServlet.class);
 
 	/**
 	 * Enable calling the getToken endpoint
@@ -47,7 +48,7 @@ public class TokenDistributionServlet
 	public void enableTokenRequest(HttpServletRequest theRequest)
 	{
 		myTokenValidTime  = System.currentTimeMillis();
-		myLogger.warning("Enabling token access, requested by " + theRequest.getRemoteAddr());
+		myLogger.error("Enabling token access, requested by " + theRequest.getRemoteAddr());
 	}
 
 	/**
@@ -61,7 +62,7 @@ public class TokenDistributionServlet
 	{
 		if (myTokenValidTime + kTokenValidTime > System.currentTimeMillis())
 		{
-			myLogger.warning("Token distributed to " + theRequest.getRemoteAddr());
+			myLogger.error("Token distributed to " + theRequest.getRemoteAddr());
 			Cookie anAuthCookie = new Cookie("t", myToken);
 			anAuthCookie.setHttpOnly(true);
 			anAuthCookie.setSecure(true);
