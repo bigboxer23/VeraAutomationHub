@@ -67,8 +67,10 @@ public class ElasticAnalyticsController
 						.orElse(false))
 				.forEach(theRoom ->
 				{
+					long aNumberDevicesOn = getNumberOfDevicesOn(theRoom);
 					Map<String, Object> aDocument = new HashMap<>();
-					aDocument.put("on", isRoomOn(theRoom));
+					aDocument.put("on", aNumberDevicesOn > 0);
+					aDocument.put("numberOfDevicesOn", getNumberOfDevicesOn(theRoom));
 					aDocument.put("time", new Date());
 					aDocument.put("name", theRoom.getName());
 					aDocument.put("type", "light");
@@ -77,16 +79,14 @@ public class ElasticAnalyticsController
 				});
 	}
 
-	private boolean isRoomOn(VeraRoomVO theRoom)
+	private long getNumberOfDevicesOn(VeraRoomVO theRoom)
 	{
 		return theRoom
 				.getDevices()
 				.stream()
 				.filter(VeraDeviceVO::isLight)
 				.filter(theDevice -> theDevice.getLevel() > 0)
-				.findAny()
-				.map(theDevice -> theDevice.getLevel() > 0)
-				.orElse(false);
+				.count();
 	}
 
 	private void handleClimateData(VeraHouseVO theVeraHouseVO, BulkRequest theRequest)
