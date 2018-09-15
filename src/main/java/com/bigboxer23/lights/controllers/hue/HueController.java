@@ -1,21 +1,17 @@
 package com.bigboxer23.lights.controllers.hue;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.ByteStreams;
+import com.bigboxer23.util.http.HttpClientUtils;
 import com.google.gson.*;
 import com.bigboxer23.lights.controllers.IStatusController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.lights.data.HueLightVO;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -124,19 +120,11 @@ public class HueController implements ISystemController, IStatusController
 
 	private void callBridge(String theUrl, JsonObject theJsonObject)
 	{
-		try
-		{
-			DefaultHttpClient aHttpClient = new DefaultHttpClient();
-			HttpPut aPost = new HttpPut(theUrl);
-			StringEntity anEntity = new StringEntity(theJsonObject.toString(), HTTP.UTF_8);
-			anEntity.setContentType("application/json");
-			aPost.setEntity(anEntity);
-			aHttpClient.execute(aPost);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		HttpPut aPost = new HttpPut(theUrl);
+		StringEntity anEntity = new StringEntity(theJsonObject.toString(), HTTP.UTF_8);
+		anEntity.setContentType("application/json");
+		aPost.setEntity(anEntity);
+		HttpClientUtils.execute(aPost);
 	}
 
 	@Override
@@ -159,13 +147,11 @@ public class HueController implements ISystemController, IStatusController
 			myStatusTime = System.currentTimeMillis();
 			try
 			{
-				DefaultHttpClient aHttpClient = new DefaultHttpClient();
-				HttpResponse aResponse = aHttpClient.execute(new HttpGet(getBaseUrl() + "/lights/"));
-				String aStatusString = new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8);
+				String aStatusString = HttpClientUtils.execute(new HttpGet(getBaseUrl() + "/lights/"));
 				myLogger.trace("Status: " + aStatusString);
 				myStatusObject = new JsonParser().parse(aStatusString);
 			}
-			catch (IOException | JsonSyntaxException e)
+			catch (JsonSyntaxException e)
 			{
 				//don't care
 			}

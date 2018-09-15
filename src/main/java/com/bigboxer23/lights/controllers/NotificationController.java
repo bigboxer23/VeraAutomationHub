@@ -1,19 +1,18 @@
 package com.bigboxer23.lights.controllers;
 
-import com.bigboxer23.lights.controllers.vera.VeraSceneVO;
 import com.bigboxer23.lights.HubContext;
 import com.bigboxer23.lights.controllers.vera.VeraController;
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
+import com.bigboxer23.lights.controllers.vera.VeraSceneVO;
+import com.bigboxer23.util.http.HttpClientUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -142,14 +141,6 @@ public class NotificationController extends HubContext implements ISystemControl
 
 	private static void doRequest(String theUrl, int theLevel)
 	{
-		DefaultHttpClient aHttpClient = new DefaultHttpClient();
-		try
-		{
-			aHttpClient.execute(new HttpGet(theUrl + theLevel));
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		HttpClientUtils.execute(new HttpGet(theUrl + theLevel));
 	}
 }

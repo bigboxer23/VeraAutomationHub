@@ -85,7 +85,7 @@ public class SceneStatusServlet extends HubContext
 	{
 		if (myLastUpdate < System.currentTimeMillis() - myUpdateInterval)
 		{
-			myLogger.error("Fetching new levels---------------------");
+			myLogger.debug("Fetching new levels---------------------");
 			myLastUpdate = System.currentTimeMillis();
 			JsonObject anElement = myVeraController.getSceneInformation(theVO.getId());
 			JsonArray aDevices = anElement.getAsJsonArray("groups").get(0).getAsJsonObject().getAsJsonArray("actions");

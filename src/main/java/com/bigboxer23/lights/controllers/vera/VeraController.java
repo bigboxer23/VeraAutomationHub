@@ -4,20 +4,14 @@ import com.bigboxer23.lights.controllers.AbstractBaseController;
 import com.bigboxer23.lights.controllers.IStatusController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.util.http.HttpClientUtils;
-import com.google.common.base.Charsets;
-import com.google.common.io.ByteStreams;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * Vera controller to make requests to a vera UI7 device
@@ -60,38 +54,18 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 	 */
 	public JsonObject getSceneInformation(int theSceneID)
 	{
-		myLogger.info("Getting Vera Level");
-		try
-		{
-			HttpResponse aResponse = HttpClientUtils.getInstance().execute(new HttpGet(kVeraHubUrl + "/data_request?id=scene&action=list&scene=" + theSceneID));
-			return new JsonParser().parse(new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8)).getAsJsonObject();
-		}
-		catch (IOException theE)
-		{
-			HttpClientUtils.reset();
-			myLogger.error("getRoomLevels", theE);
-		}
-		return null;
+		myLogger.debug("Getting Vera Level");
+		return new JsonParser().parse(HttpClientUtils.execute(new HttpGet(kVeraHubUrl + "/data_request?id=scene&action=list&scene=" + theSceneID))).getAsJsonObject();
 	}
 
 	public VeraHouseVO getStatus()
 	{
-		myLogger.info("Getting Vera Status");
-		try
-		{
-			HttpResponse aResponse = HttpClientUtils.getInstance().execute(new HttpGet(kVeraHubUrl + "/data_request?id=sdata"));
-			String aStatusString = new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8);
-			VeraHouseVO aHouseStatus = getBuilder().create().fromJson(aStatusString, VeraHouseVO.class);
-			setStatus(aHouseStatus);
-			myLogger.info("Got Vera Status");
-			return aHouseStatus;
-		}
-		catch (IOException theE)
-		{
-			HttpClientUtils.reset();
-			myLogger.error("getStatus", theE);
-		}
-		return null;
+		myLogger.debug("Getting Vera Status");
+		String aStatusString = HttpClientUtils.execute(new HttpGet(kVeraHubUrl + "/data_request?id=sdata"));
+		VeraHouseVO aHouseStatus = getBuilder().create().fromJson(aStatusString, VeraHouseVO.class);
+		setStatus(aHouseStatus);
+		myLogger.debug("Got Vera Status");
+		return aHouseStatus;
 	}
 
 	/**
@@ -113,16 +87,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 
 	private void doDeviceAction(DeviceAction theAction, boolean theScene)
 	{
-		DefaultHttpClient aHttpClient = new DefaultHttpClient();
-		try
-		{
-			HttpGet aGet = new HttpGet(kVeraHubUrl + (theScene ? kVeraSceneRequest : kVeraRequest) + theAction.getId() + (theScene ? kSceneUrn : kVeraServiceUrn) + theAction.getAction());
-			aHttpClient.execute(aGet);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		HttpClientUtils.execute(new HttpGet(kVeraHubUrl + (theScene ? kVeraSceneRequest : kVeraRequest) + theAction.getId() + (theScene ? kSceneUrn : kVeraServiceUrn) + theAction.getAction()));
 	}
 
 	/**
