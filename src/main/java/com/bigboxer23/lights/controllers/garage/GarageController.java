@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +36,7 @@ public class GarageController extends AbstractBaseController implements ISystemC
 
 	public GarageController()
 	{
-		Executors.newScheduledThreadPool(10).scheduleWithFixedDelay(new Task(), 0, 5, TimeUnit.SECONDS);
+		Executors.newScheduledThreadPool(10).scheduleWithFixedDelay(new FetchGarageStatus(), 0, 5, TimeUnit.SECONDS);
 	}
 
 	@Override
@@ -79,7 +78,7 @@ public class GarageController extends AbstractBaseController implements ISystemC
 		}
 	}
 
-	private class Task extends TimerTask
+	private class FetchGarageStatus implements Runnable
 	{
 		@Override
 		public void run()
