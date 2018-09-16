@@ -4,17 +4,23 @@ import com.bigboxer23.lights.controllers.AbstractBaseController;
 import com.bigboxer23.lights.controllers.IStatusController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.lights.controllers.ITemperatureController;
+import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
+import com.bigboxer23.lights.data.WeatherData;
 import com.bigboxer23.util.http.HttpClientUtils;
 import com.google.gson.Gson;
-import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
-import com.bigboxer23.lights.data.WeatherData;
 import org.apache.http.client.methods.HttpGet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Control garage pi
@@ -31,7 +37,7 @@ public class GarageController extends AbstractBaseController implements ISystemC
 
 	public GarageController()
 	{
-		new Timer().scheduleAtFixedRate(new Task(), 0, 5000);
+		Executors.newScheduledThreadPool(10).scheduleWithFixedDelay(new Task(), 0, 5, TimeUnit.SECONDS);
 	}
 
 	@Override
@@ -80,6 +86,7 @@ public class GarageController extends AbstractBaseController implements ISystemC
 		{
 			myGarageData = getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(myGarageURL + "/Status2")), VeraDeviceVO.class);
 			myGarageData.setName("Garage Opener");
+			myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
 		}
 	}
 }
