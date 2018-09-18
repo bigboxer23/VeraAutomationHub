@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Get status from the vera controller for everything in the house
@@ -60,7 +61,12 @@ public class SceneStatusServlet extends HubContext
 	{
 		VeraHouseVO aHouseStatus = myVeraController.getStatus();
 		myGarageController.getStatus(aHouseStatus);
-		aHouseStatus.getScenes().stream().filter(theScene -> theScene.getName().equalsIgnoreCase(kLevelSetSceneName)).findAny().ifPresent(this::setupLevels);
+		Optional.of(aHouseStatus.getScenes()).
+				ifPresent(theVeraSceneVOS -> theVeraSceneVOS.
+						stream().
+						filter(theScene -> theScene.getName().equalsIgnoreCase(kLevelSetSceneName)).
+						findAny().
+						ifPresent(this::setupLevels));
 		fillLevels(aHouseStatus);
 		aHouseStatus.getScenes().clear();
 		aHouseStatus.getDevices().clear();

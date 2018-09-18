@@ -47,7 +47,8 @@ public class GarageController extends AbstractBaseController implements ISystemC
 			return "Malformed input " + theCommands.size();
 		}
 		myLogger.error("Garage Door change requested: " + theCommands.get(0));
-		return HttpClientUtils.execute(new HttpGet(myGarageURL + "/" + theCommands.get(0)));
+		myGarageData = getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(myGarageURL + "/" + theCommands.get(0))), VeraDeviceVO.class);
+		return myGarageData.getStatus() + "";
 	}
 
 	/**

@@ -52,6 +52,7 @@ public class NotificationController extends HubContext implements ISystemControl
 		{
 			return null;
 		}
+		myLogger.info("Notification received.");
 		if (!updateNotificationSceneId())
 		{
 			return null;
@@ -61,6 +62,7 @@ public class NotificationController extends HubContext implements ISystemControl
 			myLogger.info("Not triggering notification, not enough gap yet.");
 			return null;
 		}
+		myLogger.info("Doing Notification.");
 		doPulseNotification(getDeviceInfo());
 		updateNotificationSceneContents();
 		return null;
