@@ -48,6 +48,8 @@ public class GarageController extends AbstractBaseController implements ISystemC
 		}
 		myLogger.error("Garage Door change requested: " + theCommands.get(0));
 		myGarageData = getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(myGarageURL + "/" + theCommands.get(0))), VeraDeviceVO.class);
+		myGarageData.setName("Garage Opener");
+		myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
 		return myGarageData.getStatus() + "";
 	}
 
