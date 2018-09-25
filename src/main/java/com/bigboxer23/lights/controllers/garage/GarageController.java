@@ -86,9 +86,15 @@ public class GarageController extends AbstractBaseController implements ISystemC
 		@Override
 		public void run()
 		{
-			myGarageData = getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(myGarageURL + "/Status2")), VeraDeviceVO.class);
-			myGarageData.setName("Garage Opener");
-			myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
+			try
+			{
+				myGarageData = getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(myGarageURL + "/Status2")), VeraDeviceVO.class);
+				myGarageData.setName("Garage Opener");
+				myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
+			} catch (Exception e)
+			{
+				myLogger.error("FetchGarageStatus", e);
+			}
 		}
 	}
 }

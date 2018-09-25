@@ -79,6 +79,7 @@ public class HttpClientUtils
 							.setConnectTimeout(5000)
 							.setConnectionRequestTimeout(5000)
 							.setSocketTimeout(5000).build())
+							.evictExpiredConnections()
 					.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
 					.setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy()
 					{

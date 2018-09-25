@@ -119,7 +119,7 @@
 								<sshexec host="homecontroller"
 								         username="pi"
 								         keyfile="${user.home}/.ssh/id_rsa"
-								         command="nohup java -jar /home/pi/com/bigboxer23/VeraAutomationHub/2.0.0/VeraAutomationHub-2.0.0.jar &amp;"
+								         command="cd /home/pi/com/bigboxer23/VeraAutomationHub/2.0.0/ ; nohup java -jar VeraAutomationHub-2.0.0.jar &amp;"
 								         trust="true"/>
 							</target>
 						</configuration>
