@@ -61,7 +61,8 @@ public class SceneStatusServlet extends HubContext
 	{
 		VeraHouseVO aHouseStatus = myVeraController.getStatus();
 		myGarageController.getStatus(aHouseStatus);
-		Optional.of(aHouseStatus.getScenes()).
+		Optional.of(aHouseStatus).
+				map(VeraHouseVO::getScenes).
 				ifPresent(theVeraSceneVOS -> theVeraSceneVOS.
 						stream().
 						filter(theScene -> theScene.getName().equalsIgnoreCase(kLevelSetSceneName)).
