@@ -100,6 +100,21 @@ public class NotificationController extends HubContext implements ISystemControl
 					}
 				}).start();
 			});
+		try
+		{
+			Thread.sleep(kZWaveTiming * 8);
+			theDevices.
+					stream().
+					filter(theVeraDeviceVO -> theVeraDeviceVO.getLevel() > 0).
+					forEach(theDevice ->
+					{
+						doRequest(kVeraHubUrl + VeraController.kVeraRequest + theDevice.getId() + VeraController.kVeraServiceUrn + VeraController.kDimmingCommand, theDevice.getLevel());
+					});
+		}
+		catch (InterruptedException theE)
+		{
+			theE.printStackTrace();
+		}
 	}
 
 	private List<VeraDeviceVO> getDeviceInfo()
