@@ -3,6 +3,7 @@ package com.bigboxer23.lights;
 import com.bigboxer23.lights.controllers.NotificationController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.lights.controllers.garage.GarageController;
+import com.bigboxer23.lights.controllers.openHAB.OpenHABController;
 import com.bigboxer23.lights.controllers.scene.DaylightController;
 import com.bigboxer23.lights.controllers.scene.WeatherController;
 import com.bigboxer23.lights.controllers.vera.VeraController;
@@ -28,6 +29,8 @@ public class HubContext
 	protected NotificationController myNotificationController;
 
 	protected VeraController myVeraController;
+
+	protected OpenHABController myOpenHABController;
 
 	@Autowired
 	public void setGarageController(GarageController theGarageController)
@@ -58,6 +61,13 @@ public class HubContext
 	{
 		myVeraController = theVeraController;
 	}
+
+	@Autowired
+	public void setVeraController(OpenHABController theOpenHABController)
+	{
+		myOpenHABController = theOpenHABController;
+	}
+
 	/**
 	 * Get our mapping of URL's to controllers
 	 * If not initialized, trigger that here
@@ -75,6 +85,7 @@ public class HubContext
 			myControllers.put(DaylightController.kControllerEndpoint, myDaylightController);
 			myControllers.put(NotificationController.kControllerEndpoint, myNotificationController);
 			myControllers.put(VeraController.kControllerEndpoint, myVeraController);
+			myControllers.put(OpenHABController.kControllerEndpoint, myOpenHABController);
 		}
 		return myControllers;
 	}

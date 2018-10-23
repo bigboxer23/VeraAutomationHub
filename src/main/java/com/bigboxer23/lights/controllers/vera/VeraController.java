@@ -105,7 +105,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 			{
 				for (VeraRoomVO aVeraRoomVO : myStatus.getRooms())
 				{
-					if (aVeraRoomVO.getId() == Integer.parseInt(theCommands.get(1)))
+					if (aVeraRoomVO.getId().equalsIgnoreCase(theCommands.get(1)))
 					{
 						aVeraRoomVO.getDevices().stream().filter(VeraDeviceVO::isLight).forEach(theVeraDeviceVO ->
 						{
@@ -124,7 +124,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 			}
 		} else
 		{
-			aLights.add(new DeviceAction(theCommands.get(2), Integer.parseInt(theCommands.get(1))));
+			aLights.add(new DeviceAction(theCommands.get(2), theCommands.get(1)));
 		}
 		return aLights;
 	}
@@ -141,15 +141,15 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 	{
 		private String myAction;
 
-		private int myId;
+		private String myId;
 
-		public DeviceAction(String theAction, int theId)
+		public DeviceAction(String theAction, String theId)
 		{
 			myAction = theAction;
 			myId = theId;
 		}
 
-		public int getId()
+		public String getId()
 		{
 			return myId;
 		}

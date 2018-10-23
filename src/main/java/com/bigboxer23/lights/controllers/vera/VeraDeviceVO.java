@@ -1,6 +1,10 @@
 package com.bigboxer23.lights.controllers.vera;
 
+import com.bigboxer23.lights.controllers.openHAB.OpenHABDevice;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Device returned from Vera controller
@@ -11,7 +15,7 @@ public class VeraDeviceVO
 	private String myName;
 
 	@SerializedName("id")
-	private int myId;
+	private String myId;
 
 	/**
 	 * If set to value other than -1, use this value if a room control is requested.  IE
@@ -65,6 +69,20 @@ public class VeraDeviceVO
 	@SerializedName("autoClose")
 	private long myAutoClose;
 
+	private VeraDeviceVO(OpenHABDevice theDevice)
+	{
+		myId = theDevice.getName();
+		myName = theDevice.getLabel();
+		myStatus = theDevice.getState();
+		myLevel = theDevice.getLevel();
+		myCategory = theDevice.getType();
+	}
+
+	public static List<VeraDeviceVO> fromOpenHab(List<OpenHABDevice> theDevices)
+	{
+		return theDevices.stream().map(VeraDeviceVO::new).collect(Collectors.toList());
+	}
+
 	public float getHumidity()
 	{
 		return myHumidity;
@@ -85,7 +103,7 @@ public class VeraDeviceVO
 		return myName;
 	}
 
-	public int getId()
+	public String getId()
 	{
 		return myId;
 	}

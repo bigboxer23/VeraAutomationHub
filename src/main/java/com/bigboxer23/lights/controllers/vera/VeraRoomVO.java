@@ -1,9 +1,11 @@
 package com.bigboxer23.lights.controllers.vera;
 
+import com.bigboxer23.lights.controllers.openHAB.OpenHABRoom;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * single room data structure
@@ -14,7 +16,7 @@ public class VeraRoomVO
 	private String myName;
 
 	@SerializedName("id")
-	private int myId;
+	private String myId;
 
 	@SerializedName("section")
 	private int mySection;
@@ -28,7 +30,19 @@ public class VeraRoomVO
 	public VeraRoomVO(String theName, int theId)
 	{
 		myName = theName;
-		myId = theId;
+		myId = theId + "";
+	}
+
+	private VeraRoomVO(OpenHABRoom theRoom)
+	{
+		myName = theRoom.getLabel();
+		myId = theRoom.getName();
+		myDevices = VeraDeviceVO.fromOpenHab(theRoom.getDevices());
+	}
+
+	public static List<VeraRoomVO> fromOpenHab(List<OpenHABRoom> theOpenHABHouse)
+	{
+		return theOpenHABHouse.stream().map(VeraRoomVO::new).collect(Collectors.toList());
 	}
 
 	public List<VeraDeviceVO> getDevices()
@@ -41,7 +55,7 @@ public class VeraRoomVO
 		return myName;
 	}
 
-	public int getId()
+	public String getId()
 	{
 		return myId;
 	}

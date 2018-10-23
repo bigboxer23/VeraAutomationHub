@@ -1,10 +1,14 @@
 package com.bigboxer23.lights.controllers.vera;
 
+import com.bigboxer23.lights.controllers.openHAB.OpenHABHouse;
 import com.google.gson.*;
 import com.google.gson.annotations.SerializedName;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Data structure returned from vera when status is requested
@@ -35,11 +39,21 @@ public class VeraHouseVO implements JsonDeserializer<VeraHouseVO>
 		return myScenes;
 	}
 
+	public VeraHouseVO()
+	{
+
+	}
+
+	public VeraHouseVO(OpenHABHouse theHouse)
+	{
+		myRooms = VeraRoomVO.fromOpenHab(theHouse);
+	}
+
 	@Override
 	public VeraHouseVO deserialize(JsonElement theJsonElement, Type theType, JsonDeserializationContext theJsonDeserializationContext) throws JsonParseException
 	{
 		VeraHouseVO anInstance = new Gson().fromJson(theJsonElement, theType);
-		Map<Integer, VeraRoomVO> aRooms = new HashMap<>();
+		Map<String, VeraRoomVO> aRooms = new HashMap<>();
 		for (VeraRoomVO aRoom : anInstance.getRooms())
 		{
 			aRooms.put(aRoom.getId(), aRoom);
@@ -58,7 +72,7 @@ public class VeraHouseVO implements JsonDeserializer<VeraHouseVO>
 			if (aRoom == null)
 			{
 				aRoom = new VeraRoomVO("Scenes", 0);
-				aRooms.put(0, aRoom);
+				aRooms.put("0", aRoom);
 				anInstance.getRooms().add(aRoom);
 			}
 			if (aRoom != null)

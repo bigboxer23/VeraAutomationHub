@@ -1,10 +1,10 @@
 package com.bigboxer23.lights.servlets;
 
-import com.bigboxer23.lights.controllers.elastic.ElasticAnalyticsController;
-import com.google.gson.Gson;
 import com.bigboxer23.lights.HubContext;
+import com.bigboxer23.lights.controllers.elastic.ElasticAnalyticsController;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.lights.controllers.vera.VeraSceneVO;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
@@ -59,16 +59,16 @@ public class SceneStatusServlet extends HubContext
 
 	private VeraHouseVO getHouseStatus()
 	{
-		VeraHouseVO aHouseStatus = myVeraController.getStatus();
+		VeraHouseVO aHouseStatus = new VeraHouseVO(myOpenHABController.getStatus());
 		myGarageController.getStatus(aHouseStatus);
-		Optional.of(aHouseStatus).
+		/*Optional.of(aHouseStatus).
 				map(VeraHouseVO::getScenes).
 				ifPresent(theVeraSceneVOS -> theVeraSceneVOS.
 						stream().
 						filter(theScene -> theScene.getName().equalsIgnoreCase(kLevelSetSceneName)).
 						findAny().
-						ifPresent(this::setupLevels));
-		fillLevels(aHouseStatus);
+						ifPresent(this::setupLevels));*/
+		//fillLevels(aHouseStatus);
 		aHouseStatus.getScenes().clear();
 		aHouseStatus.getDevices().clear();
 		return aHouseStatus;
