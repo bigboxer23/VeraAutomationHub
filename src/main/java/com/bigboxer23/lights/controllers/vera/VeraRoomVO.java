@@ -1,6 +1,6 @@
 package com.bigboxer23.lights.controllers.vera;
 
-import com.bigboxer23.lights.controllers.openHAB.OpenHABRoom;
+import com.bigboxer23.lights.controllers.openHAB.OpenHABItem;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -33,14 +33,14 @@ public class VeraRoomVO
 		myId = theId + "";
 	}
 
-	private VeraRoomVO(OpenHABRoom theRoom)
+	private VeraRoomVO(OpenHABItem theRoom)
 	{
 		myName = theRoom.getLabel();
 		myId = theRoom.getName();
-		myDevices = VeraDeviceVO.fromOpenHab(theRoom.getDevices());
+		myDevices = VeraDeviceVO.fromOpenHab(theRoom.getItems());
 	}
 
-	public static List<VeraRoomVO> fromOpenHab(List<OpenHABRoom> theOpenHABHouse)
+	public static List<VeraRoomVO> fromOpenHab(List<OpenHABItem> theOpenHABHouse)
 	{
 		return theOpenHABHouse.stream().map(VeraRoomVO::new).collect(Collectors.toList());
 	}

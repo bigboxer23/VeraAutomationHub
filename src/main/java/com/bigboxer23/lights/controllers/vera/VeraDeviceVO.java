@@ -1,6 +1,6 @@
 package com.bigboxer23.lights.controllers.vera;
 
-import com.bigboxer23.lights.controllers.openHAB.OpenHABDevice;
+import com.bigboxer23.lights.controllers.openHAB.OpenHABItem;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -69,7 +69,7 @@ public class VeraDeviceVO
 	@SerializedName("autoClose")
 	private long myAutoClose;
 
-	private VeraDeviceVO(OpenHABDevice theDevice)
+	private VeraDeviceVO(OpenHABItem theDevice)
 	{
 		myId = theDevice.getName();
 		myName = theDevice.getLabel();
@@ -78,7 +78,7 @@ public class VeraDeviceVO
 		myCategory = theDevice.getType();
 	}
 
-	public static List<VeraDeviceVO> fromOpenHab(List<OpenHABDevice> theDevices)
+	public static List<VeraDeviceVO> fromOpenHab(List<OpenHABItem> theDevices)
 	{
 		return theDevices.stream().map(VeraDeviceVO::new).collect(Collectors.toList());
 	}

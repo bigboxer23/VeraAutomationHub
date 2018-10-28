@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * List of Rooms
  */
-public class OpenHABHouse extends ArrayList<OpenHABRoom>
+public class OpenHABHouse extends ArrayList<OpenHABItem>
 {
 
 }

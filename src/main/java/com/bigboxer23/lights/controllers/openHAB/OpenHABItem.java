@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * An OpenHAB device (item)
  */
-public class OpenHABDevice
+public class OpenHABItem
 {
 	@SerializedName("name")
 	private String myName;
@@ -26,6 +26,14 @@ public class OpenHABDevice
 
 	@SerializedName("tags")
 	private List<String> myTags;
+
+	@SerializedName("members")
+	private List<OpenHABItem> myItems;
+
+	public List<OpenHABItem> getItems()
+	{
+		return myItems;
+	}
 
 	public String getName()
 	{
@@ -51,6 +59,18 @@ public class OpenHABDevice
 			return myState.equalsIgnoreCase("off") ? "0" : "1";
 		}
 		return myState;
+	}
+
+	public int getIntLevel()
+	{
+		String aLevel = getLevel();
+		try
+		{
+			return Integer.parseInt(aLevel);
+		} catch (NumberFormatException aNFE)
+		{
+			return 0;
+		}
 	}
 
 	public String getType()
