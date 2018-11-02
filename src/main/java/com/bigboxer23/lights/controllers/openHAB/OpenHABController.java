@@ -45,17 +45,13 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 	@Override
 	public String doAction(List<String> theCommands)
 	{
-		if (theCommands.size() != 3)
+		if (theCommands.size() != 2)
 		{
 			myLogger.warn("Bad Request: " + theCommands);
 			return null;
 		}
-		HttpPost aHttpPost = new HttpPost(kOpenHABUrl + "/rest/items/" + theCommands.get(1));
-		String aContent = theCommands.get(2);
-		if (theCommands.get(0).equalsIgnoreCase("room") && aContent.equalsIgnoreCase("1"))
-		{
-			aContent = "100";
-		}
+		HttpPost aHttpPost = new HttpPost(kOpenHABUrl + "/rest/items/" + theCommands.get(0));
+		String aContent = theCommands.get(1);
 		try
 		{
 			aHttpPost.setEntity(new ByteArrayEntity(aContent.getBytes("UTF-8")));

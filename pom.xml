@@ -114,7 +114,7 @@
 								<sshexec host="homecontroller"
 								         username="pi"
 								         keyfile="${user.home}/.ssh/id_rsa"
-								         command="pkill -f 'java.*Vera*'"
+								         command="sudo pkill -f 'java.*Vera*'"
 										trust="true"/>
 								<sshexec host="homecontroller"
 								         username="pi"

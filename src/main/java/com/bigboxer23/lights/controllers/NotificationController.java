@@ -25,7 +25,7 @@ public class NotificationController extends HubContext implements ISystemControl
 
 	public static final String kControllerEndpoint = "Notification";
 
-	private static final int kZWaveTiming = 5000;
+	private static final int kZWaveTiming = 2500;
 
 	private static final int kHueTiming = 400;
 
