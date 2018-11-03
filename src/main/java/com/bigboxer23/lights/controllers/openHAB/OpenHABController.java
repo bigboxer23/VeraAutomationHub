@@ -72,7 +72,6 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 	public void setLevel(String theItem, int theLevel)
 	{
 		List<String> aCommands = new ArrayList<>();
-		aCommands.add("device");
 		aCommands.add(theItem);
 		aCommands.add("" + theLevel);
 		doAction(aCommands);
