@@ -184,6 +184,11 @@ public class VeraDeviceVO
 		}
 	}
 
+	public String getStringLevel()
+	{
+		return myLevel;
+	}
+
 	public void setTemperature(String theTemperature)
 	{
 		myTemperature = theTemperature;

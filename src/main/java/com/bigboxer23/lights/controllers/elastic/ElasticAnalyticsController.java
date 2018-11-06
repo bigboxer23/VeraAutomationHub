@@ -59,6 +59,7 @@ public class ElasticAnalyticsController
 		theVeraHouseVO
 				.getRooms()
 				.stream()
+				.filter(theRoom -> !theRoom.getName().equalsIgnoreCase("scenes"))
 				.filter(theRoom -> theRoom.getDevices() == null ? false : theRoom.getDevices()
 						.stream()
 						.filter(VeraDeviceVO::isLight)
@@ -94,10 +95,14 @@ public class ElasticAnalyticsController
 		myLogger.debug("handleClimateData");
 		theVeraHouseVO.getRooms()
 				.stream()
-				.filter(theRoom -> theRoom.getName().equalsIgnoreCase("climate control"))
+				.filter(theRoom -> theRoom.getName().equalsIgnoreCase("climate"))
 				.findAny()
 				.ifPresent(theRoom ->
 				{
+					Map<String, Object> aThermostatDocument = new HashMap<>();
+					aThermostatDocument.put("time", new Date());
+					aThermostatDocument.put("name", "thermostat");
+					aThermostatDocument.put("type", "hvac");
 					theRoom
 							.getDevices()
 							.stream()
@@ -112,21 +117,34 @@ public class ElasticAnalyticsController
 						{
 							case "high temperature":
 							case "low temperature":
-							case "temperature":
-							case "thermostat":
-								aDocument.put("temperature", Double.parseDouble(theVeraDeviceVO.getTemperature()));
-								if (theVeraDeviceVO.getName().equalsIgnoreCase("thermostat"))
+							case "outside temperature":
+								aDocument.put("temperature", getDoubleTemperature(theVeraDeviceVO));
+								if (theVeraDeviceVO.getName().equalsIgnoreCase("outside temperature"))
 								{
-									aDocument.put("fanMode", theVeraDeviceVO.getFanMode());
-									aDocument.put("batteryLevel", Integer.parseInt(theVeraDeviceVO.getBatteryLevel()));
-									aDocument.put("cool", theVeraDeviceVO.getMode().equalsIgnoreCase("coolon"));
-									aDocument.put("heat", theVeraDeviceVO.getMode().equalsIgnoreCase("heaton"));
-									aDocument.put("setPoint", theVeraDeviceVO.getSetPoint());
+									aDocument.put("name", "temperature");
 								}
 								break;
-							case "humidity":
-							case "humidity sensor":
-								aDocument.put("humidity", theVeraDeviceVO.getHumidity());
+							case "inside temperature":
+								aThermostatDocument.put("temperature", getDoubleTemperature(theVeraDeviceVO));
+								break;
+							case "thermostat fan mode":
+								aThermostatDocument.put("fanMode", theVeraDeviceVO.getLevel());
+								break;
+							case "thermostat battery":
+								aThermostatDocument.put("batteryLevel", theVeraDeviceVO.getLevel());
+								break;
+							case "thermostat mode":
+								aThermostatDocument.put("cool", theVeraDeviceVO.getLevel() == 2);
+								aThermostatDocument.put("heat", theVeraDeviceVO.getLevel() == 1);
+								break;
+							case "heating setpoint":
+							case "cooling setpoint":
+								aThermostatDocument.put(theVeraDeviceVO.getName(), theVeraDeviceVO.getLevel());
+								break;
+							case "inside humidity":
+							case "outside humidity":
+								aDocument.put("humidity", getFloatTemperature(theVeraDeviceVO));
+								aDocument.put("name", theVeraDeviceVO.getName().equalsIgnoreCase("inside humidity") ? "humidity sensor" : "humidity");
 								break;
 						}
 						if (aDocument.size() > 3)
@@ -134,7 +152,30 @@ public class ElasticAnalyticsController
 							theRequest.add(new IndexRequest(kIndexName, kType, theVeraDeviceVO.getName() + System.currentTimeMillis()).source(aDocument));
 						}
 					});
+					String aSetPoint = ((boolean)aThermostatDocument.get("cool")) ? "Cooling" : "Heating";
+					aThermostatDocument.put("setPoint", aThermostatDocument.get(aSetPoint + " Setpoint"));
+					theRequest.add(new IndexRequest(kIndexName, kType, ((String)aThermostatDocument.get("name")) + System.currentTimeMillis()).source(aThermostatDocument));
 				});
+	}
+
+	private float getFloatTemperature(VeraDeviceVO theDeviceVO)
+	{
+		String aLevel = theDeviceVO.getStringLevel();
+		if (aLevel.contains(" "))
+		{
+			aLevel = aLevel.substring(0, aLevel.indexOf(" "));
+		}
+		return Float.parseFloat(aLevel);
+	}
+
+	private double getDoubleTemperature(VeraDeviceVO theDeviceVO)
+	{
+		String aLevel = theDeviceVO.getStringLevel();
+		if (aLevel.contains(" "))
+		{
+			aLevel = aLevel.substring(0, aLevel.indexOf(" "));
+		}
+		return Double.parseDouble(aLevel);
 	}
 
 	@PreDestroy
