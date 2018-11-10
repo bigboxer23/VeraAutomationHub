@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,10 +53,9 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 			return null;
 		}
 		HttpPost aHttpPost = new HttpPost(kOpenHABUrl + "/rest/items/" + theCommands.get(0));
-		String aContent = theCommands.get(1);
 		try
 		{
-			aHttpPost.setEntity(new ByteArrayEntity(aContent.getBytes("UTF-8")));
+			aHttpPost.setEntity(new ByteArrayEntity(URLDecoder.decode(theCommands.get(1), StandardCharsets.UTF_8.displayName()).getBytes(StandardCharsets.UTF_8)));
 		}
 		catch (UnsupportedEncodingException theE)
 		{
