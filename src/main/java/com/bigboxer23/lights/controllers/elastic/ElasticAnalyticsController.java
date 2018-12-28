@@ -118,14 +118,23 @@ public class ElasticAnalyticsController
 							case "high temperature":
 							case "low temperature":
 							case "outside temperature":
-								aDocument.put("temperature", getDoubleTemperature(theVeraDeviceVO));
+								double aTemp = getDoubleTemperature(theVeraDeviceVO);
+								if (aTemp == -99)
+								{
+									return;
+								}
+								aDocument.put("temperature", aTemp);
 								if (theVeraDeviceVO.getName().equalsIgnoreCase("outside temperature"))
 								{
 									aDocument.put("name", "temperature");
 								}
 								break;
 							case "inside temperature":
-								aThermostatDocument.put("temperature", getDoubleTemperature(theVeraDeviceVO));
+								aTemp = getDoubleTemperature(theVeraDeviceVO);
+								if (aTemp != -99)
+								{
+									aThermostatDocument.put("temperature", aTemp);
+								}
 								break;
 							case "thermostat fan mode":
 								aThermostatDocument.put("fanMode", theVeraDeviceVO.getLevel());
@@ -143,7 +152,12 @@ public class ElasticAnalyticsController
 								break;
 							case "inside humidity":
 							case "outside humidity":
-								aDocument.put("humidity", getFloatTemperature(theVeraDeviceVO));
+								float aHumidity = getFloatTemperature(theVeraDeviceVO);
+								if (aHumidity == -99)
+								{
+									return;
+								}
+								aDocument.put("humidity", aHumidity);
 								aDocument.put("name", theVeraDeviceVO.getName().equalsIgnoreCase("inside humidity") ? "humidity sensor" : "humidity");
 								break;
 						}
@@ -165,7 +179,13 @@ public class ElasticAnalyticsController
 		{
 			aLevel = aLevel.substring(0, aLevel.indexOf(" "));
 		}
-		return Float.parseFloat(aLevel);
+		try
+		{
+			return Float.parseFloat(aLevel);
+		} catch (NumberFormatException aNFE)
+		{
+			return -99;
+		}
 	}
 
 	private double getDoubleTemperature(VeraDeviceVO theDeviceVO)
@@ -175,7 +195,13 @@ public class ElasticAnalyticsController
 		{
 			aLevel = aLevel.substring(0, aLevel.indexOf(" "));
 		}
-		return Double.parseDouble(aLevel);
+		try
+		{
+			return Double.parseDouble(aLevel);
+		} catch (NumberFormatException aNFE)
+		{
+			return -99;
+		}
 	}
 
 	@PreDestroy
