@@ -11,6 +11,7 @@ import com.bigboxer23.util.http.HttpClientUtils;
 import com.google.gson.Gson;
 import org.apache.http.client.methods.HttpGet;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -18,8 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Control garage pi
@@ -33,11 +32,6 @@ public class GarageController extends AbstractBaseController implements ISystemC
 	public static final String kControllerEndpoint = "Garage";
 
 	private VeraDeviceVO myGarageData;
-
-	public GarageController()
-	{
-		Executors.newScheduledThreadPool(10).scheduleWithFixedDelay(new FetchGarageStatus(), 0, 5, TimeUnit.SECONDS);
-	}
 
 	@Override
 	public String doAction(List<String> theCommands)
@@ -81,25 +75,24 @@ public class GarageController extends AbstractBaseController implements ISystemC
 		}
 	}
 
-	private class FetchGarageStatus implements Runnable
+	@Scheduled(fixedDelay = 5000)
+	private void fetchGarageStatus()
 	{
-		@Override
-		public void run()
+		try
 		{
-			try
+			myLogger.debug("Fetching new garage data");
+			myGarageData = getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(myGarageURL + "/Status2")), VeraDeviceVO.class);
+			if (myGarageData == null)
 			{
-				myGarageData = getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(myGarageURL + "/Status2")), VeraDeviceVO.class);
-				if (myGarageData == null)
-				{
-					myLogger.info("Couldn't get status from garage node...");
-					return;
-				}
-				myGarageData.setName("Garage Opener");
-				myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
-			} catch (Exception e)
-			{
-				myLogger.error("FetchGarageStatus", e);
+				myLogger.info("Couldn't get status from garage node...");
+				return;
 			}
+			myGarageData.setName("Garage Opener");
+			myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
+			myLogger.debug("Fetched new garage data");
+		} catch (Exception e)
+		{
+			myLogger.error("FetchGarageStatus", e);
 		}
 	}
 }
