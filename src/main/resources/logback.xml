@@ -7,10 +7,7 @@
 		</layout>
 	</appender>
 	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
-		<file>/home/pi/AutomationHub.log</file>
-<!--
-		<file>/Users/matt/AutomationHub.log</file>
--->
+		<file>AutomationHub.log</file>
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
 		</layout>

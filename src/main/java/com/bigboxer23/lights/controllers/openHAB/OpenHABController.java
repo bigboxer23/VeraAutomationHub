@@ -77,4 +77,18 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 		aCommands.add("" + theLevel);
 		doAction(aCommands);
 	}
+
+	/**
+	 * Turn on or off vacation mode to change global behavior based on further scene rules
+	 *
+	 * @param theVacationMode
+	 */
+	public void setVacationMode(boolean theVacationMode)
+	{
+		myLogger.info("Vacation mode requested: " + theVacationMode);
+		List<String> aCommands = new ArrayList<>();
+		aCommands.add("VacationMode");
+		aCommands.add(theVacationMode ? "ON" : "OFF");
+		doAction(aCommands);
+	}
 }
