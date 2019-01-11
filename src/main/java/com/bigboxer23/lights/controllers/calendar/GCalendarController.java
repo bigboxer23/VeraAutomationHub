@@ -48,6 +48,9 @@ public class GCalendarController extends HubContext
 		add("pto");
 		add("paternity");
 		add("leave");
+		add("camp");
+		add("trip");
+		add("gone");
 	}};
 
 	private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException
