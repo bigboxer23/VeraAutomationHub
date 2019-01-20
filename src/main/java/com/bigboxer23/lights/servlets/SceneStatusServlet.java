@@ -59,6 +59,7 @@ public class SceneStatusServlet extends HubContext
 	private VeraHouseVO getHouseStatus()
 	{
 		VeraHouseVO aHouseStatus = new VeraHouseVO(myOpenHABController.getStatus());
+		fillMotionOverrides(aHouseStatus);
 		myGarageController.getStatus(aHouseStatus);
 		/*Optional.of(aHouseStatus).
 				map(VeraHouseVO::getScenes).
@@ -69,6 +70,37 @@ public class SceneStatusServlet extends HubContext
 						ifPresent(this::setupLevels));*/
 		//fillLevels(aHouseStatus);
 		return aHouseStatus;
+	}
+
+	/**
+	 * Looks through room list fetched from OpenHAB, if finds one named MotionOverrides, will place items from that
+	 * room into appropriate rooms based on the device naming schemes.  Necessary to place motion overrides within the
+	 * proper places in the room tree without actually attaching them to the room (so they're not turned on if the
+	 * entire room is set to on)
+	 *
+	 * @param theHouse
+	 */
+	private void fillMotionOverrides(VeraHouseVO theHouse)
+	{
+		theHouse
+				.getRooms()
+				.stream()
+				.filter(theRoom -> theRoom.getName().equalsIgnoreCase("MotionOverrides"))
+				.findAny()
+				.ifPresent(theMotionOverride ->
+				{
+					theHouse.getRooms().remove(theMotionOverride);
+					theMotionOverride.getDevices().forEach(theDevice ->
+					{
+						String aName = theDevice.getName().replace(" Motion Override", "");
+						theHouse
+								.getRooms()
+								.stream()
+								.filter(theVeraRoomVO -> theVeraRoomVO.getName().equalsIgnoreCase(aName))
+								.findAny()
+								.ifPresent(theVeraRoomVO -> theVeraRoomVO.getDevices().add(theDevice));
+					});
+				});
 	}
 
 	private void fillLevels(VeraHouseVO theHouse)
