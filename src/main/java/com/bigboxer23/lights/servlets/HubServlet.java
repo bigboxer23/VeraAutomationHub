@@ -50,13 +50,14 @@ public class HubServlet extends HubContext
 		{
 			throw new RuntimeException("No controller specified");
 		}
-		List<String> aCommands = getCommands(theRequest.getRequestURI());
+		String aRequestURL = theRequest.getRequestURI();
+		List<String> aCommands = getCommands(aRequestURL);
 		getExecutors().execute(() ->
 		{
 			String aJsonResponse = aController.doAction(aCommands);
 			if (aJsonResponse != null)
 			{
-				myLogger.error("Error running request: " + theRequest.getRequestURI());
+				myLogger.error("Error running request: " + aRequestURL);
 				myLogger.error("Message: " + aJsonResponse);
 			}
 		});
