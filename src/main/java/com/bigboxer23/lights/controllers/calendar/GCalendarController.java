@@ -91,8 +91,13 @@ public class GCalendarController extends HubContext
 			myOpenHABController.setVacationMode(anEvents.getItems().stream().anyMatch(theEvent -> kVacationKeywords.stream().anyMatch(theWord ->
 				{
 					myLogger.debug(theEvent.getSummary());
-					return (theEvent.getSummary() != null && theEvent.getSummary().toLowerCase().contains(theWord))
+					boolean aVacation =  (theEvent.getSummary() != null && theEvent.getSummary().toLowerCase().contains(theWord))
 							|| (theEvent.getDescription() != null && theEvent.getDescription().toLowerCase().contains(theWord));
+					if (aVacation)
+					{
+						myLogger.warn("Vacation enabled: " + theEvent.getSummary());
+					}
+					return aVacation;
 				}
 					)));
 			myLogger.info("Calendar information fetched and parsed");
