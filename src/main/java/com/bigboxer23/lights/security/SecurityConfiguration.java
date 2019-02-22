@@ -13,6 +13,10 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -22,11 +26,20 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 {
-	private static final RequestMatcher kProtectedUrls = new OrRequestMatcher(
-			new AntPathRequestMatcher("/SceneStatus"),
-			new AntPathRequestMatcher("/S/**"),
-			new AntPathRequestMatcher("/enableTokenFetch/**")
-	);
+	private static List<String> kProtectedUrlStrings = new ArrayList<String>()
+	{{
+		add("/SceneStatus");
+		add("/S/**");
+		add("/enableTokenFetch/**");
+		add("/SceneStatusSmart");
+	}};
+
+	private static final RequestMatcher kProtectedUrls = new OrRequestMatcher(kProtectedUrlStrings.
+			stream().
+			map(AntPathRequestMatcher::new).
+			collect(Collectors.toList()).
+			toArray(new AntPathRequestMatcher[0]));
+
 	private TokenAuthenticationProvider myProvider;
 
 	@Autowired
@@ -54,7 +67,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 				.authorizeRequests()
 				.anyRequest().
 				permitAll().
-				antMatchers("/SceneStatus", "/S/**", "/enableTokenFetch/**")
+				antMatchers(kProtectedUrlStrings.toArray(new String[0]))
 				.authenticated()
 				.and()
 				/*.csrf().disable()*/

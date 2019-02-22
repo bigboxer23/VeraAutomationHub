@@ -38,6 +38,12 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 		return aHouseStatus;
 	}
 
+	public OpenHABHouse getSmartRooms()
+	{
+		myLogger.debug("Getting OpenHAB Smart Rooms");
+		return getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(kOpenHABUrl + "/rest/items?tags=SmartRoom")), OpenHABHouse.class);
+	}
+
 	@Override
 	public boolean getStatus(int theLightId)
 	{

@@ -56,6 +56,12 @@ public class SceneStatusServlet extends HubContext
 		return new Gson().toJson(getHouseStatus());
 	}
 
+	@RequestMapping(value = "/SceneStatusSmart", produces = {MediaType.APPLICATION_JSON_VALUE})
+	public String getSmartRooms()
+	{
+		return new Gson().toJson(new VeraHouseVO(myOpenHABController.getSmartRooms()));
+	}
+
 	private VeraHouseVO getHouseStatus()
 	{
 		VeraHouseVO aHouseStatus = new VeraHouseVO(myOpenHABController.getStatus());
