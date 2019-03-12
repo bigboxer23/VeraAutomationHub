@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 
 /**
  *
@@ -31,15 +29,17 @@ public class HttpClientUtils
 
 	public static String execute(HttpRequestBase theRequestBase)
 	{
-		try
+		myLogger.info("executing " + theRequestBase.getURI());
+		try (CloseableHttpResponse aResponse = HttpClientUtils.getInstance().execute(theRequestBase))
 		{
-			CloseableHttpResponse aResponse = HttpClientUtils.getInstance().execute(theRequestBase);
-			return new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8);
+			String aResponseString = new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8);
+			myLogger.info("executed " + theRequestBase.getURI());
+			return aResponseString;
 		}
 		catch (IOException e)
 		{
 			HttpClientUtils.reset();
-			myLogger.error("HttpClientUtils:", e);
+			myLogger.error("HttpClientUtils:execute", e);
 		}
 		return null;
 	}
@@ -73,6 +73,7 @@ public class HttpClientUtils
 		}
 		try
 		{
+			myLogger.info("Creating new HTTP client");
 			myHttpClient = HttpClients
 					.custom()
 					.setDefaultRequestConfig(RequestConfig.custom()
@@ -81,19 +82,14 @@ public class HttpClientUtils
 							.setSocketTimeout(5000).build())
 							.evictExpiredConnections()
 					.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-					.setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy()
-					{
-						public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException
-						{
-							return true;
-						}
-					}).build())
+					.setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, (TrustStrategy) (arg0, arg1) -> true).build())
 					.build();
 		}
 		catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException theE)
 		{
 			myLogger.error("HttpClientUtils:getInstance", theE);
 		}
+		myLogger.info("Created new HTTP client");
 		return myHttpClient;
 	}
 }
