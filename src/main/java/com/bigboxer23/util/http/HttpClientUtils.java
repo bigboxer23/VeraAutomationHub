@@ -29,11 +29,11 @@ public class HttpClientUtils
 
 	public static String execute(HttpRequestBase theRequestBase)
 	{
-		myLogger.info("executing " + theRequestBase.getURI());
+		myLogger.debug("executing " + theRequestBase.getURI());
 		try (CloseableHttpResponse aResponse = HttpClientUtils.getInstance().execute(theRequestBase))
 		{
 			String aResponseString = new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8);
-			myLogger.info("executed " + theRequestBase.getURI());
+			myLogger.debug("executed " + theRequestBase.getURI());
 			return aResponseString;
 		}
 		catch (IOException e)
