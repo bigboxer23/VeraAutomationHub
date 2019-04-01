@@ -43,17 +43,12 @@ public class SceneStatusServlet extends HubContext
 		return new Gson().toJson(getHouseStatus());
 	}
 
-	@RequestMapping(value = "/SceneStatusSmart", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public String getSmartRooms()
-	{
-		return new Gson().toJson(new VeraHouseVO(myOpenHABController.getSmartRooms()));
-	}
-
 	private VeraHouseVO getHouseStatus()
 	{
 		VeraHouseVO aHouseStatus = new VeraHouseVO(myOpenHABController.getStatus());
 		fillMotionOverrides(aHouseStatus);
 		myGarageController.getStatus(aHouseStatus);
+		fillSmartRooms(aHouseStatus);
 		/*Optional.of(aHouseStatus).
 				map(VeraHouseVO::getScenes).
 				ifPresent(theVeraSceneVOS -> theVeraSceneVOS.
@@ -63,6 +58,14 @@ public class SceneStatusServlet extends HubContext
 						ifPresent(this::setupLevels));*/
 		//fillLevels(aHouseStatus);
 		return aHouseStatus;
+	}
+
+	private void fillSmartRooms(VeraHouseVO theHouse)
+	{
+		theHouse.getRooms().forEach(theVeraRoomVO ->
+		{
+			theVeraRoomVO.setSmart(myOpenHABController.getSmartRooms().contains("Smart" + theVeraRoomVO.getId()));
+		});
 	}
 
 	/**

@@ -8,6 +8,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
@@ -15,6 +16,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Control OpenHab instance via REST URL
@@ -30,6 +33,8 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 
 	public static final String kControllerEndpoint = "OpenHAB";
 
+	private Set<String> mySmartRooms;
+
 	public OpenHABHouse getStatus()
 	{
 		myLogger.debug("Getting OpenHAB Status");
@@ -38,10 +43,13 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 		return aHouseStatus;
 	}
 
-	public OpenHABHouse getSmartRooms()
+	public Set<String> getSmartRooms()
 	{
-		myLogger.debug("Getting OpenHAB Smart Rooms");
-		return getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(kOpenHABUrl + "/rest/items?tags=SmartRoom")), OpenHABHouse.class);
+		if (mySmartRooms == null)
+		{
+			fetchSmartRooms();
+		}
+		return mySmartRooms;
 	}
 
 	@Override
@@ -96,5 +104,24 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 		aCommands.add("VacationMode");
 		aCommands.add(theVacationMode ? "ON" : "OFF");
 		doAction(aCommands);
+	}
+
+	@Scheduled(fixedDelay = 5000)
+	private void fetchSmartRooms()
+	{
+		try
+		{
+			myLogger.debug("Getting Smart Rooms");
+			mySmartRooms = getBuilder().
+					create().
+					fromJson(HttpClientUtils.execute(new HttpGet(kOpenHABUrl + "/rest/items?tags=SmartRoom")), OpenHABHouse.class).
+					stream().
+					map(OpenHABItem::getName).
+					collect(Collectors.toSet());
+			myLogger.debug("Retrieved Smart Rooms");
+		} catch (Exception e)
+		{
+			myLogger.error("fetchSmartRooms", e);
+		}
 	}
 }

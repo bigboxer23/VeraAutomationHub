@@ -21,6 +21,9 @@ public class VeraRoomVO
 	@SerializedName("section")
 	private int mySection;
 
+	@SerializedName("smart")
+	private boolean myIsSmart;
+
 	@SerializedName("devices")
 	private List<VeraDeviceVO> myDevices;
 
@@ -81,5 +84,15 @@ public class VeraRoomVO
 			myScenes = new ArrayList<>();
 		}
 		myScenes.add(theScene);
+	}
+
+	public boolean isSmart()
+	{
+		return myIsSmart;
+	}
+
+	public void setSmart(boolean theSmart)
+	{
+		myIsSmart = theSmart;
 	}
 }
