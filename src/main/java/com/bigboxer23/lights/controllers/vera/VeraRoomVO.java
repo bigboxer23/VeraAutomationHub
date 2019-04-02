@@ -18,12 +18,6 @@ public class VeraRoomVO
 	@SerializedName("id")
 	private String myId;
 
-	@SerializedName("section")
-	private int mySection;
-
-	@SerializedName("smart")
-	private boolean myIsSmart;
-
 	@SerializedName("devices")
 	private List<VeraDeviceVO> myDevices;
 
@@ -63,11 +57,6 @@ public class VeraRoomVO
 		return myId;
 	}
 
-	public int getSection()
-	{
-		return mySection;
-	}
-
 	public void addDevice(VeraDeviceVO theDevice)
 	{
 		if (myDevices == null)
@@ -86,13 +75,11 @@ public class VeraRoomVO
 		myScenes.add(theScene);
 	}
 
-	public boolean isSmart()
-	{
-		return myIsSmart;
-	}
-
 	public void setSmart(boolean theSmart)
 	{
-		myIsSmart = theSmart;
+		if (theSmart && !myId.startsWith("Smart"))
+		{
+			myId = "Smart" + myId;
+		}
 	}
 }
