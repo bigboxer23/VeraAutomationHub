@@ -69,6 +69,12 @@ public class VeraDeviceVO
 	@SerializedName("autoClose")
 	private long myAutoClose;
 
+	public VeraDeviceVO(String theName, float theLevel)
+	{
+		myName = theName;
+		myLevel = "" + theLevel;
+	}
+
 	private VeraDeviceVO(OpenHABItem theDevice)
 	{
 		myId = theDevice.getName();

@@ -1,7 +1,10 @@
 package com.bigboxer23.lights.controllers;
 
+import com.bigboxer23.util.http.HttpClientUtils;
 import com.google.gson.GsonBuilder;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
+import com.google.gson.JsonSyntaxException;
+import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +18,12 @@ public class AbstractBaseController
 
 	private GsonBuilder myBuilder;
 
-	protected GsonBuilder getBuilder()
+	protected <T> T fromJson(String theUrl, Class<T> theClass) throws JsonSyntaxException
+	{
+		return getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(theUrl)), theClass);
+	}
+
+	private GsonBuilder getBuilder()
 	{
 		if (myBuilder == null)
 		{

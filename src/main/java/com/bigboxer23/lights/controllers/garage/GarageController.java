@@ -41,7 +41,7 @@ public class GarageController extends AbstractBaseController implements ISystemC
 			return "Malformed input " + theCommands.size();
 		}
 		myLogger.error("Garage Door change requested: " + theCommands.get(0));
-		myGarageData = getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(myGarageURL + "/" + theCommands.get(0))), VeraDeviceVO.class);
+		myGarageData = fromJson(myGarageURL + "/" + theCommands.get(0), VeraDeviceVO.class);
 		myGarageData.setName("Garage Opener");
 		myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
 		return null;
@@ -81,7 +81,7 @@ public class GarageController extends AbstractBaseController implements ISystemC
 		try
 		{
 			myLogger.debug("Fetching new garage data");
-			myGarageData = getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(myGarageURL + "/Status2")), VeraDeviceVO.class);
+			myGarageData = fromJson(myGarageURL + "/Status2", VeraDeviceVO.class);
 			if (myGarageData == null)
 			{
 				myLogger.info("Couldn't get status from garage node...");

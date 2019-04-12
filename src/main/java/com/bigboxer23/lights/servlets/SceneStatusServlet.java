@@ -1,6 +1,7 @@
 package com.bigboxer23.lights.servlets;
 
 import com.bigboxer23.lights.HubContext;
+import com.bigboxer23.lights.controllers.climate.ClimateController;
 import com.bigboxer23.lights.controllers.elastic.ElasticAnalyticsController;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.google.gson.Gson;
@@ -31,10 +32,18 @@ public class SceneStatusServlet extends HubContext
 
 	private ElasticAnalyticsController myElasticAnalyticsController;
 
+	private ClimateController myClimateController;
+
 	@Autowired
 	public void setGarageController(ElasticAnalyticsController theElasticAnalyticsController)
 	{
 		myElasticAnalyticsController = theElasticAnalyticsController;
+	}
+
+	@Autowired
+	public void setClimateController(ClimateController theClimateController)
+	{
+		myClimateController = theClimateController;
 	}
 
 	@RequestMapping(value = "/SceneStatus", produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -48,15 +57,8 @@ public class SceneStatusServlet extends HubContext
 		VeraHouseVO aHouseStatus = new VeraHouseVO(myOpenHABController.getStatus());
 		fillMotionOverrides(aHouseStatus);
 		myGarageController.getStatus(aHouseStatus);
+		myClimateController.getClimateData(aHouseStatus);
 		fillSmartRooms(aHouseStatus);
-		/*Optional.of(aHouseStatus).
-				map(VeraHouseVO::getScenes).
-				ifPresent(theVeraSceneVOS -> theVeraSceneVOS.
-						stream().
-						filter(theScene -> theScene.getName().equalsIgnoreCase(kLevelSetSceneName)).
-						findAny().
-						ifPresent(this::setupLevels));*/
-		//fillLevels(aHouseStatus);
 		return aHouseStatus;
 	}
 

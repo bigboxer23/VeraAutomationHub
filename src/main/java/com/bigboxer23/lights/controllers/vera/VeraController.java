@@ -4,8 +4,6 @@ import com.bigboxer23.lights.controllers.AbstractBaseController;
 import com.bigboxer23.lights.controllers.IStatusController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.util.http.HttpClientUtils;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.apache.http.client.methods.HttpGet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -47,22 +45,10 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 		return false;
 	}
 
-	/**
-	 * Query particular scene id to get data about that scene
-	 * @param theSceneID
-	 * @return
-	 */
-	public JsonObject getSceneInformation(int theSceneID)
-	{
-		myLogger.debug("Getting Vera Level");
-		return new JsonParser().parse(HttpClientUtils.execute(new HttpGet(kVeraHubUrl + "/data_request?id=scene&action=list&scene=" + theSceneID))).getAsJsonObject();
-	}
-
 	public VeraHouseVO getStatus()
 	{
 		myLogger.debug("Getting Vera Status");
-		String aStatusString = HttpClientUtils.execute(new HttpGet(kVeraHubUrl + "/data_request?id=sdata"));
-		VeraHouseVO aHouseStatus = getBuilder().create().fromJson(aStatusString, VeraHouseVO.class);
+		VeraHouseVO aHouseStatus = fromJson(kVeraHubUrl + "/data_request?id=sdata", VeraHouseVO.class);
 		setStatus(aHouseStatus);
 		myLogger.debug("Got Vera Status");
 		return aHouseStatus;

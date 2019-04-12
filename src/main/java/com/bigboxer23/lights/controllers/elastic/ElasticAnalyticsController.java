@@ -166,9 +166,12 @@ public class ElasticAnalyticsController
 							theRequest.add(new IndexRequest(kIndexName, kType, theVeraDeviceVO.getName() + System.currentTimeMillis()).source(aDocument));
 						}
 					});
-					String aSetPoint = ((boolean)aThermostatDocument.get("cool")) ? "Cooling" : "Heating";
-					aThermostatDocument.put("setPoint", aThermostatDocument.get(aSetPoint + " Setpoint"));
-					theRequest.add(new IndexRequest(kIndexName, kType, ((String)aThermostatDocument.get("name")) + System.currentTimeMillis()).source(aThermostatDocument));
+					if  (aThermostatDocument.get("cool") != null)
+					{
+						String aSetPoint = ((boolean) aThermostatDocument.get("cool")) ? "Cooling" : "Heating";
+						aThermostatDocument.put("setPoint", aThermostatDocument.get(aSetPoint + " Setpoint"));
+					}
+					theRequest.add(new IndexRequest(kIndexName, kType, ((String) aThermostatDocument.get("name")) + System.currentTimeMillis()).source(aThermostatDocument));
 				});
 	}
 

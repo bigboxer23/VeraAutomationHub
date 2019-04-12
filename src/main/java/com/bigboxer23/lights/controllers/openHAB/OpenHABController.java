@@ -4,7 +4,6 @@ import com.bigboxer23.lights.controllers.AbstractBaseController;
 import com.bigboxer23.lights.controllers.IStatusController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.util.http.HttpClientUtils;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +37,7 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 	public OpenHABHouse getStatus()
 	{
 		myLogger.debug("Getting OpenHAB Status");
-		OpenHABHouse aHouseStatus = getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(kOpenHABUrl + "/rest/items?type=Group&tags=Room&recursive=true")), OpenHABHouse.class);
+		OpenHABHouse aHouseStatus = fromJson(kOpenHABUrl + "/rest/items?type=Group&tags=Room&recursive=true", OpenHABHouse.class);
 		myLogger.debug("Got OpenHAB Status");
 		return aHouseStatus;
 	}
@@ -81,7 +80,7 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 
 	public OpenHABHouse getItemsByTag(String theTag)
 	{
-		return getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(kOpenHABUrl + "/rest/items?tags=" + theTag)), OpenHABHouse.class);
+		return fromJson(kOpenHABUrl + "/rest/items?tags=" + theTag, OpenHABHouse.class);
 	}
 
 	public void setLevel(String theItem, int theLevel)
@@ -112,9 +111,7 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 		try
 		{
 			myLogger.debug("Getting Smart Rooms");
-			mySmartRooms = getBuilder().
-					create().
-					fromJson(HttpClientUtils.execute(new HttpGet(kOpenHABUrl + "/rest/items?tags=SmartRoom")), OpenHABHouse.class).
+			mySmartRooms = fromJson(kOpenHABUrl + "/rest/items?tags=SmartRoom", OpenHABHouse.class).
 					stream().
 					map(OpenHABItem::getName).
 					collect(Collectors.toSet());
