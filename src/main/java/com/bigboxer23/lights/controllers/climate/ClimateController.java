@@ -24,10 +24,10 @@ public class ClimateController extends AbstractBaseController
 		{
 			theHouseStatus.getRooms().stream().filter(aRoom -> aRoom.getName().equals("Climate")).findAny().ifPresent(aRoom ->
 			{
-				aRoom.addDevice(new VeraDeviceVO("inside temperature", myClimateData.getTemperature()));
-				aRoom.addDevice(new VeraDeviceVO("inside humidity", myClimateData.getHumidity()));
-				aRoom.addDevice(new VeraDeviceVO("barometric pressure", myClimateData.getPressure()));
-				aRoom.addDevice(new VeraDeviceVO("air  quality", myClimateData.getQuality()));
+				aRoom.addDevice(new VeraDeviceVO("Inside Temperature", myClimateData.getTemperature()));
+				aRoom.addDevice(new VeraDeviceVO("Inside Humidity", myClimateData.getHumidity()));
+				aRoom.addDevice(new VeraDeviceVO("Barometric Pressure", myClimateData.getPressure()));
+				aRoom.addDevice(new VeraDeviceVO("Air  Quality", myClimateData.getQuality()));
 			});
 		}
 	}
