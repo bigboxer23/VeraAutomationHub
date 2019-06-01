@@ -14,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -81,6 +82,12 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 	public OpenHABHouse getItemsByTag(String theTag)
 	{
 		return fromJson(kOpenHABUrl + "/rest/items?tags=" + theTag, OpenHABHouse.class);
+	}
+
+	public List<OpenHABItem> getItemByName(String theName)
+	{
+		OpenHABItem anItem = fromJson(kOpenHABUrl + "/rest/items/" + theName, OpenHABItem.class);
+		return anItem == null || anItem.getName() == null ? null : Collections.singletonList(anItem);
 	}
 
 	public void setLevel(String theItem, int theLevel)

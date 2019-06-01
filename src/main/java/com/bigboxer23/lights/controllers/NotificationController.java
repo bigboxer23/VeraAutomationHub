@@ -1,7 +1,7 @@
 package com.bigboxer23.lights.controllers;
 
 import com.bigboxer23.lights.HubContext;
-import com.bigboxer23.lights.controllers.openHAB.OpenHABHouse;
+import com.bigboxer23.lights.controllers.openHAB.OpenHABItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,7 +57,7 @@ public class NotificationController extends HubContext implements ISystemControl
 			return null;
 		}
 		myLogger.info("Notification received.");
-		OpenHABHouse anItems = myOpenHABController.getItemsByTag(kNotificationTag);
+		List<OpenHABItem> anItems = getItems(theCommands);
 		if (anItems == null || anItems.isEmpty())
 		{
 			myLogger.info("No items to notify.");
@@ -68,12 +68,21 @@ public class NotificationController extends HubContext implements ISystemControl
 		return null;
 	}
 
+	private List<OpenHABItem> getItems(List<String> theCommands)
+	{
+		if (theCommands == null || theCommands.isEmpty())
+		{
+			return myOpenHABController.getItemsByTag(kNotificationTag);
+		}
+		return myOpenHABController.getItemByName(theCommands.get(0));
+	}
+
 	/**
 	 * Display a "pulse" notification which pulses twice
 	 *
 	 * @param theItems
 	 */
-	private void doPulseNotification(OpenHABHouse theItems)
+	private void doPulseNotification(List<OpenHABItem> theItems)
 	{
 		if (theItems.isEmpty())
 		{
