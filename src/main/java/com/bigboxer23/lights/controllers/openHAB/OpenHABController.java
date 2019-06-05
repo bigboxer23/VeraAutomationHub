@@ -13,10 +13,7 @@ import org.springframework.stereotype.Component;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -118,7 +115,8 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 		try
 		{
 			myLogger.debug("Getting Smart Rooms");
-			mySmartRooms = fromJson(kOpenHABUrl + "/rest/items?tags=SmartRoom", OpenHABHouse.class).
+			mySmartRooms = Optional.ofNullable(fromJson(kOpenHABUrl + "/rest/items?tags=SmartRoom", OpenHABHouse.class)).
+					orElse(new OpenHABHouse()).
 					stream().
 					map(OpenHABItem::getName).
 					collect(Collectors.toSet());
