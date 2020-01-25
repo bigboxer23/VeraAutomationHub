@@ -41,7 +41,7 @@ public class ClimateController extends AbstractBaseController
 			myClimateData = fromJson(myClimateServiceUrl + "/climate", ClimateData.class);
 			if (myClimateData == null)
 			{
-				myLogger.info("Couldn't get status from garage node...");
+				myLogger.info("Couldn't get status from climate node...");
 				return;
 			}
 			myLogger.debug("Fetched new climate data");
