@@ -36,12 +36,12 @@ public class GarageController extends AbstractBaseController implements ISystemC
 	@Override
 	public String doAction(List<String> theCommands)
 	{
-		if(theCommands.size() != 1)
+		if(theCommands.size() == 0 || theCommands.size() > 2)
 		{
 			return "Malformed input " + theCommands.size();
 		}
 		myLogger.error("Garage Door change requested: " + theCommands.get(0));
-		myGarageData = fromJson(myGarageURL + "/" + theCommands.get(0), VeraDeviceVO.class);
+		myGarageData = fromJson(myGarageURL + "/" + theCommands.get(0) + (theCommands.size() == 2 ? "/" + theCommands.get(1) : ""), VeraDeviceVO.class);
 		myGarageData.setName("Garage Opener");
 		myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
 		return null;
