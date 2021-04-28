@@ -36,7 +36,7 @@ public class DaylightController extends HueController
 	{
 		String aDaylightString = HttpClientUtils.execute(new HttpGet(getBaseUrl() + "/sensors/1"));
 		myLogger.debug(aDaylightString);
-		JsonElement anElement = new JsonParser().parse(aDaylightString);
+		JsonElement anElement = JsonParser.parseString(aDaylightString);
 		return anElement.getAsJsonObject().get("state").getAsJsonObject().get("daylight").getAsBoolean();
 	}
 }

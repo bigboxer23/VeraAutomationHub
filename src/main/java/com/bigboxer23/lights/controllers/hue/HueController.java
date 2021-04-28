@@ -149,7 +149,7 @@ public class HueController implements ISystemController, IStatusController
 			{
 				String aStatusString = HttpClientUtils.execute(new HttpGet(getBaseUrl() + "/lights/"));
 				myLogger.trace("Status: " + aStatusString);
-				myStatusObject = new JsonParser().parse(aStatusString);
+				myStatusObject = JsonParser.parseString(aStatusString);
 			}
 			catch (JsonSyntaxException e)
 			{

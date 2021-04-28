@@ -65,12 +65,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 				.authenticationProvider(myProvider)
 				.addFilterBefore(restAuthenticationFilter(), AnonymousAuthenticationFilter.class)
 				.authorizeRequests()
-				.anyRequest().
-				permitAll().
-				antMatchers(kProtectedUrlStrings.toArray(new String[0]))
+				.antMatchers(kProtectedUrlStrings.toArray(new String[0]))
 				.authenticated()
 				.and()
-				/*.csrf().disable()*/
 				.formLogin().disable()
 				.httpBasic().disable()
 				.logout().disable();

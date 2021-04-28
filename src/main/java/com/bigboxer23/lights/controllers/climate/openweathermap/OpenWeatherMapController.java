@@ -41,7 +41,7 @@ public class OpenWeatherMapController extends AbstractBaseController
 	private void fetchClimateData()
 	{
 		myLogger.info("Fetching OpenWeatherMap data");
-		JsonObject aWeatherData = new JsonParser().parse(
+		JsonObject aWeatherData = JsonParser.parseString(
 				HttpClientUtils.execute(new HttpGet(
 						MessageFormat.format(kOpenWeatherMapUrl, myLatitude, myLongitude, myOpenWeatherMapAPIKey)))).getAsJsonObject();
 		aWeatherData = aWeatherData.get("main").getAsJsonObject();
