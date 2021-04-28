@@ -58,6 +58,7 @@ public class SceneStatusServlet extends HubContext
 		fillMotionOverrides(aHouseStatus);
 		myGarageController.getStatus(aHouseStatus);
 		myClimateController.getClimateData(aHouseStatus);
+		myFrontDoorController.getStatus(aHouseStatus);
 		fillSmartRooms(aHouseStatus);
 		return aHouseStatus;
 	}

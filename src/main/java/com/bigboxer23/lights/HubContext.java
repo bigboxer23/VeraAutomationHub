@@ -2,6 +2,7 @@ package com.bigboxer23.lights;
 
 import com.bigboxer23.lights.controllers.NotificationController;
 import com.bigboxer23.lights.controllers.ISystemController;
+import com.bigboxer23.lights.controllers.frontdoor.FrontDoorController;
 import com.bigboxer23.lights.controllers.garage.GarageController;
 import com.bigboxer23.lights.controllers.openHAB.OpenHABController;
 import com.bigboxer23.lights.controllers.scene.DaylightController;
@@ -22,6 +23,8 @@ public class HubContext
 
 	protected GarageController myGarageController;
 
+	protected FrontDoorController myFrontDoorController;
+
 	protected WeatherController myWeatherController;
 
 	protected DaylightController myDaylightController;
@@ -36,6 +39,12 @@ public class HubContext
 	public void setGarageController(GarageController theGarageController)
 	{
 		myGarageController = theGarageController;
+	}
+
+	@Autowired
+	public void setFrontDoorController(FrontDoorController theFrontDoorController)
+	{
+		myFrontDoorController = theFrontDoorController;
 	}
 
 	@Autowired
@@ -81,6 +90,7 @@ public class HubContext
 		{
 			myControllers = new HashMap<>();
 			myControllers.put(new SceneVO(GarageController.kControllerEndpoint).getSceneUrl(), myGarageController);
+			myControllers.put(FrontDoorController.kControllerEndpoint, myFrontDoorController);
 			myControllers.put(WeatherController.kControllerEndpoint, myWeatherController);
 			myControllers.put(DaylightController.kControllerEndpoint, myDaylightController);
 			myControllers.put(NotificationController.kControllerEndpoint, myNotificationController);

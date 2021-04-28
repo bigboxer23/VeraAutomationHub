@@ -39,6 +39,9 @@ public class VeraHouseVO implements JsonDeserializer<VeraHouseVO>
 		return myScenes;
 	}
 
+	@SerializedName("frontDoor")
+	private int myFrontDoor;
+
 	public VeraHouseVO()
 	{
 
@@ -83,5 +86,10 @@ public class VeraHouseVO implements JsonDeserializer<VeraHouseVO>
 		//Sort scene to top of list so displayed first in UI
 		Collections.sort(anInstance.getRooms(), (theRoomVO, theRoomVO2) -> theRoomVO.getName().equalsIgnoreCase("scenes") ? -1 : theRoomVO.getName().compareToIgnoreCase(theRoomVO2.getName()));
 		return anInstance;
+	}
+
+	public void setFrontDoor(int theFrontDoor)
+	{
+		myFrontDoor = theFrontDoor;
 	}
 }
