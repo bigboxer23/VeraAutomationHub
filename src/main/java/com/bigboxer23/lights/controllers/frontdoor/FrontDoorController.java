@@ -33,7 +33,17 @@ public class FrontDoorController extends AbstractBaseController implements ISyst
 	@Override
 	public String doAction(List<String> theCommands)
 	{
-		return null;//TODO
+		if(theCommands.size() != 1)
+		{
+			return "Malformed input " + theCommands.size();
+		}
+		myLogger.info("front door change requested: " + theCommands.get(0));
+		myFrontDoorPauseTime = Optional.ofNullable(
+				HttpClientUtils.execute(new HttpGet(myFrontDoorURL + "/pause/" + theCommands.get(0))))
+				.map(Integer::parseInt)
+				.orElse(0);
+		myLogger.info("front door changed");
+		return null;
 	}
 
 	@Scheduled(fixedDelay = 10000)
