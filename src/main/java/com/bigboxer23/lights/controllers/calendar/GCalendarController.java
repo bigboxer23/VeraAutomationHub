@@ -45,12 +45,16 @@ public class GCalendarController extends HubContext
 	private static List<String> kVacationKeywords = new ArrayList<String>()
 	{{
 		add("vacation");
-		add("pto");
 		add("paternity");
 		add("leave");
 		add("camp");
 		add("trip");
 		add("gone");
+	}};
+
+	private static List<String> kPTOKeywords = new ArrayList<String>()
+	{{
+		add("pto");
 	}};
 
 	private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException
@@ -88,23 +92,29 @@ public class GCalendarController extends HubContext
 					.setSingleEvents(true)
 					.execute();
 			anEvents.getItems().forEach(theEvent -> System.out.println(theEvent.getSummary()));
-			myOpenHABController.setVacationMode(anEvents.getItems().stream().anyMatch(theEvent -> kVacationKeywords.stream().anyMatch(theWord ->
-				{
-					myLogger.debug(theEvent.getSummary());
-					boolean aVacation =  (theEvent.getSummary() != null && theEvent.getSummary().toLowerCase().contains(theWord))
-							|| (theEvent.getDescription() != null && theEvent.getDescription().toLowerCase().contains(theWord));
-					if (aVacation)
-					{
-						myLogger.warn("Vacation enabled: " + theEvent.getSummary());
-					}
-					return aVacation;
-				}
-					)));
+			myOpenHABController.setVacationMode(findMatchingEvents("Vacation", anEvents, kVacationKeywords));
+			myOpenHABController.setPTOMode(findMatchingEvents("PTO", anEvents, kPTOKeywords));
 			myLogger.info("Calendar information fetched and parsed");
 		}
 		catch (GeneralSecurityException | IOException theE)
 		{
 			theE.printStackTrace();
 		}
+	}
+
+	private boolean findMatchingEvents(String theType, Events theEvents, List<String> theKeywords)
+	{
+		return theEvents.getItems().stream().anyMatch(theEvent -> theKeywords.stream().anyMatch(theWord ->
+				{
+					myLogger.debug(theEvent.getSummary());
+					boolean aFound =  (theEvent.getSummary() != null && theEvent.getSummary().toLowerCase().contains(theWord))
+							|| (theEvent.getDescription() != null && theEvent.getDescription().toLowerCase().contains(theWord));
+					if (aFound)
+					{
+						myLogger.warn(theType + " enabled: " + theEvent.getSummary());
+					}
+					return aFound;
+				}
+		));
 	}
 }

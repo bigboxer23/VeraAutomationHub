@@ -1,7 +1,7 @@
 package com.bigboxer23.lights;
 
-import com.bigboxer23.lights.controllers.NotificationController;
 import com.bigboxer23.lights.controllers.ISystemController;
+import com.bigboxer23.lights.controllers.NotificationController;
 import com.bigboxer23.lights.controllers.frontdoor.FrontDoorController;
 import com.bigboxer23.lights.controllers.garage.GarageController;
 import com.bigboxer23.lights.controllers.openHAB.OpenHABController;
@@ -10,6 +10,7 @@ import com.bigboxer23.lights.controllers.scene.WeatherController;
 import com.bigboxer23.lights.controllers.vera.VeraController;
 import com.bigboxer23.lights.data.SceneVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class HubContext
 	}
 
 	@Autowired
-	public void setNotificationController(NotificationController theNotificationController)
+	public void setNotificationController(@Lazy NotificationController theNotificationController)
 	{
 		myNotificationController = theNotificationController;
 	}

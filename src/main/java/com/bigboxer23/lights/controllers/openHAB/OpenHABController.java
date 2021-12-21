@@ -102,10 +102,20 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 	 */
 	public void setVacationMode(boolean theVacationMode)
 	{
-		myLogger.info("Vacation mode requested: " + theVacationMode);
+		setModeFromCalendar(theVacationMode, "VacationMode");
+	}
+
+	public void setPTOMode(boolean thePTOMode)
+	{
+		setModeFromCalendar(thePTOMode, "IsPTO");
+	}
+
+	private void setModeFromCalendar(boolean theMode, String theDevice)
+	{
+		myLogger.info(theDevice + " requested: " + theMode);
 		List<String> aCommands = new ArrayList<>();
-		aCommands.add("VacationMode");
-		aCommands.add(theVacationMode ? "ON" : "OFF");
+		aCommands.add(theDevice);
+		aCommands.add(theMode ? "ON" : "OFF");
 		doAction(aCommands);
 	}
 
