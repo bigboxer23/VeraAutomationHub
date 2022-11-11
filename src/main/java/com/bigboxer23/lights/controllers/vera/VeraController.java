@@ -1,7 +1,6 @@
 package com.bigboxer23.lights.controllers.vera;
 
 import com.bigboxer23.lights.controllers.AbstractBaseController;
-import com.bigboxer23.lights.controllers.IStatusController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.util.http.HttpClientUtils;
 import org.apache.http.client.methods.HttpGet;
@@ -15,7 +14,7 @@ import java.util.List;
  * Vera controller to make requests to a vera UI7 device
  */
 @Component
-public class VeraController extends AbstractBaseController implements ISystemController, IStatusController
+public class VeraController extends AbstractBaseController implements ISystemController
 {
 	/**
 	 * Location of Vera Hub, assume locally running on default port
@@ -39,7 +38,7 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 
 	public static final String kControllerEndpoint = "Vera";
 
-	@Override
+
 	public boolean getStatus(int theLightId)
 	{
 		return false;

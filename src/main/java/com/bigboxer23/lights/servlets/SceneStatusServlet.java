@@ -4,7 +4,10 @@ import com.bigboxer23.lights.HubContext;
 import com.bigboxer23.lights.controllers.climate.ClimateController;
 import com.bigboxer23.lights.controllers.elastic.ElasticAnalyticsController;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
-import com.google.gson.Gson;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +15,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.HttpURLConnection;
 
 /**
  * Get status from the vera controller for everything in the house
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @EnableAutoConfiguration
+@Tag(name = "Scene Status", description = "Return a JSON object that describes the state of all the house's items")
 public class SceneStatusServlet extends HubContext
 {
 	private static final Logger myLogger = LoggerFactory.getLogger(SceneStatusServlet.class);
@@ -46,10 +52,15 @@ public class SceneStatusServlet extends HubContext
 		myClimateController = theClimateController;
 	}
 
-	@RequestMapping(value = "/SceneStatus", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public String getHouseStatusJson()
+	@GetMapping(value = "/SceneStatus",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "Get object representing house's state",
+			description = "Returns object that shows all devices and various state associated with them.")
+	@ApiResponses({@ApiResponse(responseCode = HttpURLConnection.HTTP_UNAUTHORIZED + "", description = "unauthorized"),
+			@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")})
+	public VeraHouseVO getHouseStatusJson()
 	{
-		return new Gson().toJson(getHouseStatus());
+		return getHouseStatus();
 	}
 
 	private VeraHouseVO getHouseStatus()
