@@ -2,11 +2,20 @@ package com.bigboxer23.lights.controllers;
 
 import com.bigboxer23.lights.HubContext;
 import com.bigboxer23.lights.controllers.openHAB.OpenHABItem;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -15,15 +24,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * controller for receiving a notification from some source and triggering an alert to scenes that care about it
  */
-@Component
-public class NotificationController extends HubContext implements ISystemController
+@Tag(name = "Notification Controller", description = "Service to fire pulsing notifications to devices")
+@RestController
+public class NotificationController extends HubContext
 {
 	protected static final Logger myLogger = LoggerFactory.getLogger(NotificationController.class);
 
 	@Value("${veraUrl}")
 	private String kVeraHubUrl;
-
-	public static final String kControllerEndpoint = "Notification";
 
 	private static final int kZWaveTiming = 2500;
 
@@ -48,8 +56,15 @@ public class NotificationController extends HubContext implements ISystemControl
 		return myExecutor;
 	}
 
-	@Override
-	public String doAction(List<String> theCommands)
+	@GetMapping(value = {"/S/${notificationTag}", "/S/${notificationTag}/{deviceId}"},
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "Trigger a notification",
+			description = "Fire notification tagged devices with a pulse. Can provide a specific device to notify if" +
+					" using the defined notification device(s) isn't waht is wanted")
+	@ApiResponses({@ApiResponse(responseCode = HttpURLConnection.HTTP_UNAUTHORIZED + "", description = "unauthorized"),
+			@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")})
+	public String doAction(@Parameter(description = "optional device id to do a notification to")
+	                           @PathVariable(value = "deviceId", required = false) String deviceId)
 	{
 		if ((System.currentTimeMillis() - myNotificationGap * 1000 * 60) < myLastNotification)
 		{
@@ -57,7 +72,7 @@ public class NotificationController extends HubContext implements ISystemControl
 			return null;
 		}
 		myLogger.info("Notification received.");
-		List<OpenHABItem> anItems = getItems(theCommands);
+		List<OpenHABItem> anItems = getItems(deviceId);
 		if (anItems == null || anItems.isEmpty())
 		{
 			myLogger.info("No items to notify.");
@@ -68,13 +83,9 @@ public class NotificationController extends HubContext implements ISystemControl
 		return null;
 	}
 
-	private List<OpenHABItem> getItems(List<String> theCommands)
+	private List<OpenHABItem> getItems(String deviceId)
 	{
-		if (theCommands == null || theCommands.isEmpty())
-		{
-			return myOpenHABController.getItemsByTag(kNotificationTag);
-		}
-		return myOpenHABController.getItemByName(theCommands.get(0));
+		return myOpenHABController.getItemsByTag(deviceId == null || deviceId.isEmpty() ? kNotificationTag : deviceId);
 	}
 
 	/**

@@ -1,16 +1,23 @@
 package com.bigboxer23.lights.controllers.openHAB;
 
 import com.bigboxer23.lights.controllers.AbstractBaseController;
-import com.bigboxer23.lights.controllers.IStatusController;
-import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.util.http.HttpClientUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -19,16 +26,15 @@ import java.util.stream.Collectors;
 /**
  * Control OpenHab instance via REST URL
  */
-@Component
-public class OpenHABController extends AbstractBaseController implements ISystemController, IStatusController
+@Tag(name = "OpenHAB Controller", description = "Service to send commands to OpenHAB")
+@RestController
+public class OpenHABController extends AbstractBaseController
 {
 	/**
 	 * Location of OpenHAB
 	 */
 	@Value("${openHABUrl}")
 	private String kOpenHABUrl;
-
-	public static final String kControllerEndpoint = "OpenHAB";
 
 	private Set<String> mySmartRooms;
 
@@ -49,24 +55,20 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 		return mySmartRooms;
 	}
 
-	@Override
-	public boolean getStatus(int theLightId)
+	@GetMapping(value = "/S/OpenHAB/{deviceId}/{command}",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "Pause the front door from triggering notifications",
+			description = "Pass the delay in seconds to pause the front door camera from triggering notifications" +
+					" and sending emails")
+	@ApiResponses({@ApiResponse(responseCode = HttpURLConnection.HTTP_UNAUTHORIZED + "", description = "unauthorized"),
+			@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")})
+	public String doAction(@Parameter(description = "deviceId to run command on") @PathVariable(value = "deviceId") String deviceId,
+	                       @Parameter(description = "command to run.  Possible values [0-100, ON, OFF]") @PathVariable(value = "command") String command)
 	{
-		return false;
-	}
-
-	@Override
-	public String doAction(List<String> theCommands)
-	{
-		if (theCommands.size() != 2)
-		{
-			myLogger.warn("Bad Request: " + theCommands);
-			return null;
-		}
-		HttpPost aHttpPost = new HttpPost(kOpenHABUrl + "/rest/items/" + theCommands.get(0));
+		HttpPost aHttpPost = new HttpPost(kOpenHABUrl + "/rest/items/" + deviceId);
 		try
 		{
-			aHttpPost.setEntity(new ByteArrayEntity(URLDecoder.decode(theCommands.get(1), StandardCharsets.UTF_8.displayName()).getBytes(StandardCharsets.UTF_8)));
+			aHttpPost.setEntity(new ByteArrayEntity(URLDecoder.decode(command, StandardCharsets.UTF_8.displayName()).getBytes(StandardCharsets.UTF_8)));
 		}
 		catch (UnsupportedEncodingException theE)
 		{
@@ -89,10 +91,7 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 
 	public void setLevel(String theItem, int theLevel)
 	{
-		List<String> aCommands = new ArrayList<>();
-		aCommands.add(theItem);
-		aCommands.add("" + theLevel);
-		doAction(aCommands);
+		doAction(theItem, "" + theLevel);
 	}
 
 	/**
@@ -113,10 +112,7 @@ public class OpenHABController extends AbstractBaseController implements ISystem
 	private void setModeFromCalendar(boolean theMode, String theDevice)
 	{
 		myLogger.info(theDevice + " requested: " + theMode);
-		List<String> aCommands = new ArrayList<>();
-		aCommands.add(theDevice);
-		aCommands.add(theMode ? "ON" : "OFF");
-		doAction(aCommands);
+		doAction(theDevice, theMode ? "ON" : "OFF");
 	}
 
 	@Scheduled(fixedDelay = 5000)

@@ -1,41 +1,24 @@
 package com.bigboxer23.lights.controllers.vera;
 
-import com.google.gson.annotations.SerializedName;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 /**
  *
  */
+@Data
+@Schema(description = "JSON representing a scene")
 public class VeraSceneVO
 {
-	@SerializedName("name")
-	private String myName;
+	@Schema(description = "name of the scene")
+	private String name;
 
-	@SerializedName("id")
-	private int myId;
+	@Schema(description = "id of the scene")
+	private int id;
 
-	@SerializedName("active")
-	private int myActive;
+	@Schema(description = "is the scene active")
+	private int active;
 
-	@SerializedName("room")
-	private Integer myRoom;
-
-	public Integer getRoom()
-	{
-		return myRoom;
-	}
-
-	public String getName()
-	{
-		return myName;
-	}
-
-	public int getId()
-	{
-		return myId;
-	}
-
-	public int getActive()
-	{
-		return myActive;
-	}
+	@Schema(description = "id of a room associated with the scene")
+	private Integer room;
 }

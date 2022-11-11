@@ -1,7 +1,8 @@
 package com.bigboxer23.lights.controllers.vera;
 
 import com.bigboxer23.lights.controllers.openHAB.OpenHABItem;
-import com.google.gson.annotations.SerializedName;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,31 +11,32 @@ import java.util.stream.Collectors;
 /**
  * single room data structure
  */
+@Schema(description = "JSON representing a room")
 public class VeraRoomVO
 {
-	@SerializedName("name")
-	private String myName;
+	@Schema(description = "name of room")
+	private String name;
 
-	@SerializedName("id")
-	private String myId;
+	@Schema(description = "room's id")
+	private String id;
 
-	@SerializedName("devices")
-	private List<VeraDeviceVO> myDevices;
+	@Schema(description = "Individual devices within a room")
+	private List<VeraDeviceVO> devices;
 
-	@SerializedName("scenes")
-	private List<VeraSceneVO> myScenes;
+	@Schema(description = "Scenes within the room")
+	private List<VeraSceneVO> scenes;
 
 	public VeraRoomVO(String theName, int theId)
 	{
-		myName = theName;
-		myId = theId + "";
+		name = theName;
+		id = theId + "";
 	}
 
 	private VeraRoomVO(OpenHABItem theRoom)
 	{
-		myName = theRoom.getLabel();
-		myId = theRoom.getName();
-		myDevices = VeraDeviceVO.fromOpenHab(theRoom.getItems());
+		name = theRoom.getLabel();
+		id = theRoom.getName();
+		devices = VeraDeviceVO.fromOpenHab(theRoom.getItems());
 	}
 
 	public static List<VeraRoomVO> fromOpenHab(List<OpenHABItem> theOpenHABHouse)
@@ -44,42 +46,43 @@ public class VeraRoomVO
 
 	public List<VeraDeviceVO> getDevices()
 	{
-		return myDevices;
+		return devices;
 	}
 
 	public String getName()
 	{
-		return myName;
+		return name;
 	}
 
 	public String getId()
 	{
-		return myId;
+		return id;
 	}
 
 	public void addDevice(VeraDeviceVO theDevice)
 	{
-		if (myDevices == null)
+		if (devices == null)
 		{
-			myDevices = new ArrayList<>();
+			devices = new ArrayList<>();
 		}
-		myDevices.add(theDevice);
+		devices.add(theDevice);
 	}
 
 	public void addScene(VeraSceneVO theScene)
 	{
-		if (myScenes == null)
+		if (scenes == null)
 		{
-			myScenes = new ArrayList<>();
+			scenes = new ArrayList<>();
 		}
-		myScenes.add(theScene);
+		scenes.add(theScene);
 	}
 
+	@Hidden
 	public void setSmart(boolean theSmart)
 	{
-		if (theSmart && !myId.startsWith("Smart"))
+		if (theSmart && !id.startsWith("Smart"))
 		{
-			myId = "Smart" + myId;
+			id = "Smart" + id;
 		}
 	}
 }
