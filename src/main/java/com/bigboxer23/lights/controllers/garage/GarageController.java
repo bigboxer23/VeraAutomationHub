@@ -5,14 +5,11 @@ import com.bigboxer23.lights.controllers.ITemperatureController;
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.lights.data.WeatherData;
-import com.bigboxer23.util.http.HttpClientUtils;
-import com.google.gson.Gson;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.http.client.methods.HttpGet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -63,7 +60,7 @@ public class GarageController extends AbstractBaseController implements ITempera
 	@Override
 	public WeatherData getWeatherData()
 	{
-		return new Gson().fromJson(HttpClientUtils.execute(new HttpGet(myGarageURL + "/Weather")), WeatherData.class);
+		return new WeatherData(Float.parseFloat(myGarageData.getTemperature()), myGarageData.getHumidity());
 	}
 
 	public void getStatus(VeraHouseVO theHouseStatus)
@@ -87,7 +84,6 @@ public class GarageController extends AbstractBaseController implements ITempera
 				return;
 			}
 			myGarageData.setName("Garage Opener");
-			myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
 			myLogger.debug("Fetched new garage data");
 		} catch (Exception e)
 		{
