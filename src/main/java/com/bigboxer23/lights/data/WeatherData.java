@@ -1,35 +1,20 @@
 package com.bigboxer23.lights.data;
 
-import com.google.gson.annotations.SerializedName;
+import lombok.Data;
 
 /**
  * Data object for the data fetched via REST and JSON object from garage sensors
  */
+@Data
 public class WeatherData
 {
-	@SerializedName("temperature")
-	private double myTemperature;
+	private double temperature;
 
-	@SerializedName("humidity")
-	private double myHumidity;
+	private double humidity;
 
-	public double getHumidity()
+	public WeatherData(double temperature, double humidity)
 	{
-		return myHumidity;
-	}
-
-	public void setHumidity(double theHumidity)
-	{
-		myHumidity = theHumidity;
-	}
-
-	public double getTemperature()
-	{
-		return myTemperature;
-	}
-
-	public void setTemperature(double theTemperature)
-	{
-		myTemperature = theTemperature;
+		setTemperature(temperature);
+		setHumidity(humidity);
 	}
 }

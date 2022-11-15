@@ -1,47 +1,51 @@
 package com.bigboxer23.lights.controllers.garage;
 
 import com.bigboxer23.lights.controllers.AbstractBaseController;
-import com.bigboxer23.lights.controllers.IStatusController;
-import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.lights.controllers.ITemperatureController;
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.lights.data.WeatherData;
-import com.bigboxer23.util.http.HttpClientUtils;
-import com.google.gson.Gson;
-import org.apache.http.client.methods.HttpGet;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Control garage pi
  */
-@Component
-public class GarageController extends AbstractBaseController implements ISystemController, IStatusController, ITemperatureController
+@Tag(name = "Garage Controller", description = "Service to control the garage door pi")
+@RestController
+public class GarageController extends AbstractBaseController implements ITemperatureController
 {
 	@Value("${garage.url}")
 	private String myGarageURL;
 
-	public static final String kControllerEndpoint = "Garage";
-
 	private VeraDeviceVO myGarageData;
 
-	@Override
-	public String doAction(List<String> theCommands)
+	@GetMapping(value = {"/S/Garage/{command}", "/S/Garage/{command}/{delay}"},
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "Service for communicating with the garage pi",
+			description = "Allows pass through of various commands associated with the garage pi.")
+	@ApiResponses({@ApiResponse(responseCode = HttpURLConnection.HTTP_UNAUTHORIZED + "", description = "unauthorized"),
+			@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")})
+	public String doAction(@Parameter(description = "command to run.  Possible values [Open, Close, Status2, SetAutoCloseDelay, DisableAutoClose]") @PathVariable(value = "command") String command,
+	                       @Parameter(description = "used with SetAutoCloseDelay. Seconds to set delay for", required = false)
+	                       @PathVariable(value = "delay", required = false) Long delay)
 	{
-		if(theCommands.size() == 0 || theCommands.size() > 2)
-		{
-			return "Malformed input " + theCommands.size();
-		}
-		myLogger.error("Garage Door change requested: " + theCommands.get(0));
-		myGarageData = fromJson(myGarageURL + "/" + theCommands.get(0) + (theCommands.size() == 2 ? "/" + theCommands.get(1) : ""), VeraDeviceVO.class);
+		myLogger.error("Garage Door change requested: " + command);
+		myGarageData = fromJson(myGarageURL + "/" + command + (delay != null ? "/" + delay : ""), VeraDeviceVO.class);
 		myGarageData.setName("Garage Opener");
 		myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
 		return null;
@@ -56,15 +60,7 @@ public class GarageController extends AbstractBaseController implements ISystemC
 	@Override
 	public WeatherData getWeatherData()
 	{
-		return new Gson().fromJson(HttpClientUtils.execute(new HttpGet(myGarageURL + "/Weather")), WeatherData.class);
-	}
-
-	@Override
-	public boolean getStatus(int theLightId)
-	{
-		List<String> aList = new ArrayList<>();
-		aList.add("Status");
-		return Boolean.parseBoolean(doAction(aList));
+		return new WeatherData(Float.parseFloat(myGarageData.getTemperature()), myGarageData.getHumidity());
 	}
 
 	public void getStatus(VeraHouseVO theHouseStatus)
@@ -88,7 +84,6 @@ public class GarageController extends AbstractBaseController implements ISystemC
 				return;
 			}
 			myGarageData.setName("Garage Opener");
-			myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
 			myLogger.debug("Fetched new garage data");
 		} catch (Exception e)
 		{

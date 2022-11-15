@@ -1,10 +1,9 @@
 package com.bigboxer23.lights.controllers.hue;
 
-import com.bigboxer23.util.http.HttpClientUtils;
-import com.google.gson.*;
-import com.bigboxer23.lights.controllers.IStatusController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.lights.data.HueLightVO;
+import com.bigboxer23.util.http.HttpClientUtils;
+import com.google.gson.*;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
@@ -17,7 +16,7 @@ import java.util.List;
 /**
  * controller for a philips hue light system
  */
-public class HueController implements ISystemController, IStatusController
+public class HueController implements ISystemController
 {
 	private static final Logger myLogger = LoggerFactory.getLogger(HueController.class);
 
@@ -127,7 +126,6 @@ public class HueController implements ISystemController, IStatusController
 		HttpClientUtils.execute(aPost);
 	}
 
-	@Override
 	public boolean getStatus(int theLightId)
 	{
 		getAllLightsCache();

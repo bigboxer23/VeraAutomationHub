@@ -2,7 +2,6 @@ package com.bigboxer23.lights.controllers;
 
 import com.bigboxer23.util.http.HttpClientUtils;
 import com.google.gson.GsonBuilder;
-import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.google.gson.JsonSyntaxException;
 import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
@@ -28,7 +27,6 @@ public class AbstractBaseController
 		if (myBuilder == null)
 		{
 			myBuilder = new GsonBuilder();
-			myBuilder.registerTypeAdapter(VeraHouseVO.class, new VeraHouseVO());
 		}
 		return myBuilder;
 	}

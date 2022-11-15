@@ -2,11 +2,19 @@ package com.bigboxer23.lights.controllers.scene;
 
 import com.bigboxer23.lights.controllers.garage.GarageController;
 import com.bigboxer23.lights.controllers.hue.HueController;
-import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.lights.data.WeatherData;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +24,11 @@ import java.util.List;
  * We use the GarageController object which is a RPi located in the garage which has a restful
  * service to return a JSON object with temperature and humidity returned
  */
-@Component
-public class WeatherController implements ISystemController
+@Tag(name = "Weather Controller", description = "Controller to make lights reactive to temperature outside." +
+		" The GarageController object is used, which is a RPi located in the garage which has a restful" +
+		" service to return a JSON object with temperature and humidity returned.")
+@RestController
+public class WeatherController
 {
 	private static final String kLightModel = "LCT001";
 
@@ -28,8 +39,6 @@ public class WeatherController implements ISystemController
 	private HueController myHueController;
 
 	private GarageController myGarageController;
-
-	public static final String kControllerEndpoint = "Weather";
 
 	@Autowired
 	public void setGarageController(GarageController theGarageController)
@@ -50,8 +59,14 @@ public class WeatherController implements ISystemController
 	 * @param theResponse
 	 * @return
 	 */
-	@Override
-	public String doAction(List<String> theCommands)
+	@GetMapping(value = "/S/Weather/{deviceId}",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "Fetches weather data from remote source, updates lights defined by the command with weather appropriate color",
+			description = "Fetches weather data from remote source, updates lights defined by the command with weather appropriate color." +
+					" The defined device should be a philips hue light")
+	@ApiResponses({@ApiResponse(responseCode = HttpURLConnection.HTTP_UNAUTHORIZED + "", description = "unauthorized"),
+			@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")})
+	public String doAction(@Parameter(description = "device id for which to apply the weather color") @PathVariable(value = "deviceId") String deviceId)
 	{
 		WeatherData aData = myGarageController.getWeatherData();
 		if (aData == null)
@@ -59,7 +74,7 @@ public class WeatherController implements ISystemController
 			return "Cannot get weather data.";
 		}
 		List<String> aCommands = new ArrayList<>();
-		aCommands.add(theCommands.get(0));
+		aCommands.add(deviceId);
 		aCommands.add("xy");
 		int[] aColor = getColor(aData.getTemperature(), kMinTemp, kMaxTemp);
 		float[] aXY = new float[]{0f,0f};//TODO: this is totally non-functional PHUtilities.calculateXYFromRGB(aColor[0], aColor[1], aColor[2], kLightModel);
