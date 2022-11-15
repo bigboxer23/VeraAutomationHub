@@ -11,4 +11,10 @@ public class WeatherData
 	private double temperature;
 
 	private double humidity;
+
+	public WeatherData(double temperature, double humidity)
+	{
+		setTemperature(temperature);
+		setHumidity(humidity);
+	}
 }

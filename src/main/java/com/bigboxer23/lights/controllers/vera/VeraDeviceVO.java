@@ -45,6 +45,9 @@ public class VeraDeviceVO
 	@Schema(description = "humidity level associated with device")
 	private float humidity;
 
+	@Schema(description = "auto close (in ms) associated with the device")
+	private long autoClose;
+
 	public VeraDeviceVO(String theName, float theLevel)
 	{
 		name = theName;
