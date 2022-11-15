@@ -86,8 +86,19 @@ public class ElasticAnalyticsController
 				.getDevices()
 				.stream()
 				.filter(VeraDeviceVO::isLight)
-				.filter(theDevice -> theDevice.getLevel() > 0)
+				.filter(ElasticAnalyticsController::isDeviceOn)
 				.count();
+	}
+
+	private static boolean isDeviceOn(VeraDeviceVO device)
+	{
+		try
+		{
+			return Integer.parseInt(Optional.ofNullable(device.getLevel()).orElse("0")) > 0;
+		} catch (NumberFormatException aNFE)
+		{
+			return false;
+		}
 	}
 
 	private void handleClimateData(VeraHouseVO theVeraHouseVO, BulkRequest theRequest)
@@ -143,8 +154,8 @@ public class ElasticAnalyticsController
 								aThermostatDocument.put("batteryLevel", theVeraDeviceVO.getLevel());
 								break;
 							case "thermostat mode":
-								aThermostatDocument.put("cool", theVeraDeviceVO.getLevel() == 2);
-								aThermostatDocument.put("heat", theVeraDeviceVO.getLevel() == 1);
+								aThermostatDocument.put("cool", "2".equals(theVeraDeviceVO.getLevel()));
+								aThermostatDocument.put("heat", "1".equals(theVeraDeviceVO.getLevel()));
 								break;
 							case "heating setpoint":
 							case "cooling setpoint":
@@ -177,7 +188,7 @@ public class ElasticAnalyticsController
 
 	private float getFloatTemperature(VeraDeviceVO theDeviceVO)
 	{
-		String aLevel = theDeviceVO.getStringLevel();
+		String aLevel = theDeviceVO.getLevel();
 		if (aLevel.contains(" "))
 		{
 			aLevel = aLevel.substring(0, aLevel.indexOf(" "));
@@ -193,7 +204,7 @@ public class ElasticAnalyticsController
 
 	private double getDoubleTemperature(VeraDeviceVO theDeviceVO)
 	{
-		String aLevel = theDeviceVO.getStringLevel();
+		String aLevel = theDeviceVO.getLevel();
 		if (aLevel.contains(" "))
 		{
 			aLevel = aLevel.substring(0, aLevel.indexOf(" "));

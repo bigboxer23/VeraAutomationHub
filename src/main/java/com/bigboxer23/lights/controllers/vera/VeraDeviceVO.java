@@ -39,17 +39,11 @@ public class VeraDeviceVO
 	@Schema(description = "level of the device")
 	private String level;
 
-	/*@SerializedName("temperature")
+	@Schema(description = "string representing temperature at device (in c)")
 	private String temperature;
 
-	@SerializedName("humidity")
+	@Schema(description = "humidity level associated with device")
 	private float humidity;
-
-	@SerializedName("door")
-	private boolean door;
-
-	@SerializedName("autoClose")
-	private long autoClose;*/
 
 	public VeraDeviceVO(String theName, float theLevel)
 	{
@@ -71,29 +65,8 @@ public class VeraDeviceVO
 		return theDevices.stream().map(VeraDeviceVO::new).collect(Collectors.toList());
 	}
 
-	public boolean getStatus()
-	{
-		return status != null && status.equalsIgnoreCase("1");
-	}
-
-	public int getLevel()
-	{
-		try
-		{
-			return Integer.parseInt(level);
-		} catch (NumberFormatException aNFE)
-		{
-			return 0;
-		}
-	}
-
 	public final boolean isLight()
 	{
 		return getCategory() != null && (getCategory().equals("2") || getCategory().equalsIgnoreCase("3"));
-	}
-
-	public String getStringLevel()
-	{
-		return level;
 	}
 }
