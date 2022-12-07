@@ -1,6 +1,5 @@
 package com.bigboxer23.lights.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,7 +25,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 {
-	private static List<String> kProtectedUrlStrings = new ArrayList<String>()
+	private static final List<String> protectedUrlStrings = new ArrayList<String>()
 	{{
 		add("/SceneStatus");
 		add("/S/**");
@@ -34,23 +33,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 		add("/SceneStatusSmart");
 	}};
 
-	private static final RequestMatcher kProtectedUrls = new OrRequestMatcher(kProtectedUrlStrings.
+	private static final RequestMatcher kProtectedUrls = new OrRequestMatcher(protectedUrlStrings.
 			stream().
 			map(AntPathRequestMatcher::new).
 			collect(Collectors.toList()).
 			toArray(new AntPathRequestMatcher[0]));
 
-	private TokenAuthenticationProvider myProvider;
+	private TokenAuthenticationProvider provider;
 
-	@Autowired
-	public void setTokenAuthenticationProvider(TokenAuthenticationProvider theProvider)
+	public SecurityConfiguration(TokenAuthenticationProvider provider)
 	{
-		myProvider = theProvider;
+		this.provider = provider;
 	}
 
 	@Override
-	protected void configure(final AuthenticationManagerBuilder auth) {
-		auth.authenticationProvider(myProvider);
+	protected void configure(final AuthenticationManagerBuilder auth)
+	{
+		auth.authenticationProvider(provider);
 	}
 
 	@Override
@@ -62,27 +61,27 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 				.exceptionHandling()
 				.defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(UNAUTHORIZED), kProtectedUrls)
 				.and()
-				.authenticationProvider(myProvider)
+				.authenticationProvider(provider)
 				.addFilterBefore(restAuthenticationFilter(), AnonymousAuthenticationFilter.class)
 				.authorizeRequests()
-				.antMatchers(kProtectedUrlStrings.toArray(new String[0]))
+				.antMatchers(protectedUrlStrings.toArray(new String[0]))
 				.authenticated()
 				.and()
 				.formLogin().disable()
 				.httpBasic().disable()
-				.logout().disable();
+				.logout().disable()
+				.csrf().disable();
 	}
 
 	@Bean
-	TokenAuthenticationFilter restAuthenticationFilter() throws Exception {
-		final TokenAuthenticationFilter aTokenAuthenticationFilter = new TokenAuthenticationFilter(kProtectedUrls);
-		aTokenAuthenticationFilter.setAuthenticationManager(authenticationManager());
-		aTokenAuthenticationFilter.setAuthenticationSuccessHandler(successHandler());
-		return aTokenAuthenticationFilter;
+	TokenAuthenticationFilter restAuthenticationFilter() throws Exception
+	{
+		return new TokenAuthenticationFilter(kProtectedUrls, authenticationManager(), successHandler());
 	}
 
 	@Bean
-	SimpleUrlAuthenticationSuccessHandler successHandler() {
+	SimpleUrlAuthenticationSuccessHandler successHandler()
+	{
 		final SimpleUrlAuthenticationSuccessHandler aSuccessHandler = new SimpleUrlAuthenticationSuccessHandler();
 		aSuccessHandler.setRedirectStrategy((theRequest, theResponse, theUrl) -> { });
 		return aSuccessHandler;

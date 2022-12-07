@@ -1,9 +1,11 @@
 package com.bigboxer23.lights.security;
 
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.FilterChain;
@@ -21,9 +23,12 @@ import static java.util.Optional.ofNullable;
  */
 public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter
 {
-	public TokenAuthenticationFilter(final RequestMatcher requiresAuth)
+	public TokenAuthenticationFilter(final RequestMatcher requiresAuth, AuthenticationManager manager,
+	                                 AuthenticationSuccessHandler handler)
 	{
 		super(requiresAuth);
+		setAuthenticationManager(manager);
+		setAuthenticationSuccessHandler(handler);
 	}
 
 	@Override
