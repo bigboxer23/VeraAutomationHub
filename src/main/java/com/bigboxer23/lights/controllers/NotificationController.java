@@ -56,7 +56,7 @@ public class NotificationController extends HubContext
 		return myExecutor;
 	}
 
-	@GetMapping(value = {"/S/${notificationTag}", "/S/${notificationTag}/{deviceId}"},
+	@GetMapping(value = {"/S/Notification", "/S/Notification/{deviceId}"},
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "Trigger a notification",
 			description = "Fire notification tagged devices with a pulse. Can provide a specific device to notify if" +
