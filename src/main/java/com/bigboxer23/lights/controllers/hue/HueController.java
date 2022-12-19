@@ -2,7 +2,7 @@ package com.bigboxer23.lights.controllers.hue;
 
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.lights.data.HueLightVO;
-import com.bigboxer23.util.http.HttpClientUtils;
+import com.bigboxer23.utils.http.HttpClientUtils;
 import com.google.gson.*;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;

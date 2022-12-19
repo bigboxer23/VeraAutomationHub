@@ -1,7 +1,7 @@
 package com.bigboxer23.lights.controllers.scene;
 
 import com.bigboxer23.lights.controllers.hue.HueController;
-import com.bigboxer23.util.http.HttpClientUtils;
+import com.bigboxer23.utils.http.HttpClientUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import io.swagger.v3.oas.annotations.Operation;

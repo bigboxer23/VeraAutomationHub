@@ -1,6 +1,6 @@
 package com.bigboxer23.lights.controllers;
 
-import com.bigboxer23.util.http.HttpClientUtils;
+import com.bigboxer23.utils.http.HttpClientUtils;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import org.apache.http.client.methods.HttpGet;

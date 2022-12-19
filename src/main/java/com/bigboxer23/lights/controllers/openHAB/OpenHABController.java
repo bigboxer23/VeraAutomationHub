@@ -1,7 +1,7 @@
 package com.bigboxer23.lights.controllers.openHAB;
 
 import com.bigboxer23.lights.controllers.AbstractBaseController;
-import com.bigboxer23.util.http.HttpClientUtils;
+import com.bigboxer23.utils.http.HttpClientUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

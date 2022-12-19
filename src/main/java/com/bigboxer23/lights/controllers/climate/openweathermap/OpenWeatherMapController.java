@@ -1,7 +1,7 @@
 package com.bigboxer23.lights.controllers.climate.openweathermap;
 
 import com.bigboxer23.lights.controllers.AbstractBaseController;
-import com.bigboxer23.util.http.HttpClientUtils;
+import com.bigboxer23.utils.http.HttpClientUtils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.http.client.methods.HttpGet;
