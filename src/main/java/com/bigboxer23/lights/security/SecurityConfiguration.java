@@ -31,6 +31,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 		add("/S/**");
 		add("/enableTokenFetch/**");
 		add("/SceneStatusSmart");
+		add("/swagger-ui/**");
+
 	}};
 
 	private static final RequestMatcher kProtectedUrls = new OrRequestMatcher(protectedUrlStrings.
