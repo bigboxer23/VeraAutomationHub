@@ -1,14 +1,10 @@
 package com.bigboxer23.lights.controllers.openHAB;
 
 import com.google.gson.annotations.SerializedName;
-
 import java.util.List;
 
-/**
- * An OpenHAB device (item)
- */
-public class OpenHABItem
-{
+/** An OpenHAB device (item) */
+public class OpenHABItem {
 	@SerializedName("name")
 	private String myName;
 
@@ -30,57 +26,44 @@ public class OpenHABItem
 	@SerializedName("members")
 	private List<OpenHABItem> myItems;
 
-	public List<OpenHABItem> getItems()
-	{
+	public List<OpenHABItem> getItems() {
 		return myItems;
 	}
 
-	public String getName()
-	{
+	public String getName() {
 		return myName;
 	}
 
-	public String getState()
-	{
+	public String getState() {
 		return getLevel().equalsIgnoreCase("0") ? "0" : "1";
 	}
 
-	public String getLevel()
-	{
-		if (myType.equalsIgnoreCase("color"))
-		{
-			if (myState.lastIndexOf(",") < 0)
-			{
+	public String getLevel() {
+		if (myType.equalsIgnoreCase("color")) {
+			if (myState.lastIndexOf(",") < 0) {
 				return "0";
 			}
 			return myState.substring(myState.lastIndexOf(",") + 1);
-		} else if (myType.equalsIgnoreCase("switch"))
-		{
+		} else if (myType.equalsIgnoreCase("switch")) {
 			return myState.equalsIgnoreCase("off") ? "0" : "1";
 		}
 		return myState;
 	}
 
-	public int getIntLevel()
-	{
+	public int getIntLevel() {
 		String aLevel = getLevel();
-		try
-		{
+		try {
 			return Integer.parseInt(aLevel);
-		} catch (NumberFormatException aNFE)
-		{
+		} catch (NumberFormatException aNFE) {
 			return 0;
 		}
 	}
 
-	public String getType()
-	{
-		if (getTags().contains("ignore"))
-		{
+	public String getType() {
+		if (getTags().contains("ignore")) {
 			return "0";
 		}
-		switch (myType.toLowerCase())
-		{
+		switch (myType.toLowerCase()) {
 			case "dimmer":
 			case "color":
 				return "2";
@@ -90,18 +73,15 @@ public class OpenHABItem
 		return "0";
 	}
 
-	public String getCategory()
-	{
+	public String getCategory() {
 		return myCategory;
 	}
 
-	public String getLabel()
-	{
+	public String getLabel() {
 		return myLabel;
 	}
 
-	public List<String> getTags()
-	{
+	public List<String> getTags() {
 		return myTags;
 	}
 }

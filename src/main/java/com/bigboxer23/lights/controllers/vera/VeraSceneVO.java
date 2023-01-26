@@ -3,13 +3,10 @@ package com.bigboxer23.lights.controllers.vera;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-/**
- *
- */
+/** */
 @Data
 @Schema(description = "JSON representing a scene")
-public class VeraSceneVO
-{
+public class VeraSceneVO {
 	@Schema(description = "name of the scene")
 	private String name;
 

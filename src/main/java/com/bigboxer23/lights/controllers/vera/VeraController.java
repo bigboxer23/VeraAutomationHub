@@ -3,22 +3,16 @@ package com.bigboxer23.lights.controllers.vera;
 import com.bigboxer23.lights.controllers.AbstractBaseController;
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.utils.http.HttpClientUtils;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.http.client.methods.HttpGet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Vera controller to make requests to a vera UI7 device
- */
+/** Vera controller to make requests to a vera UI7 device */
 @Component
-public class VeraController extends AbstractBaseController implements ISystemController
-{
-	/**
-	 * Location of Vera Hub, assume locally running on default port
-	 */
+public class VeraController extends AbstractBaseController implements ISystemController {
+	/** Location of Vera Hub, assume locally running on default port */
 	@Value("${veraUrl}")
 	private String kVeraHubUrl;
 
@@ -38,14 +32,11 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 
 	public static final String kControllerEndpoint = "Vera";
 
-
-	public boolean getStatus(int theLightId)
-	{
+	public boolean getStatus(int theLightId) {
 		return false;
 	}
 
-	public VeraHouseVO getStatus()
-	{
+	public VeraHouseVO getStatus() {
 		myLogger.debug("Getting Vera Status");
 		VeraHouseVO aHouseStatus = fromJson(kVeraHubUrl + "/data_request?id=sdata", VeraHouseVO.class);
 		setStatus(aHouseStatus);
@@ -60,87 +51,79 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 	 * @return
 	 */
 	@Override
-	public String doAction(List<String> theCommands)
-	{
-		if (theCommands.size() != 3)
-		{
-			//TODO:fail, bad request
+	public String doAction(List<String> theCommands) {
+		if (theCommands.size() != 3) {
+			// TODO:fail, bad request
 		}
-		findLights(theCommands).forEach(theDeviceAction -> doDeviceAction(theDeviceAction, theCommands.get(0).equalsIgnoreCase("scene")));
+		findLights(theCommands)
+				.forEach(theDeviceAction ->
+						doDeviceAction(theDeviceAction, theCommands.get(0).equalsIgnoreCase("scene")));
 		return null;
 	}
 
-	private void doDeviceAction(DeviceAction theAction, boolean theScene)
-	{
-		HttpClientUtils.execute(new HttpGet(kVeraHubUrl + (theScene ? kVeraSceneRequest : kVeraRequest) + theAction.getId() + (theScene ? kSceneUrn : kVeraServiceUrn) + theAction.getAction()));
+	private void doDeviceAction(DeviceAction theAction, boolean theScene) {
+		HttpClientUtils.execute(new HttpGet(kVeraHubUrl
+				+ (theScene ? kVeraSceneRequest : kVeraRequest)
+				+ theAction.getId()
+				+ (theScene ? kSceneUrn : kVeraServiceUrn)
+				+ theAction.getAction()));
 	}
 
 	/**
-	 * Find all the lights we need to do the action to, vera doesn't seem to have any API exposed to hit the room directly.
+	 * Find all the lights we need to do the action to, vera doesn't seem to have any API exposed to
+	 * hit the room directly.
 	 *
 	 * @param theCommands
 	 * @return
 	 */
-	private List<DeviceAction> findLights(List<String> theCommands)
-	{
+	private List<DeviceAction> findLights(List<String> theCommands) {
 		List<DeviceAction> aLights = new ArrayList<>();
-		if (theCommands.get(0).equalsIgnoreCase("Room"))
-		{
-			if (myStatus != null)
-			{
-				for (VeraRoomVO aVeraRoomVO : myStatus.getRooms())
-				{
-					if (aVeraRoomVO.getId().equalsIgnoreCase(theCommands.get(1)))
-					{
-						aVeraRoomVO.getDevices().stream().filter(VeraDeviceVO::isLight).forEach(theVeraDeviceVO ->
-						{
-							String anAction = theCommands.get(2);
-							if (theVeraDeviceVO.getDefinedDim() > 0 && theVeraDeviceVO.getDefinedDim() <= 100 && !anAction.endsWith("0"))
-							{
-								anAction = kDimmingCommand + theVeraDeviceVO.getDefinedDim();
-							}
-							if (theVeraDeviceVO.getDefinedDim() != 0 || anAction.endsWith("0"))
-							{
-								aLights.add(new DeviceAction(anAction, theVeraDeviceVO.getId()));
-							}
-						});
+		if (theCommands.get(0).equalsIgnoreCase("Room")) {
+			if (myStatus != null) {
+				for (VeraRoomVO aVeraRoomVO : myStatus.getRooms()) {
+					if (aVeraRoomVO.getId().equalsIgnoreCase(theCommands.get(1))) {
+						aVeraRoomVO.getDevices().stream()
+								.filter(VeraDeviceVO::isLight)
+								.forEach(theVeraDeviceVO -> {
+									String anAction = theCommands.get(2);
+									if (theVeraDeviceVO.getDefinedDim() > 0
+											&& theVeraDeviceVO.getDefinedDim() <= 100
+											&& !anAction.endsWith("0")) {
+										anAction = kDimmingCommand + theVeraDeviceVO.getDefinedDim();
+									}
+									if (theVeraDeviceVO.getDefinedDim() != 0 || anAction.endsWith("0")) {
+										aLights.add(new DeviceAction(anAction, theVeraDeviceVO.getId()));
+									}
+								});
 					}
 				}
 			}
-		} else
-		{
+		} else {
 			aLights.add(new DeviceAction(theCommands.get(2), theCommands.get(1)));
 		}
 		return aLights;
 	}
 
-	public void setStatus(VeraHouseVO theStatus)
-	{
+	public void setStatus(VeraHouseVO theStatus) {
 		myStatus = theStatus;
 	}
 
-	/**
-	 * Encapsulate the action to run (dim or on/off) and the device id
-	 */
-	private class DeviceAction
-	{
+	/** Encapsulate the action to run (dim or on/off) and the device id */
+	private class DeviceAction {
 		private String myAction;
 
 		private String myId;
 
-		public DeviceAction(String theAction, String theId)
-		{
+		public DeviceAction(String theAction, String theId) {
 			myAction = theAction;
 			myId = theId;
 		}
 
-		public String getId()
-		{
+		public String getId() {
 			return myId;
 		}
 
-		public String getAction()
-		{
+		public String getAction() {
 			return myAction;
 		}
 	}

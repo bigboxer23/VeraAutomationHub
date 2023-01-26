@@ -2,18 +2,14 @@ package com.bigboxer23.lights.controllers.vera;
 
 import com.bigboxer23.lights.controllers.openHAB.OpenHABItem;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Data;
 
-/**
- * Device returned from Vera controller
- */
+/** Device returned from Vera controller */
 @Data
 @Schema(description = "JSON representing a device (light, switch, etc)")
-public class VeraDeviceVO
-{
+public class VeraDeviceVO {
 	@Schema(description = "device name", required = true)
 	private String name;
 
@@ -21,8 +17,8 @@ public class VeraDeviceVO
 	private String id;
 
 	/**
-	 * If set to value other than -1, use this value if a room control is requested.  IE
-	 * load is 0, don't turn this light on if room light is requested.  If set to 50, dim and turn on to 50%
+	 * If set to value other than -1, use this value if a room control is requested. IE load is 0,
+	 * don't turn this light on if room light is requested. If set to 50, dim and turn on to 50%
 	 * Leaving at 100 or -1 means turn on as normal
 	 */
 	private int definedDim = -1;
@@ -48,14 +44,12 @@ public class VeraDeviceVO
 	@Schema(description = "auto close (in ms) associated with the device")
 	private long autoClose;
 
-	public VeraDeviceVO(String theName, float theLevel)
-	{
+	public VeraDeviceVO(String theName, float theLevel) {
 		name = theName;
 		level = "" + theLevel;
 	}
 
-	private VeraDeviceVO(OpenHABItem theDevice)
-	{
+	private VeraDeviceVO(OpenHABItem theDevice) {
 		id = theDevice.getName();
 		name = theDevice.getLabel();
 		status = theDevice.getState();
@@ -63,13 +57,12 @@ public class VeraDeviceVO
 		category = theDevice.getType();
 	}
 
-	public static List<VeraDeviceVO> fromOpenHab(List<OpenHABItem> theDevices)
-	{
+	public static List<VeraDeviceVO> fromOpenHab(List<OpenHABItem> theDevices) {
 		return theDevices.stream().map(VeraDeviceVO::new).collect(Collectors.toList());
 	}
 
-	public final boolean isLight()
-	{
-		return getCategory() != null && (getCategory().equals("2") || getCategory().equalsIgnoreCase("3"));
+	public final boolean isLight() {
+		return getCategory() != null
+				&& (getCategory().equals("2") || getCategory().equalsIgnoreCase("3"));
 	}
 }

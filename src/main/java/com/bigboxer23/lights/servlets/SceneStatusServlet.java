@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.net.HttpURLConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,17 +19,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.HttpURLConnection;
-
-/**
- * Get status from the vera controller for everything in the house
- */
-
+/** Get status from the vera controller for everything in the house */
 @RestController
 @EnableAutoConfiguration
 @Tag(name = "Scene Status", description = "Return a JSON object that describes the state of all the house's items")
-public class SceneStatusServlet extends HubContext
-{
+public class SceneStatusServlet extends HubContext {
 	private static final Logger myLogger = LoggerFactory.getLogger(SceneStatusServlet.class);
 
 	private long myLastUpdate = -1;
@@ -41,30 +36,28 @@ public class SceneStatusServlet extends HubContext
 	private ClimateController myClimateController;
 
 	@Autowired
-	public void setGarageController(ElasticAnalyticsController theElasticAnalyticsController)
-	{
+	public void setGarageController(ElasticAnalyticsController theElasticAnalyticsController) {
 		myElasticAnalyticsController = theElasticAnalyticsController;
 	}
 
 	@Autowired
-	public void setClimateController(ClimateController theClimateController)
-	{
+	public void setClimateController(ClimateController theClimateController) {
 		myClimateController = theClimateController;
 	}
 
-	@GetMapping(value = "/SceneStatus",
-			produces = MediaType.APPLICATION_JSON_VALUE)
-	@Operation(summary = "Get object representing house's state",
+	@GetMapping(value = "/SceneStatus", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "Get object representing house's state",
 			description = "Returns object that shows all devices and various state associated with them.")
-	@ApiResponses({@ApiResponse(responseCode = HttpURLConnection.HTTP_UNAUTHORIZED + "", description = "unauthorized"),
-			@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")})
-	public VeraHouseVO getHouseStatusJson()
-	{
+	@ApiResponses({
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_UNAUTHORIZED + "", description = "unauthorized"),
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
+	})
+	public VeraHouseVO getHouseStatusJson() {
 		return getHouseStatus();
 	}
 
-	private VeraHouseVO getHouseStatus()
-	{
+	private VeraHouseVO getHouseStatus() {
 		VeraHouseVO aHouseStatus = new VeraHouseVO(myOpenHABController.getStatus());
 		fillMotionOverrides(aHouseStatus);
 		myGarageController.getStatus(aHouseStatus);
@@ -74,51 +67,40 @@ public class SceneStatusServlet extends HubContext
 		return aHouseStatus;
 	}
 
-	private void fillSmartRooms(VeraHouseVO theHouse)
-	{
-		theHouse.getRooms().forEach(theVeraRoomVO ->
-		{
+	private void fillSmartRooms(VeraHouseVO theHouse) {
+		theHouse.getRooms().forEach(theVeraRoomVO -> {
 			theVeraRoomVO.setSmart(myOpenHABController.getSmartRooms().contains("Smart" + theVeraRoomVO.getId()));
 		});
 	}
 
 	/**
-	 * Looks through room list fetched from OpenHAB, if finds one named MotionOverrides, will place items from that
-	 * room into appropriate rooms based on the device naming schemes.  Necessary to place motion overrides within the
-	 * proper places in the room tree without actually attaching them to the room (so they're not turned on if the
-	 * entire room is set to on)
+	 * Looks through room list fetched from OpenHAB, if finds one named MotionOverrides, will place
+	 * items from that room into appropriate rooms based on the device naming schemes. Necessary to
+	 * place motion overrides within the proper places in the room tree without actually attaching
+	 * them to the room (so they're not turned on if the entire room is set to on)
 	 *
 	 * @param theHouse
 	 */
-	private void fillMotionOverrides(VeraHouseVO theHouse)
-	{
-		theHouse
-				.getRooms()
-				.stream()
+	private void fillMotionOverrides(VeraHouseVO theHouse) {
+		theHouse.getRooms().stream()
 				.filter(theRoom -> theRoom.getName().equalsIgnoreCase("MotionOverrides"))
 				.findAny()
-				.ifPresent(theMotionOverride ->
-				{
+				.ifPresent(theMotionOverride -> {
 					theHouse.getRooms().remove(theMotionOverride);
-					theMotionOverride.getDevices().forEach(theDevice ->
-					{
+					theMotionOverride.getDevices().forEach(theDevice -> {
 						String aName = theDevice.getName().replace(" Motion Override", "");
-						theHouse
-								.getRooms()
-								.stream()
+						theHouse.getRooms().stream()
 								.filter(theVeraRoomVO -> theVeraRoomVO.getName().equalsIgnoreCase(aName))
 								.findAny()
-								.ifPresent(theVeraRoomVO -> theVeraRoomVO.getDevices().add(theDevice));
+								.ifPresent(theVeraRoomVO ->
+										theVeraRoomVO.getDevices().add(theDevice));
 					});
 				});
 	}
 
-	/**
-	 * Send to elastic every 5 min
-	 */
+	/** Send to elastic every 5 min */
 	@Scheduled(fixedDelay = 300000)
-	private void updateStatus()
-	{
+	private void updateStatus() {
 		myElasticAnalyticsController.logStatusEvent(getHouseStatus());
 	}
 }

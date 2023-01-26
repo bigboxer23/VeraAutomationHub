@@ -10,11 +10,8 @@ import com.bigboxer23.lights.controllers.vera.VeraController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
-/**
- * Config controlling class.  Reads JSON data from file, initializes scenes from file's contents
- */
-public class HubContext
-{
+/** Config controlling class. Reads JSON data from file, initializes scenes from file's contents */
+public class HubContext {
 	protected GarageController myGarageController;
 
 	protected FrontDoorController myFrontDoorController;
@@ -30,44 +27,37 @@ public class HubContext
 	protected OpenHABController myOpenHABController;
 
 	@Autowired
-	public void setGarageController(GarageController theGarageController)
-	{
+	public void setGarageController(GarageController theGarageController) {
 		myGarageController = theGarageController;
 	}
 
 	@Autowired
-	public void setFrontDoorController(FrontDoorController theFrontDoorController)
-	{
+	public void setFrontDoorController(FrontDoorController theFrontDoorController) {
 		myFrontDoorController = theFrontDoorController;
 	}
 
 	@Autowired
-	public void setWeatherController(WeatherController theWeatherController)
-	{
+	public void setWeatherController(WeatherController theWeatherController) {
 		myWeatherController = theWeatherController;
 	}
 
 	@Autowired
-	public void setDaylightController(DaylightController theDaylightController)
-	{
+	public void setDaylightController(DaylightController theDaylightController) {
 		myDaylightController = theDaylightController;
 	}
 
 	@Autowired
-	public void setNotificationController(@Lazy NotificationController theNotificationController)
-	{
+	public void setNotificationController(@Lazy NotificationController theNotificationController) {
 		myNotificationController = theNotificationController;
 	}
 
 	@Autowired
-	public void setVeraController(VeraController theVeraController)
-	{
+	public void setVeraController(VeraController theVeraController) {
 		myVeraController = theVeraController;
 	}
 
 	@Autowired
-	public void setVeraController(OpenHABController theOpenHABController)
-	{
+	public void setVeraController(OpenHABController theOpenHABController) {
 		myOpenHABController = theOpenHABController;
 	}
 }

@@ -2,11 +2,8 @@ package com.bigboxer23.lights.data;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * overlay for information from a hue light
- */
-public class HueLightVO
-{
+/** overlay for information from a hue light */
+public class HueLightVO {
 	@SerializedName("state")
 	private HueLightStateVO myState;
 
@@ -28,33 +25,27 @@ public class HueLightVO
 	/*@SerializedName("pointsymbol")
 	private String myPointSymbol;*/
 
-	public HueLightStateVO getState()
-	{
+	public HueLightStateVO getState() {
 		return myState;
 	}
 
-	public String getType()
-	{
+	public String getType() {
 		return myType;
 	}
 
-	public String getName()
-	{
+	public String getName() {
 		return myName;
 	}
 
-	public String getModelId()
-	{
+	public String getModelId() {
 		return myModelId;
 	}
 
-	public String getUniqueId()
-	{
+	public String getUniqueId() {
 		return myUniqueId;
 	}
 
-	public String getSWVersion()
-	{
+	public String getSWVersion() {
 		return mySWVersion;
 	}
 

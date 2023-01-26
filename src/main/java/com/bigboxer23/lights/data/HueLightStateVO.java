@@ -1,14 +1,10 @@
 package com.bigboxer23.lights.data;
 
 import com.google.gson.annotations.SerializedName;
-
 import java.util.List;
 
-/**
- * overlay over data retrieved from hue hub
- */
-public class HueLightStateVO
-{
+/** overlay over data retrieved from hue hub */
+public class HueLightStateVO {
 	@SerializedName("on")
 	private boolean myState;
 
@@ -39,53 +35,43 @@ public class HueLightStateVO
 	@SerializedName("reachable")
 	private boolean myReachable;
 
-	public boolean isState()
-	{
+	public boolean isState() {
 		return myState;
 	}
 
-	public int getBrightness()
-	{
+	public int getBrightness() {
 		return myBrightness;
 	}
 
-	public int getHue()
-	{
+	public int getHue() {
 		return myHue;
 	}
 
-	public int getSaturation()
-	{
+	public int getSaturation() {
 		return mySaturation;
 	}
 
-	public String getEffect()
-	{
+	public String getEffect() {
 		return myEffect;
 	}
 
-	public List<Float> getXY()
-	{
+	public List<Float> getXY() {
 		return myXY;
 	}
 
-	public int getCT()
-	{
+	public int getCT() {
 		return myCT;
 	}
 
-	public String getAlert()
-	{
+	public String getAlert() {
 		return myAlert;
 	}
 
-	public String getColorMode()
-	{
+	public String getColorMode() {
 		return myColorMode;
 	}
 
-	public boolean isReachable()
-	{
+	public boolean isReachable() {
 		return myReachable;
 	}
 }

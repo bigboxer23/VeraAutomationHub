@@ -2,11 +2,8 @@ package com.bigboxer23.lights.data;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Encapsulate a singular light including it's type, id, and brightness on action
- */
-public class LightVO
-{
+/** Encapsulate a singular light including it's type, id, and brightness on action */
+public class LightVO {
 	@SerializedName("type")
 	private String myType;
 
@@ -19,23 +16,19 @@ public class LightVO
 	@SerializedName("movie")
 	private String myMovieModeAction;
 
-	public String getType()
-	{
+	public String getType() {
 		return myType;
 	}
 
-	public int getId()
-	{
+	public int getId() {
 		return myId;
 	}
 
-	public int getBrightness()
-	{
+	public int getBrightness() {
 		return myBrightness;
 	}
 
-	public String getMovieModeAction()
-	{
+	public String getMovieModeAction() {
 		return myMovieModeAction;
 	}
 }

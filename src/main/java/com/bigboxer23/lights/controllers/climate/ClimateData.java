@@ -2,11 +2,8 @@ package com.bigboxer23.lights.controllers.climate;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- *
- */
-public class ClimateData
-{
+/** */
+public class ClimateData {
 	@SerializedName("temperature")
 	private float myTemperature;
 
@@ -19,23 +16,19 @@ public class ClimateData
 	@SerializedName("quality")
 	private float myQuality;
 
-	public float getQuality()
-	{
+	public float getQuality() {
 		return myQuality;
 	}
 
-	public float getHumidity()
-	{
+	public float getHumidity() {
 		return myHumidity;
 	}
 
-	public float getPressure()
-	{
+	public float getPressure() {
 		return myPressure;
 	}
 
-	public float getTemperature()
-	{
-		return (myTemperature * 9/5) + 32;
+	public float getTemperature() {
+		return (myTemperature * 9 / 5) + 32;
 	}
 }

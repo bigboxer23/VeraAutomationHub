@@ -1,14 +1,10 @@
 package com.bigboxer23.lights.data;
 
 import com.google.gson.annotations.SerializedName;
-
 import java.util.List;
 
-/**
- * Encapsulate a "scene" (or room whatevs)
- */
-public class SceneVO
-{
+/** Encapsulate a "scene" (or room whatevs) */
+public class SceneVO {
 	@SerializedName("name")
 	private String mySceneName;
 
@@ -24,45 +20,37 @@ public class SceneVO
 	@SerializedName("events")
 	private List<String> myNotificationEvents;
 
-	public SceneVO(){}
+	public SceneVO() {}
 
-	public SceneVO(String theName)
-	{
+	public SceneVO(String theName) {
 		mySceneName = theName;
 	}
 
-	public String getSceneName()
-	{
+	public String getSceneName() {
 		return mySceneName;
 	}
 
-	public String getSceneUrl()
-	{
+	public String getSceneUrl() {
 		return mySceneName.replace(" ", "");
 	}
 
-	public List<LightVO> getLights()
-	{
+	public List<LightVO> getLights() {
 		return myLights;
 	}
 
-	public boolean isStatus()
-	{
+	public boolean isStatus() {
 		return myStatus;
 	}
 
-	public void setStatus(boolean theStatus)
-	{
+	public void setStatus(boolean theStatus) {
 		myStatus = theStatus;
 	}
 
-	public WeatherData getWeatherData()
-	{
+	public WeatherData getWeatherData() {
 		return myWeatherData;
 	}
 
-	public void setWeatherData(WeatherData theWeatherData)
-	{
+	public void setWeatherData(WeatherData theWeatherData) {
 		myWeatherData = theWeatherData;
 	}
 
@@ -71,13 +59,11 @@ public class SceneVO
 	 *
 	 * @return
 	 */
-	public List<String> getNotificationEvents()
-	{
+	public List<String> getNotificationEvents() {
 		return myNotificationEvents;
 	}
 
-	public void setNotificationEvents(List<String> theNotificationEvents)
-	{
+	public void setNotificationEvents(List<String> theNotificationEvents) {
 		myNotificationEvents = theNotificationEvents;
 	}
 }
