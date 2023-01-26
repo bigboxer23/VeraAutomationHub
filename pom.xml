@@ -17,6 +17,7 @@
 
   <name>VeraAutomationHub</name>
   <description/>
+  <url>https://github.com/bigboxer23/VeraAutomationHub</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
