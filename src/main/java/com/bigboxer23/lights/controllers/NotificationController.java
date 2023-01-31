@@ -1,17 +1,18 @@
 package com.bigboxer23.lights.controllers;
 
 import com.bigboxer23.lights.HubContext;
+import com.bigboxer23.lights.controllers.frontdoor.FrontDoorController;
+import com.bigboxer23.lights.controllers.garage.GarageController;
+import com.bigboxer23.lights.controllers.openHAB.OpenHABController;
 import com.bigboxer23.lights.controllers.openHAB.OpenHABItem;
+import com.bigboxer23.lights.controllers.scene.DaylightController;
+import com.bigboxer23.lights.controllers.scene.WeatherController;
+import com.bigboxer23.lights.controllers.vera.VeraController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.net.HttpURLConnection;
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,12 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.HttpURLConnection;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * controller for receiving a notification from some source and triggering an alert to scenes that
@@ -45,6 +52,22 @@ public class NotificationController extends HubContext {
 	private long myLastNotification = -1;
 
 	private ThreadPoolExecutor myExecutor;
+
+	protected NotificationController(
+			GarageController garageController,
+			FrontDoorController frontDoorController,
+			WeatherController weatherController,
+			DaylightController daylightController,
+			VeraController veraController,
+			OpenHABController openHABController) {
+		super(
+				garageController,
+				frontDoorController,
+				weatherController,
+				daylightController,
+				veraController,
+				openHABController);
+	}
 
 	private ThreadPoolExecutor getExecutors() {
 		if (myExecutor == null) {

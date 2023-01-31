@@ -1,5 +1,8 @@
 package com.bigboxer23.lights.controllers.meural;
 
+import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
+import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
+import com.squareup.moshi.Moshi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -7,19 +10,24 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
+import java.util.concurrent.TimeUnit;
 
 /** */
 @Tag(name = "Meural Service", description = "Expose APIs needed to change source, art, etc on our Meural device.")
@@ -29,6 +37,10 @@ public class MeuralController {
 
 	@Value("${meuralServer}")
 	private String meuralServer;
+
+	private VeraDeviceVO meuralStatus;
+
+	private final Moshi moshi = new Moshi.Builder().build();
 
 	private final OkHttpClient client = new OkHttpClient.Builder()
 			.connectTimeout(1, TimeUnit.MINUTES)
@@ -108,6 +120,50 @@ public class MeuralController {
 		callMeural("/changeSource?source=" + source);
 	}
 
+	@GetMapping(value = "/S/meural/isAwake")
+	@Operation(
+			summary = "Check if the Meural is asleep.",
+			description = "If the Meural is asleep return true, otherwise false.  \"Response\" field"
+					+ " within return value denotes state")
+	@ApiResponses({
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_UNAUTHORIZED + "", description = "missing valid token"),
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
+	})
+	public boolean isAwake() throws IOException {
+		Response response = client.newCall(new Request.Builder()
+						.url(meuralServer + "/isAsleep")
+						.get()
+						.build())
+				.execute();
+		return moshi.adapter(MeuralResponse.class)
+				.fromJson(response.body().string())
+				.getResponse();
+	}
+
+	@PostMapping(value = "/S/meural/sleep", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "Put the meural to sleep if it's awake",
+			description = "If the Meural is awake, will put it to sleep.")
+	@ApiResponses({
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
+	})
+	public void sleep() {
+		callMeural("/sleep");
+	}
+
+	@PostMapping(value = "/S/meural/wakeup", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "Wake the Meural if it's asleep",
+			description = "If the Meural is sleeping, this will turn it on.")
+	@ApiResponses({
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
+	})
+	public void wakeup() {
+		callMeural("/wakeup");
+	}
+
 	private void callMeural(String url) {
 		logger.info("meural requested: " + url);
 		client.newCall(new Request.Builder()
@@ -115,5 +171,25 @@ public class MeuralController {
 						.post(RequestBody.create(new byte[0]))
 						.build())
 				.enqueue(new MeuralCallback());
+	}
+
+	@Scheduled(fixedDelay = 5000)
+	private void fetchMeuralStatus() {
+		try {
+			logger.debug("Fetching meural data");
+			boolean isAwake = isAwake();
+			meuralStatus = new VeraDeviceVO("Meural", isAwake ? 0 : 1);
+			logger.debug("Fetched meural data");
+		} catch (Exception e) {
+			logger.error("fetchMeuralStatus", e);
+		}
+	}
+
+	public void getStatus(VeraHouseVO houseStatus) {
+		if (meuralStatus != null && houseStatus != null && houseStatus.getRooms() != null) {
+			houseStatus.getRooms().stream()
+					.filter(room -> "Meural".equalsIgnoreCase(room.getName()))
+					.forEach(room -> room.addDevice(meuralStatus));
+		}
 	}
 }

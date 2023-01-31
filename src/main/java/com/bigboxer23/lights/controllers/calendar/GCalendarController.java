@@ -1,6 +1,13 @@
 package com.bigboxer23.lights.controllers.calendar;
 
 import com.bigboxer23.lights.HubContext;
+import com.bigboxer23.lights.controllers.NotificationController;
+import com.bigboxer23.lights.controllers.frontdoor.FrontDoorController;
+import com.bigboxer23.lights.controllers.garage.GarageController;
+import com.bigboxer23.lights.controllers.openHAB.OpenHABController;
+import com.bigboxer23.lights.controllers.scene.DaylightController;
+import com.bigboxer23.lights.controllers.scene.WeatherController;
+import com.bigboxer23.lights.controllers.vera.VeraController;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -15,6 +22,12 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Events;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,11 +35,6 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 /**
  * Check calendar once a day for PTO/Vacation items, set status of this controller to reflect.
@@ -57,6 +65,23 @@ public class GCalendarController extends HubContext {
 			add("pto");
 		}
 	};
+
+	protected GCalendarController(
+			GarageController garageController,
+			FrontDoorController frontDoorController,
+			WeatherController weatherController,
+			DaylightController daylightController,
+			NotificationController notificationController,
+			VeraController veraController,
+			OpenHABController openHABController) {
+		super(
+				garageController,
+				frontDoorController,
+				weatherController,
+				daylightController,
+				veraController,
+				openHABController);
+	}
 
 	private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
 		myLogger.info("Getting gCal creds");

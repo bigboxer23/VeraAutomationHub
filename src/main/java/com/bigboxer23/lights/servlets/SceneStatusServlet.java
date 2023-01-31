@@ -3,21 +3,28 @@ package com.bigboxer23.lights.servlets;
 import com.bigboxer23.lights.HubContext;
 import com.bigboxer23.lights.controllers.climate.ClimateController;
 import com.bigboxer23.lights.controllers.elastic.ElasticAnalyticsController;
+import com.bigboxer23.lights.controllers.frontdoor.FrontDoorController;
+import com.bigboxer23.lights.controllers.garage.GarageController;
+import com.bigboxer23.lights.controllers.meural.MeuralController;
+import com.bigboxer23.lights.controllers.openHAB.OpenHABController;
+import com.bigboxer23.lights.controllers.scene.DaylightController;
+import com.bigboxer23.lights.controllers.scene.WeatherController;
+import com.bigboxer23.lights.controllers.vera.VeraController;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.net.HttpURLConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.HttpURLConnection;
 
 /** Get status from the vera controller for everything in the house */
 @RestController
@@ -35,14 +42,28 @@ public class SceneStatusServlet extends HubContext {
 
 	private ClimateController myClimateController;
 
-	@Autowired
-	public void setGarageController(ElasticAnalyticsController theElasticAnalyticsController) {
-		myElasticAnalyticsController = theElasticAnalyticsController;
-	}
+	private MeuralController meuralController;
 
-	@Autowired
-	public void setClimateController(ClimateController theClimateController) {
-		myClimateController = theClimateController;
+	protected SceneStatusServlet(
+			GarageController garageController,
+			FrontDoorController frontDoorController,
+			WeatherController weatherController,
+			DaylightController daylightController,
+			VeraController veraController,
+			OpenHABController openHABController,
+			MeuralController meuralController,
+			ElasticAnalyticsController elasticAnalyticsController,
+			ClimateController climateController) {
+		super(
+				garageController,
+				frontDoorController,
+				weatherController,
+				daylightController,
+				veraController,
+				openHABController);
+		this.meuralController = meuralController;
+		myElasticAnalyticsController = elasticAnalyticsController;
+		myClimateController = climateController;
 	}
 
 	@GetMapping(value = "/SceneStatus", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -63,6 +84,7 @@ public class SceneStatusServlet extends HubContext {
 		myGarageController.getStatus(aHouseStatus);
 		myClimateController.getClimateData(aHouseStatus);
 		myFrontDoorController.getStatus(aHouseStatus);
+		meuralController.getStatus(aHouseStatus);
 		fillSmartRooms(aHouseStatus);
 		return aHouseStatus;
 	}
