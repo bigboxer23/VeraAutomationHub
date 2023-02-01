@@ -6,9 +6,6 @@ import lombok.Data;
 /** */
 @Data
 public class MeuralResponse {
-	@Schema(
-			description = "Gives more specific reason request is successful or fails",
-			required = true,
-			example = "Unsupported file format uploaded")
+	@Schema(description = "Boolean response from the Meural service", required = true, example = "true")
 	private Boolean response;
 }

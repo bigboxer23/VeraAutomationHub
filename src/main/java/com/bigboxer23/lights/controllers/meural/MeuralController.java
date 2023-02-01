@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /** */
@@ -118,6 +119,19 @@ public class MeuralController {
 	})
 	public void changeSource(int source) {
 		callMeural("/changeSource?source=" + source);
+ 		Optional.ofNullable(meuralStatus).ifPresent(meuralStatus -> meuralStatus.setStatus("" + source));
+	}
+
+	@GetMapping(value = "/S/meural/getSource")
+	public int getSource() throws IOException {
+		Response response = client.newCall(new Request.Builder()
+						.url(meuralServer + "/getCurrentSource")
+						.get()
+						.build())
+				.execute();
+		return moshi.adapter(MeuralIntegerResponse.class)
+				.fromJson(response.body().string())
+				.getResponse();
 	}
 
 	@GetMapping(value = "/S/meural/isAwake")
@@ -150,6 +164,7 @@ public class MeuralController {
 	})
 	public void sleep() {
 		callMeural("/sleep");
+		Optional.ofNullable(meuralStatus).ifPresent(meuralStatus -> meuralStatus.setLevel("0"));
 	}
 
 	@PostMapping(value = "/S/meural/wakeup", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -162,6 +177,7 @@ public class MeuralController {
 	})
 	public void wakeup() {
 		callMeural("/wakeup");
+		Optional.ofNullable(meuralStatus).ifPresent(meuralStatus -> meuralStatus.setLevel("1"));
 	}
 
 	private void callMeural(String url) {
@@ -178,7 +194,9 @@ public class MeuralController {
 		try {
 			logger.debug("Fetching meural data");
 			boolean isAwake = isAwake();
+			int source = getSource();
 			meuralStatus = new VeraDeviceVO("Meural", isAwake ? 0 : 1);
+			meuralStatus.setStatus("" + source);
 			logger.debug("Fetched meural data");
 		} catch (Exception e) {
 			logger.error("fetchMeuralStatus", e);
