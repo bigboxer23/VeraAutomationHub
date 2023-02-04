@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -95,6 +96,26 @@ public class MeuralController {
 		} catch (UnsupportedEncodingException e) {
 			logger.warn("updateOpenAIPrompt", e);
 		}
+	}
+
+	@GetMapping(value = "/S/meural/getOpenAIPrompt", produces = MediaType.TEXT_PLAIN_VALUE)
+	@Operation(
+			summary = "Gets the prompt used to generate the images from OpenAI component",
+			description = "This prompt was last sent to OpenAI's Dall-e for image creation.")
+	@ApiResponses({
+			@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
+			@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
+	})
+	public String getOpenAIPrompt(HttpServletResponse servletResponse) throws IOException
+	{
+		Response response = client.newCall(new Request.Builder()
+						.url(meuralServer + "/getOpenAIPrompt")
+						.get()
+						.build())
+				.execute();
+		return moshi.adapter(MeuralStringResponse.class)
+				.fromJson(response.body().string())
+				.getResponse();
 	}
 
 	@PostMapping(value = "/S/meural/changeSource")
