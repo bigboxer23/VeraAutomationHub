@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -103,11 +102,10 @@ public class MeuralController {
 			summary = "Gets the prompt used to generate the images from OpenAI component",
 			description = "This prompt was last sent to OpenAI's Dall-e for image creation.")
 	@ApiResponses({
-			@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
-			@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
-	public String getOpenAIPrompt(HttpServletResponse servletResponse) throws IOException
-	{
+	public String getOpenAIPrompt() throws IOException {
 		Response response = client.newCall(new Request.Builder()
 						.url(meuralServer + "/getOpenAIPrompt")
 						.get()
@@ -116,6 +114,30 @@ public class MeuralController {
 		return moshi.adapter(MeuralStringResponse.class)
 				.fromJson(response.body().string())
 				.getResponse();
+	}
+
+	@PostMapping(value = "/S/meural/showInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "Display info about what's currently displayed",
+			description = "Display info about what's currently displayed on the Meural's display")
+	@ApiResponses({
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
+	})
+	public void showInfo() {
+		callMeural("/showInfo");
+	}
+
+	@PostMapping(value = "/S/meural/hideInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "If displaying info no the Meural display, hide it",
+			description = "If displaying info no the Meural display, hide it")
+	@ApiResponses({
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
+	})
+	public void hideInfo() {
+		callMeural("/hideInfo");
 	}
 
 	@PostMapping(value = "/S/meural/changeSource")
@@ -140,7 +162,7 @@ public class MeuralController {
 	})
 	public void changeSource(int source) {
 		callMeural("/changeSource?source=" + source);
- 		Optional.ofNullable(meuralStatus).ifPresent(meuralStatus -> meuralStatus.setStatus("" + source));
+		Optional.ofNullable(meuralStatus).ifPresent(meuralStatus -> meuralStatus.setStatus("" + source));
 	}
 
 	@GetMapping(value = "/S/meural/getSource")
@@ -218,6 +240,7 @@ public class MeuralController {
 			int source = getSource();
 			meuralStatus = new VeraDeviceVO("Meural", isAwake ? 0 : 1);
 			meuralStatus.setStatus("" + source);
+			meuralStatus.setTemperature(getOpenAIPrompt());
 			logger.debug("Fetched meural data");
 		} catch (Exception e) {
 			logger.error("fetchMeuralStatus", e);

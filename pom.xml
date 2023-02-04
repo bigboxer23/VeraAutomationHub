@@ -165,10 +165,28 @@
             <phase>package</phase>
             <configuration>
               <target>
-                <scp file="${project.basedir}/target/VeraAutomationHub-2.0.0.jar" keyfile="${user.home}/.ssh/id_rsa" passphrase="" todir="pi@homecontroller:/home/pi/com/bigboxer23/VeraAutomationHub/2.0.0" trust="true"/>
-                <sshexec command="sudo pkill -f 'java.*Vera*'" host="homecontroller" keyfile="${user.home}/.ssh/id_rsa" trust="true" username="pi"/>
-                <sshexec command="cd /home/pi/com/bigboxer23/VeraAutomationHub/2.0.0/ ; nohup java -jar VeraAutomationHub-2.0.0.jar &amp;" host="homecontroller" keyfile="${user.home}/.ssh/id_rsa" trust="true" username="pi"/>
+                <scp file="${project.basedir}/target/VeraAutomationHub-2.0.0.jar" keyfile="${user.home}/.ssh/id_rsa" passphrase="" todir="pi@${host}:/home/pi/com/bigboxer23/VeraAutomationHub/2.0.0" trust="true"/>
+                <sshexec command="sudo pkill -f 'java.*Vera*'" host="${host}" keyfile="${user.home}/.ssh/id_rsa" trust="true" username="pi"/>
+                <sshexec command="cd /home/pi/com/bigboxer23/VeraAutomationHub/2.0.0/ ; nohup java -jar VeraAutomationHub-2.0.0.jar &amp;" host="${host}" keyfile="${user.home}/.ssh/id_rsa" trust="true" username="pi"/>
               </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>read-project-properties</goal>
+            </goals>
+            <phase>initialize</phase>
+            <configuration>
+              <files>
+                <file>${basedir}/src/main/resources/application.properties</file>
+              </files>
             </configuration>
           </execution>
         </executions>
