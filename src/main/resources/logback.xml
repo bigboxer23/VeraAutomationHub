@@ -6,12 +6,6 @@
 			<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
 		</layout>
 	</appender>
-	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
-		<file>AutomationHub.log</file>
-		<layout class="ch.qos.logback.classic.PatternLayout">
-			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
-		</layout>
-	</appender>
 	<appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
 		<destination>${logbackserver}</destination>
 		<keepAliveDuration>5 minutes</keepAliveDuration>
@@ -20,7 +14,6 @@
 	<logger name="com.bigboxer23" level="INFO"/>
 	<root level="INFO">
 		<!--<appender-ref ref="STDOUT" />-->
-		<!--<appender-ref ref="FILE" />-->
 		<appender-ref ref="stash" />
 	</root>
 </configuration>
