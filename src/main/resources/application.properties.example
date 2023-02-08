@@ -1,0 +1,35 @@
+#port for this to deploy on
+server.port:8080
+#vera url
+veraUrl=http://192.168.0.xxx:3480
+#open hab server location
+openHABUrl=http://192.168.0.xxx:8080
+#how frequently in ms to fetch scene data
+scene.update.interval=120000
+#gap in min between sending notifications
+notificationGap=5
+#security token to use
+spring.security.user.password=xxx-xxx-xxx
+auth.token.window=30000
+#location of elastic server
+elastic.url=http://192.168.0.xxx:9200
+#garage url
+garage.url=https://192.168.0.xxx
+#front door camera
+frontDoor.url=http://192.168.0.xxx:8082
+#climate server url
+climate.url=https://192.168.0.xxx
+#location of logback server
+logbackserver=192.168.0.xxx:5671
+#notification tag in open hab to hit
+notificationTag=Notify
+#information for fetching weather from
+openweathermap.api=xxx
+lat=xxx
+long=xxx
+#where is the meural located
+meuralServer=http://192.168.0.xxx:8081
+#where to publish to
+host=192.168.0.xxx
+#enable caching for static resources
+spring.web.resources.cache.cachecontrol.max-age=365d
