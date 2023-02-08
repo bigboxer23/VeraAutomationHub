@@ -1,3 +1,5 @@
+[![CodeQL](https://github.com/bigboxer23/VeraAutomationHub/actions/workflows/codeql.yml/badge.svg)](https://github.com/bigboxer23/VeraAutomationHub/actions/workflows/codeql.yml)
+
 AutomationHub
 =============
 
