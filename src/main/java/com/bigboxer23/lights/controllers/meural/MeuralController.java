@@ -2,6 +2,8 @@ package com.bigboxer23.lights.controllers.meural;
 
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
+import com.bigboxer23.utils.http.OkHttpCallback;
+import com.bigboxer23.utils.http.OkHttpUtil;
 import com.squareup.moshi.Moshi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,10 +17,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,13 +39,6 @@ public class MeuralController {
 	private VeraDeviceVO meuralStatus;
 
 	private final Moshi moshi = new Moshi.Builder().build();
-
-	private final OkHttpClient client = new OkHttpClient.Builder()
-			.connectTimeout(1, TimeUnit.MINUTES)
-			.writeTimeout(1, TimeUnit.MINUTES)
-			.readTimeout(1, TimeUnit.MINUTES)
-			.callTimeout(1, TimeUnit.MINUTES)
-			.build();
 
 	@PostMapping(value = "/S/meural/nextPicture", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(
@@ -105,11 +96,7 @@ public class MeuralController {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public String getOpenAIPrompt() throws IOException {
-		try (Response response = client.newCall(new Request.Builder()
-						.url(meuralServer + "/getOpenAIPrompt")
-						.get()
-						.build())
-				.execute()) {
+		try (Response response = OkHttpUtil.getSynchronous(meuralServer + "/getOpenAIPrompt", null)) {
 			return moshi.adapter(MeuralStringResponse.class)
 					.fromJson(response.body().string())
 					.getResponse();
@@ -167,11 +154,7 @@ public class MeuralController {
 
 	@GetMapping(value = "/S/meural/getSource")
 	public int getSource() throws IOException {
-		try (Response response = client.newCall(new Request.Builder()
-						.url(meuralServer + "/getCurrentSource")
-						.get()
-						.build())
-				.execute(); ) {
+		try (Response response = OkHttpUtil.getSynchronous(meuralServer + "/getCurrentSource", null)) {
 			return moshi.adapter(MeuralIntegerResponse.class)
 					.fromJson(response.body().string())
 					.getResponse();
@@ -188,11 +171,7 @@ public class MeuralController {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public boolean isAwake() throws IOException {
-		try (Response response = client.newCall(new Request.Builder()
-						.url(meuralServer + "/isAsleep")
-						.get()
-						.build())
-				.execute()) {
+		try (Response response = OkHttpUtil.getSynchronous(meuralServer + "/isAsleep", null)) {
 			return moshi.adapter(MeuralResponse.class)
 					.fromJson(response.body().string())
 					.getResponse();
@@ -227,11 +206,7 @@ public class MeuralController {
 
 	private void callMeural(String url) {
 		logger.info("meural requested: " + url);
-		client.newCall(new Request.Builder()
-						.url(meuralServer + url)
-						.post(RequestBody.create(new byte[0]))
-						.build())
-				.enqueue(new MeuralCallback());
+		OkHttpUtil.post(meuralServer + url, new OkHttpCallback());
 	}
 
 	@Scheduled(fixedDelay = 5000)
