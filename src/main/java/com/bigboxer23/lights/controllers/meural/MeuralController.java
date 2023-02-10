@@ -105,14 +105,15 @@ public class MeuralController {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public String getOpenAIPrompt() throws IOException {
-		Response response = client.newCall(new Request.Builder()
+		try (Response response = client.newCall(new Request.Builder()
 						.url(meuralServer + "/getOpenAIPrompt")
 						.get()
 						.build())
-				.execute();
-		return moshi.adapter(MeuralStringResponse.class)
-				.fromJson(response.body().string())
-				.getResponse();
+				.execute()) {
+			return moshi.adapter(MeuralStringResponse.class)
+					.fromJson(response.body().string())
+					.getResponse();
+		}
 	}
 
 	@PostMapping(value = "/S/meural/showInfo", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -166,14 +167,15 @@ public class MeuralController {
 
 	@GetMapping(value = "/S/meural/getSource")
 	public int getSource() throws IOException {
-		Response response = client.newCall(new Request.Builder()
+		try (Response response = client.newCall(new Request.Builder()
 						.url(meuralServer + "/getCurrentSource")
 						.get()
 						.build())
-				.execute();
-		return moshi.adapter(MeuralIntegerResponse.class)
-				.fromJson(response.body().string())
-				.getResponse();
+				.execute(); ) {
+			return moshi.adapter(MeuralIntegerResponse.class)
+					.fromJson(response.body().string())
+					.getResponse();
+		}
 	}
 
 	@GetMapping(value = "/S/meural/isAwake")
@@ -186,14 +188,15 @@ public class MeuralController {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public boolean isAwake() throws IOException {
-		Response response = client.newCall(new Request.Builder()
+		try (Response response = client.newCall(new Request.Builder()
 						.url(meuralServer + "/isAsleep")
 						.get()
 						.build())
-				.execute();
-		return moshi.adapter(MeuralResponse.class)
-				.fromJson(response.body().string())
-				.getResponse();
+				.execute()) {
+			return moshi.adapter(MeuralResponse.class)
+					.fromJson(response.body().string())
+					.getResponse();
+		}
 	}
 
 	@PostMapping(value = "/S/meural/sleep", produces = MediaType.APPLICATION_JSON_VALUE)
