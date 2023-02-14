@@ -5,7 +5,6 @@ import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.lights.controllers.vera.VeraRoomVO;
 import java.io.IOException;
 import java.util.*;
-import javax.annotation.PreDestroy;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
@@ -13,12 +12,13 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /** Send statistics about house status to an elasticsearch backend */
 @Component
-public class ElasticAnalyticsController {
+public class ElasticAnalyticsController implements DisposableBean {
 	@Value("${elastic.url}")
 	private String myElasticUrl;
 
@@ -188,7 +188,7 @@ public class ElasticAnalyticsController {
 		}
 	}
 
-	@PreDestroy
+	@Override
 	public void destroy() throws IOException {
 		if (myClient != null) {
 			myLogger.debug("closing elastic client");
