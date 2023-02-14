@@ -7,10 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -21,7 +25,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /** Add authentication based on the token stored with the application */
 @EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+@Configuration
+public class SecurityConfiguration {
 	private static final List<String> protectedUrlStrings = new ArrayList<String>() {
 		{
 			add("/SceneStatus");
@@ -29,41 +34,28 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			add("/enableTokenFetch/**");
 			add("/SceneStatusSmart");
 			add("/swagger-ui/**");
+			add("/v3/**");
 		}
 	};
 
 	private static final RequestMatcher kProtectedUrls = new OrRequestMatcher(protectedUrlStrings.stream()
 			.map(AntPathRequestMatcher::new)
-			.collect(Collectors.toList())
+			.toList()
 			.toArray(new AntPathRequestMatcher[0]));
 
-	private TokenAuthenticationProvider provider;
-
-	public SecurityConfiguration(TokenAuthenticationProvider provider) {
-		this.provider = provider;
-	}
-
-	@Override
-	protected void configure(final AuthenticationManagerBuilder auth) {
-		auth.authenticationProvider(provider);
-	}
-
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http, TokenAuthenticationFilter filter) throws Exception {
 		CookieCsrfTokenRepository csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
 		csrfRepo.setSecure(true);
 		csrfRepo.setCookieMaxAge(60 * 60); // Store cookie for 1 min
 		http.sessionManagement()
 				.sessionCreationPolicy(STATELESS)
 				.and()
+				.csrf()
+				.csrfTokenRepository(csrfRepo).
+				and()
 				.exceptionHandling()
 				.defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(UNAUTHORIZED), kProtectedUrls)
-				.and()
-				.authenticationProvider(provider)
-				.addFilterBefore(restAuthenticationFilter(), AnonymousAuthenticationFilter.class)
-				.authorizeRequests()
-				.antMatchers(protectedUrlStrings.toArray(new String[0]))
-				.authenticated()
 				.and()
 				.formLogin()
 				.disable()
@@ -71,13 +63,29 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.disable()
 				.logout()
 				.disable()
-				.csrf()
-				.csrfTokenRepository(csrfRepo);
+				/*.csrf()
+				.csrfTokenRepository(csrfRepo)*/
+				//.and()
+				.authenticationProvider(new TokenAuthenticationProvider())
+				//.addFilterBefore(restAuthenticationFilter(http), AnonymousAuthenticationFilter.class)
+				.authorizeHttpRequests(auth ->
+				{
+					auth.requestMatchers(protectedUrlStrings.toArray(new String[0]))
+							.authenticated();
+				})
+				.addFilterBefore(filter, AnonymousAuthenticationFilter.class);
+		return http.build();
 	}
 
 	@Bean
-	TokenAuthenticationFilter restAuthenticationFilter() throws Exception {
-		return new TokenAuthenticationFilter(kProtectedUrls, authenticationManager(), successHandler());
+	public AuthenticationManager authenticationManager(
+			AuthenticationConfiguration authConfig) throws Exception {
+		return authConfig.getAuthenticationManager();
+	}
+
+	@Bean
+	TokenAuthenticationFilter restAuthenticationFilter(HttpSecurity http, AuthenticationManager auth) throws Exception {
+		return new TokenAuthenticationFilter(kProtectedUrls, auth, successHandler());
 	}
 
 	@Bean
