@@ -5,20 +5,18 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -51,35 +49,29 @@ public class SecurityConfiguration {
 		http.sessionManagement()
 				.sessionCreationPolicy(STATELESS)
 				.and()
-				.csrf()
-				.csrfTokenRepository(csrfRepo).
-				and()
 				.exceptionHandling()
 				.defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(UNAUTHORIZED), kProtectedUrls)
 				.and()
+				.authenticationProvider(new TokenAuthenticationProvider())
+				.addFilterBefore(filter, AnonymousAuthenticationFilter.class)
+				.authorizeHttpRequests(auth -> {
+					auth.requestMatchers(protectedUrlStrings.toArray(new String[0]))
+							.authenticated();
+				})
 				.formLogin()
 				.disable()
 				.httpBasic()
 				.disable()
 				.logout()
 				.disable()
-				/*.csrf()
-				.csrfTokenRepository(csrfRepo)*/
-				//.and()
-				.authenticationProvider(new TokenAuthenticationProvider())
-				//.addFilterBefore(restAuthenticationFilter(http), AnonymousAuthenticationFilter.class)
-				.authorizeHttpRequests(auth ->
-				{
-					auth.requestMatchers(protectedUrlStrings.toArray(new String[0]))
-							.authenticated();
-				})
-				.addFilterBefore(filter, AnonymousAuthenticationFilter.class);
+				.csrf()
+				.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler())
+				.csrfTokenRepository(csrfRepo);
 		return http.build();
 	}
 
 	@Bean
-	public AuthenticationManager authenticationManager(
-			AuthenticationConfiguration authConfig) throws Exception {
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
 		return authConfig.getAuthenticationManager();
 	}
 
@@ -93,5 +85,12 @@ public class SecurityConfiguration {
 		final SimpleUrlAuthenticationSuccessHandler aSuccessHandler = new SimpleUrlAuthenticationSuccessHandler();
 		aSuccessHandler.setRedirectStrategy((theRequest, theResponse, theUrl) -> {});
 		return aSuccessHandler;
+	}
+
+	@Bean
+	CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler() {
+		CsrfTokenRequestAttributeHandler handler = new CsrfTokenRequestAttributeHandler();
+		handler.setCsrfRequestAttributeName(null);
+		return handler;
 	}
 }

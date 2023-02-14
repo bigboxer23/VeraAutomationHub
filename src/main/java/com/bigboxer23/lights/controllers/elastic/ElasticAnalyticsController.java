@@ -18,8 +18,7 @@ import org.springframework.stereotype.Component;
 
 /** Send statistics about house status to an elasticsearch backend */
 @Component
-public class ElasticAnalyticsController implements DisposableBean
-{
+public class ElasticAnalyticsController implements DisposableBean {
 	@Value("${elastic.url}")
 	private String myElasticUrl;
 

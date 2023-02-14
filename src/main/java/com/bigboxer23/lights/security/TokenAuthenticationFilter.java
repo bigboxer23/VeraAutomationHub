@@ -2,14 +2,13 @@ package com.bigboxer23.lights.security;
 
 import static java.util.Optional.ofNullable;
 
-import java.io.IOException;
-import java.util.Arrays;
-
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Arrays;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,8 +42,7 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
 			HttpServletResponse theResponse,
 			FilterChain theChain,
 			Authentication theAuthResult)
-			throws IOException, ServletException
-	{
+			throws IOException, ServletException {
 		super.successfulAuthentication(theRequest, theResponse, theChain, theAuthResult);
 		theChain.doFilter(theRequest, theResponse);
 	}
