@@ -1,7 +1,6 @@
 package com.bigboxer23.lights.security;
 
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
@@ -43,21 +43,16 @@ public class SecurityConfiguration {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, TokenAuthenticationFilter filter) throws Exception {
-		CookieCsrfTokenRepository csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
-		csrfRepo.setSecure(true);
-		csrfRepo.setCookieMaxAge(60 * 60); // Store cookie for 1 min
 		http.sessionManagement()
-				.sessionCreationPolicy(STATELESS)
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and()
 				.exceptionHandling()
 				.defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(UNAUTHORIZED), kProtectedUrls)
 				.and()
 				.authenticationProvider(new TokenAuthenticationProvider())
 				.addFilterBefore(filter, AnonymousAuthenticationFilter.class)
-				.authorizeHttpRequests(auth -> {
-					auth.requestMatchers(protectedUrlStrings.toArray(new String[0]))
-							.authenticated();
-				})
+				.authorizeHttpRequests(auth -> auth.requestMatchers(protectedUrlStrings.toArray(new String[0]))
+						.authenticated())
 				.formLogin()
 				.disable()
 				.httpBasic()
@@ -66,8 +61,15 @@ public class SecurityConfiguration {
 				.disable()
 				.csrf()
 				.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler())
-				.csrfTokenRepository(csrfRepo);
+				.csrfTokenRepository(getCSRFRepo());
 		return http.build();
+	}
+
+	private CookieCsrfTokenRepository getCSRFRepo() {
+		CookieCsrfTokenRepository csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+		csrfRepo.setSecure(true);
+		csrfRepo.setCookieMaxAge(60 * 60); // Store cookie for 1 min
+		return csrfRepo;
 	}
 
 	@Bean
@@ -76,7 +78,7 @@ public class SecurityConfiguration {
 	}
 
 	@Bean
-	TokenAuthenticationFilter restAuthenticationFilter(HttpSecurity http, AuthenticationManager auth) throws Exception {
+	TokenAuthenticationFilter restAuthenticationFilter(AuthenticationManager auth) {
 		return new TokenAuthenticationFilter(kProtectedUrls, auth, successHandler());
 	}
 
