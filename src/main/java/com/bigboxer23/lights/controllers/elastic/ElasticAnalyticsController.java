@@ -94,62 +94,69 @@ public class ElasticAnalyticsController implements DisposableBean {
 					aThermostatDocument.put("time", new Date());
 					aThermostatDocument.put("name", "thermostat");
 					aThermostatDocument.put("type", "hvac");
-					theRoom.getDevices().stream().filter(Objects::nonNull).forEach(theVeraDeviceVO -> {
+					theRoom.getDevices().stream().filter(Objects::nonNull).forEach(deviceVO -> {
 						Map<String, Object> aDocument = new HashMap<>();
 						aDocument.put("time", new Date());
-						aDocument.put("name", theVeraDeviceVO.getName());
+						aDocument.put("name", deviceVO.getName());
 						aDocument.put("type", "hvac");
-						switch (theVeraDeviceVO.getName().toLowerCase()) {
+						switch (deviceVO.getName().toLowerCase()) {
 							case "high temperature":
 							case "low temperature":
 							case "outside temperature":
-								double aTemp = getDoubleTemperature(theVeraDeviceVO);
+								double aTemp = getDoubleTemperature(deviceVO);
 								if (aTemp == -99) {
 									return;
 								}
 								aDocument.put("temperature", aTemp);
-								if (theVeraDeviceVO.getName().equalsIgnoreCase("outside temperature")) {
+								if (deviceVO.getName().equalsIgnoreCase("outside temperature")) {
 									aDocument.put("name", "temperature");
 								}
 								break;
 							case "inside temperature":
-								aTemp = getDoubleTemperature(theVeraDeviceVO);
+								aTemp = getDoubleTemperature(deviceVO);
 								if (aTemp != -99) {
 									aThermostatDocument.put("temperature", aTemp);
 								}
 								break;
 							case "thermostat fan mode":
-								aThermostatDocument.put("fanMode", theVeraDeviceVO.getLevel());
+								aThermostatDocument.put("fanMode", deviceVO.getLevel());
 								break;
 							case "thermostat battery":
-								aThermostatDocument.put("batteryLevel", theVeraDeviceVO.getLevel());
+								aThermostatDocument.put("batteryLevel", deviceVO.getLevel());
 								break;
 							case "thermostat mode":
-								aThermostatDocument.put("cool", "2".equals(theVeraDeviceVO.getLevel()));
-								aThermostatDocument.put("heat", "1".equals(theVeraDeviceVO.getLevel()));
+								aThermostatDocument.put("cool", "2".equals(deviceVO.getLevel()));
+								aThermostatDocument.put("heat", "1".equals(deviceVO.getLevel()));
 								break;
 							case "heating setpoint":
 							case "cooling setpoint":
-								aThermostatDocument.put(theVeraDeviceVO.getName(), theVeraDeviceVO.getLevel());
+								aThermostatDocument.put(deviceVO.getName(), deviceVO.getLevel());
 								break;
 							case "inside humidity":
 							case "outside humidity":
-								float aHumidity = getFloatTemperature(theVeraDeviceVO);
+								float aHumidity = getFloatTemperature(deviceVO);
 								if (aHumidity == -99) {
 									return;
 								}
 								aDocument.put("humidity", aHumidity);
 								aDocument.put(
 										"name",
-										theVeraDeviceVO.getName().equalsIgnoreCase("inside" + " humidity")
+										deviceVO.getName().equalsIgnoreCase("inside" + " humidity")
 												? "humidity sensor"
 												: "humidity");
 								break;
+							case "air quality":
+								float airQuality = getFloatTemperature(deviceVO);
+								if (airQuality == -99) {
+									return;
+								}
+								aDocument.put("air quality", airQuality);
+								break;
 						}
 						if (aDocument.size() > 3) {
-							theRequest.add(new IndexRequest(
-											kIndexName, kType, theVeraDeviceVO.getName() + System.currentTimeMillis())
-									.source(aDocument));
+							theRequest.add(
+									new IndexRequest(kIndexName, kType, deviceVO.getName() + System.currentTimeMillis())
+											.source(aDocument));
 						}
 					});
 					if (aThermostatDocument.get("cool") != null) {

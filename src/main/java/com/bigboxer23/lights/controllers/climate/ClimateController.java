@@ -24,7 +24,7 @@ public class ClimateController extends AbstractBaseController {
 						aRoom.addDevice(new VeraDeviceVO("Inside Temperature", myClimateData.getTemperature()));
 						aRoom.addDevice(new VeraDeviceVO("Inside Humidity", myClimateData.getHumidity()));
 						aRoom.addDevice(new VeraDeviceVO("Barometric Pressure", myClimateData.getPressure()));
-						aRoom.addDevice(new VeraDeviceVO("Air  Quality", myClimateData.getQuality()));
+						aRoom.addDevice(new VeraDeviceVO("Air Quality", myClimateData.getQuality()));
 					});
 		}
 	}
