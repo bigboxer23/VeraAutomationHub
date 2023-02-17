@@ -53,6 +53,7 @@ public class SecurityConfiguration {
 				.addFilterBefore(filter, AnonymousAuthenticationFilter.class)
 				.authorizeHttpRequests(auth -> auth.requestMatchers(protectedUrlStrings.toArray(new String[0]))
 						.authenticated())
+				.authorizeHttpRequests(auth -> auth.requestMatchers("/**").anonymous())
 				.formLogin()
 				.disable()
 				.httpBasic()
