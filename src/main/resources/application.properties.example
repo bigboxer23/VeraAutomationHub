@@ -33,3 +33,4 @@ meuralServer=http://192.168.0.xxx:8081
 host=192.168.0.xxx
 #enable caching for static resources
 spring.web.resources.cache.cachecontrol.max-age=365d
+spring.web.resources.static-locations=file:/home/pi/com/bigboxer23/VeraAutomationHub/2.0.0/public
