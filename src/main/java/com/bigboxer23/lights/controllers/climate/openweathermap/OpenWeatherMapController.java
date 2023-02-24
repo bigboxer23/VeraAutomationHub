@@ -1,16 +1,14 @@
 package com.bigboxer23.lights.controllers.climate.openweathermap;
 
 import com.bigboxer23.lights.controllers.AbstractBaseController;
-import com.bigboxer23.utils.http.HttpClientUtils;
+import com.bigboxer23.utils.http.OkHttpCallback;
+import com.bigboxer23.utils.http.OkHttpUtil;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
+import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -35,34 +33,44 @@ public class OpenWeatherMapController extends AbstractBaseController {
 
 	@Scheduled(fixedDelay = 900000) // 15min
 	private void fetchClimateData() {
-		myLogger.info("Fetching OpenWeatherMap data");
-		JsonObject aWeatherData = JsonParser.parseString(HttpClientUtils.execute(new HttpGet(
-						MessageFormat.format(kOpenWeatherMapUrl, myLatitude, myLongitude, myOpenWeatherMapAPIKey))))
-				.getAsJsonObject();
-		aWeatherData = aWeatherData.get("main").getAsJsonObject();
-		sendDataToOpenHab(
-				"OutsideTemperature",
-				"" + kelvinToFahrenheit(aWeatherData.get("temp").getAsFloat()));
-		sendDataToOpenHab(
-				"LowTemperature",
-				"" + kelvinToFahrenheit(aWeatherData.get("temp_min").getAsFloat()));
-		sendDataToOpenHab(
-				"HighTemperature",
-				"" + kelvinToFahrenheit(aWeatherData.get("temp_max").getAsFloat()));
-		sendDataToOpenHab("OutsideHumidity", aWeatherData.get("humidity").getAsString());
-		myLogger.info("OpenWeatherMap data successfully updated");
+		myLogger.debug("Fetching OpenWeatherMap data");
+		OkHttpUtil.get(
+				MessageFormat.format(kOpenWeatherMapUrl, myLatitude, myLongitude, myOpenWeatherMapAPIKey),
+				new OkHttpCallback() {
+					@Override
+					public void onResponseBody(Call call, ResponseBody responseBody) {
+						try {
+							JsonObject weatherData = JsonParser.parseString(responseBody.string())
+									.getAsJsonObject();
+							weatherData = weatherData.get("main").getAsJsonObject();
+							sendDataToOpenHab(
+									"OutsideTemperature",
+									kelvinToFahrenheit(weatherData.get("temp").getAsFloat()));
+							sendDataToOpenHab(
+									"LowTemperature",
+									kelvinToFahrenheit(
+											weatherData.get("temp_min").getAsFloat()));
+							sendDataToOpenHab(
+									"HighTemperature",
+									kelvinToFahrenheit(
+											weatherData.get("temp_max").getAsFloat()));
+							sendDataToOpenHab(
+									"OutsideHumidity",
+									weatherData.get("humidity").getAsFloat());
+							myLogger.debug("OpenWeatherMap data successfully updated");
+						} catch (IOException e) {
+							myLogger.warn("fetchClimateData:", e);
+						}
+					}
+				});
 	}
 
-	private void sendDataToOpenHab(String theItemName, String theItemValue) {
-		HttpPost aHttpPost = new HttpPost(kOpenHABUrl + "/rest/items/" + theItemName);
-		try {
-			aHttpPost.setEntity(
-					new ByteArrayEntity(URLDecoder.decode(theItemValue, StandardCharsets.UTF_8.displayName())
-							.getBytes(StandardCharsets.UTF_8)));
-		} catch (UnsupportedEncodingException theE) {
-			myLogger.warn("OpenWeatherMapController:doAction", theE);
-		}
-		HttpClientUtils.execute(aHttpPost);
+	private void sendDataToOpenHab(String theItemName, float theItemValue) {
+		OkHttpUtil.post(
+				kOpenHABUrl + "/rest/items/" + theItemName,
+				new OkHttpCallback(),
+				theBuilder ->
+						theBuilder.post(RequestBody.create(("" + theItemValue).getBytes(StandardCharsets.UTF_8))));
 	}
 
 	private float kelvinToFahrenheit(float theTempInKelvin) {
