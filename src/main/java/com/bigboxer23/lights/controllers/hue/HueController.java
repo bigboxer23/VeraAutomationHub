@@ -2,13 +2,12 @@ package com.bigboxer23.lights.controllers.hue;
 
 import com.bigboxer23.lights.controllers.ISystemController;
 import com.bigboxer23.lights.data.HueLightVO;
-import com.bigboxer23.utils.http.HttpClientUtils;
+import com.bigboxer23.utils.http.OkHttpCallback;
+import com.bigboxer23.utils.http.OkHttpUtil;
 import com.google.gson.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.protocol.HTTP;
+import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,11 +93,12 @@ public class HueController implements ISystemController {
 	}
 
 	private void callBridge(String theUrl, JsonObject theJsonObject) {
-		HttpPut aPost = new HttpPut(theUrl);
-		StringEntity anEntity = new StringEntity(theJsonObject.toString(), HTTP.UTF_8);
-		anEntity.setContentType("application/json");
-		aPost.setEntity(anEntity);
-		HttpClientUtils.execute(aPost);
+		OkHttpUtil.put(
+				theUrl,
+				new OkHttpCallback(),
+				builder -> builder.put(RequestBody.create(
+						theJsonObject.toString().getBytes(StandardCharsets.UTF_8),
+						MediaType.parse("application/json"))));
 	}
 
 	public boolean getStatus(int theLightId) {
@@ -117,9 +117,13 @@ public class HueController implements ISystemController {
 			myLogger.trace("Getting new status");
 			myStatusTime = System.currentTimeMillis();
 			try {
-				String aStatusString = HttpClientUtils.execute(new HttpGet(getBaseUrl() + "/lights/"));
-				myLogger.trace("Status: " + aStatusString);
-				myStatusObject = JsonParser.parseString(aStatusString);
+				OkHttpUtil.get(getBaseUrl() + "/lights/", new OkHttpCallback() {
+					@Override
+					public void onResponseBodyString(Call call, String stringBody) {
+						myLogger.trace("Status: " + stringBody);
+						myStatusObject = JsonParser.parseString(stringBody);
+					}
+				});
 			} catch (JsonSyntaxException e) {
 				// don't care
 			}
