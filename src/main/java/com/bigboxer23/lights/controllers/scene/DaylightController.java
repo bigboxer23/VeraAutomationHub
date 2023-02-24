@@ -1,15 +1,16 @@
 package com.bigboxer23.lights.controllers.scene;
 
 import com.bigboxer23.lights.controllers.hue.HueController;
-import com.bigboxer23.utils.http.HttpClientUtils;
+import com.bigboxer23.utils.http.OkHttpUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import java.net.HttpURLConnection;
-import org.apache.http.client.methods.HttpGet;
+import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -42,14 +43,22 @@ public class DaylightController extends HueController {
 	 * @return
 	 */
 	public boolean isDaylight() {
-		String aDaylightString = HttpClientUtils.execute(new HttpGet(getBaseUrl() + "/sensors/1"));
-		myLogger.debug(aDaylightString);
-		JsonElement anElement = JsonParser.parseString(aDaylightString);
-		return anElement
-				.getAsJsonObject()
-				.get("state")
-				.getAsJsonObject()
-				.get("daylight")
-				.getAsBoolean();
+		try (Response response = OkHttpUtil.getSynchronous(getBaseUrl() + "/sensors/1", null)) {
+			String body = response.body().string();
+			if (!response.isSuccessful()) {
+				throw new IOException("call to " + getBaseUrl() + "/sensors/1 failed. " + body);
+			}
+			myLogger.debug(body);
+			JsonElement anElement = JsonParser.parseString(body);
+			return anElement
+					.getAsJsonObject()
+					.get("state")
+					.getAsJsonObject()
+					.get("daylight")
+					.getAsBoolean();
+		} catch (IOException e) {
+			myLogger.warn("isDaylight: ", e);
+		}
+		return false;
 	}
 }

@@ -2,10 +2,10 @@ package com.bigboxer23.lights.controllers.vera;
 
 import com.bigboxer23.lights.controllers.AbstractBaseController;
 import com.bigboxer23.lights.controllers.ISystemController;
-import com.bigboxer23.utils.http.HttpClientUtils;
+import com.bigboxer23.utils.http.OkHttpCallback;
+import com.bigboxer23.utils.http.OkHttpUtil;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.http.client.methods.HttpGet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -29,12 +29,6 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 	public static final String kDimmingCommand = "Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=";
 
 	private VeraHouseVO myStatus;
-
-	public static final String kControllerEndpoint = "Vera";
-
-	public boolean getStatus(int theLightId) {
-		return false;
-	}
 
 	public VeraHouseVO getStatus() {
 		myLogger.debug("Getting Vera Status");
@@ -62,11 +56,13 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 	}
 
 	private void doDeviceAction(DeviceAction theAction, boolean theScene) {
-		HttpClientUtils.execute(new HttpGet(kVeraHubUrl
-				+ (theScene ? kVeraSceneRequest : kVeraRequest)
-				+ theAction.getId()
-				+ (theScene ? kSceneUrn : kVeraServiceUrn)
-				+ theAction.getAction()));
+		OkHttpUtil.get(
+				kVeraHubUrl
+						+ (theScene ? kVeraSceneRequest : kVeraRequest)
+						+ theAction.getId()
+						+ (theScene ? kSceneUrn : kVeraServiceUrn)
+						+ theAction.getAction(),
+				new OkHttpCallback());
 	}
 
 	/**
