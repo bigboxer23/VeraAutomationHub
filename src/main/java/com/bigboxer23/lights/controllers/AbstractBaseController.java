@@ -1,9 +1,10 @@
 package com.bigboxer23.lights.controllers;
 
-import com.bigboxer23.utils.http.HttpClientUtils;
+import com.bigboxer23.utils.http.OkHttpUtil;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import org.apache.http.client.methods.HttpGet;
+import java.io.IOException;
+import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,15 @@ public class AbstractBaseController {
 	private GsonBuilder myBuilder;
 
 	protected <T> T fromJson(String theUrl, Class<T> theClass) throws JsonSyntaxException {
-		return getBuilder().create().fromJson(HttpClientUtils.execute(new HttpGet(theUrl)), theClass);
+		try (Response response = OkHttpUtil.getSynchronous(theUrl, null)) {
+			String body = response.body().string();
+			if (!response.isSuccessful()) {
+				throw new IOException("call to " + theUrl + "failed. " + body);
+			}
+			return getBuilder().create().fromJson(body, theClass);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private GsonBuilder getBuilder() {

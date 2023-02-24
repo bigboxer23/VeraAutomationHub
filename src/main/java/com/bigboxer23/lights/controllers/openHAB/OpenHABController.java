@@ -1,7 +1,8 @@
 package com.bigboxer23.lights.controllers.openHAB;
 
 import com.bigboxer23.lights.controllers.AbstractBaseController;
-import com.bigboxer23.utils.http.HttpClientUtils;
+import com.bigboxer23.utils.http.OkHttpCallback;
+import com.bigboxer23.utils.http.OkHttpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,8 +14,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
+import okhttp3.RequestBody;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -61,14 +61,15 @@ public class OpenHABController extends AbstractBaseController {
 			@Parameter(description = "command to run.  Possible values [0-100, ON, OFF]")
 					@PathVariable(value = "command")
 					String command) {
-		HttpPost aHttpPost = new HttpPost(kOpenHABUrl + "/rest/items/" + deviceId);
-		try {
-			aHttpPost.setEntity(new ByteArrayEntity(URLDecoder.decode(command, StandardCharsets.UTF_8.displayName())
-					.getBytes(StandardCharsets.UTF_8)));
-		} catch (UnsupportedEncodingException theE) {
-			myLogger.warn("OpenHABController:doAction", theE);
-		}
-		HttpClientUtils.execute(aHttpPost);
+		OkHttpUtil.post(kOpenHABUrl + "/rest/items/" + deviceId, new OkHttpCallback(), builder -> {
+			try {
+				builder.post(RequestBody.create(URLDecoder.decode(command, StandardCharsets.UTF_8.displayName())
+						.getBytes(StandardCharsets.UTF_8)));
+			} catch (UnsupportedEncodingException theE) {
+				myLogger.warn("OpenHABController:doAction", theE);
+			}
+			return builder;
+		});
 		return null;
 	}
 
