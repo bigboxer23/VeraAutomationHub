@@ -140,12 +140,12 @@ public class MeuralController {
 				name = "source",
 				description = "ordinal to change backing sources.",
 				required = true,
-				example = "0=Google Photos, 1=OpenAI Dall-e",
+				example = "0=Google Photos Album, 1=OpenAI TextCompletion Dall-e, 2=OpenAI ChatGPT" + " Dall-e",
 				schema =
 						@Schema(
 								type = "string",
 								defaultValue = "0",
-								allowableValues = {"0", "1"}))
+								allowableValues = {"0", "1", "2"}))
 	})
 	public void changeSource(int source) {
 		callMeural("/changeSource?source=" + source);
