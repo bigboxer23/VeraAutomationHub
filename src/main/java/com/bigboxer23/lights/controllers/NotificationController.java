@@ -126,7 +126,7 @@ public class NotificationController extends HubContext {
 					myLogger.info(theDevice.getName() + " " + theDevice.getLevel());
 					getExecutors().execute(() -> {
 						try {
-							myOpenHABController.setLevel(theDevice.getName(), theDevice.getIntLevel() / 3);
+							myOpenHABController.setLevel(theDevice.getName(), theDevice.getIntLevel() / 2);
 							Thread.sleep(kZWaveTiming);
 							myOpenHABController.setLevel(theDevice.getName(), theDevice.getIntLevel());
 							Thread.sleep(kZWaveTiming * 8);
