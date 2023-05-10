@@ -44,6 +44,9 @@ public class VeraDeviceVO {
 	@Schema(description = "auto close (in ms) associated with the device")
 	private long autoClose;
 
+	@Schema(description = "When was the last time the door was opened")
+	private long historicOpenTime;
+
 	public VeraDeviceVO(String theName, float theLevel) {
 		name = theName;
 		level = "" + theLevel;
