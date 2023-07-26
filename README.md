@@ -1,7 +1,6 @@
 [![CodeQL](https://github.com/bigboxer23/VeraAutomationHub/actions/workflows/codeql.yml/badge.svg)](https://github.com/bigboxer23/VeraAutomationHub/actions/workflows/codeql.yml)
 
-AutomationHub
-=============
+# AutomationHub
 
 This project is a java web archive deployable which contains servlets to control different home automation technologies.
 There's also a scheduler task running to automatically run specific actions based on time, weather, or sunrise/sunset.
@@ -22,3 +21,7 @@ There's a web-app included to allow setting up new tasks to run automatically (T
 
 Another web-app for manual control of lights and garage door.  It displays buttons for available light controls, a button with
 status to close/open a garage door, and outdoor temperature.  This page is accessible at /HouseLights.html.
+
+### Swagger API
+
+Is available at `http://[server ip address]:[server port]/swagger-ui/index.html`

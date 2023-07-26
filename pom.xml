@@ -182,8 +182,7 @@
             <configuration>
               <target>
                 <scp file="${project.basedir}/target/VeraAutomationHub-2.0.0.jar" keyfile="${user.home}/.ssh/id_rsa" passphrase="" todir="pi@${host}:/home/pi/com/bigboxer23/VeraAutomationHub/2.0.0" trust="true"/>
-                <sshexec command="sudo pkill -f 'java.*Vera*'" host="${host}" keyfile="${user.home}/.ssh/id_rsa" trust="true" username="pi"/>
-                <sshexec command="cd /home/pi/com/bigboxer23/VeraAutomationHub/2.0.0/ ; nohup java -jar VeraAutomationHub-2.0.0.jar &amp;" host="${host}" keyfile="${user.home}/.ssh/id_rsa" trust="true" username="pi"/>
+                <sshexec command="sudo systemctl restart automation-hub.service" host="${host}" keyfile="${user.home}/.ssh/id_rsa" trust="true" username="pi"/>
               </target>
             </configuration>
           </execution>
