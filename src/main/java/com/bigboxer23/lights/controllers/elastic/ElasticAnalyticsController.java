@@ -6,8 +6,11 @@ import com.bigboxer23.lights.controllers.vera.VeraRoomVO;
 import java.io.IOException;
 import java.util.*;
 import org.apache.http.HttpHost;
+import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
@@ -34,13 +37,17 @@ public class ElasticAnalyticsController implements DisposableBean {
 		BulkRequest aBulkRequest = new BulkRequest();
 		handleLightsData(theVeraHouseVO, aBulkRequest);
 		handleClimateData(theVeraHouseVO, aBulkRequest);
-		try {
-			if (aBulkRequest.numberOfActions() > 0) {
-				myLogger.debug("Sending Request to elastic");
-				getClient().bulk(aBulkRequest);
-			}
-		} catch (IOException theE) {
-			myLogger.error("logStatusEvent:", theE);
+		if (aBulkRequest.numberOfActions() > 0) {
+			myLogger.info("Sending Request to elastic");
+			getClient().bulkAsync(aBulkRequest, RequestOptions.DEFAULT, new ActionListener<>() {
+				@Override
+				public void onResponse(BulkResponse theBulkItemResponses) {}
+
+				@Override
+				public void onFailure(Exception e) {
+					myLogger.debug("logStatusEvent:", e);
+				}
+			});
 		}
 	}
 
