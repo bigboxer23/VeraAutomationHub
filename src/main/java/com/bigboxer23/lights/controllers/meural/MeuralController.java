@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import okhttp3.Response;
 import org.slf4j.Logger;
@@ -87,20 +88,56 @@ public class MeuralController {
 		}
 	}
 
-	@GetMapping(value = "/S/meural/getOpenAIPrompt", produces = MediaType.TEXT_PLAIN_VALUE)
+	@GetMapping(value = "/S/meural/getOpenAIInformation", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(
-			summary = "Gets the prompt used to generate the images from OpenAI component",
-			description = "This prompt was last sent to OpenAI's Dall-e for image creation.")
+			summary = "Gets the information used to generate the images from OpenAI component",
+			description = "This information was last sent to OpenAI's Dall-e for image creation.")
 	@ApiResponses({
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public String getOpenAIPrompt() throws IOException {
-		try (Response response = OkHttpUtil.getSynchronous(meuralServer + "/getOpenAIPrompt", null)) {
-			return moshi.adapter(MeuralStringResponse.class)
-					.fromJson(response.body().string())
-					.getResponse();
+		try (Response response = OkHttpUtil.getSynchronous(meuralServer + "/getOpenAIInformation", null)) {
+			return response.body().string();
 		}
+	}
+
+	@PostMapping(value = "/S/meural/updateOpenAIQuality", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "Updates the quality used to generate the images from OpenAI component",
+			description = "This quality is sent to OpenAI's generator and an AI creates an image based on" + " this")
+	@ApiResponses({
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_UNAUTHORIZED + "", description = "missing valid token"),
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
+	})
+	@Parameters({
+		@Parameter(
+				name = "quality",
+				description = "quality for OpenAI to generate an image with",
+				required = true,
+				example = "standard | hd")
+	})
+	public void updateOpenAIQuality(String quality) {
+		callMeural("/changeOpenAIQuality?quality=" + URLEncoder.encode(quality, StandardCharsets.UTF_8));
+	}
+
+	@PostMapping(value = "/S/meural/updateOpenAIStyle", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "Updates the style used to generate the images from OpenAI component",
+			description = "This style is sent to OpenAI's generator and an AI creates an image based on" + " this")
+	@ApiResponses({
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_UNAUTHORIZED + "", description = "missing valid token"),
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
+	})
+	@Parameters({
+		@Parameter(
+				name = "style",
+				description = "style for OpenAI to generate an image with",
+				required = true,
+				example = "natural | vivid")
+	})
+	public void updateOpenAIStyle(String style) {
+		callMeural("/changeOpenAIStyle?style=" + URLEncoder.encode(style, StandardCharsets.UTF_8));
 	}
 
 	@PostMapping(value = "/S/meural/showInfo", produces = MediaType.APPLICATION_JSON_VALUE)
