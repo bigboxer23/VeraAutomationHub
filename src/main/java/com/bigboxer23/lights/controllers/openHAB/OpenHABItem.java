@@ -45,7 +45,7 @@ public class OpenHABItem {
 			}
 			return myState.substring(myState.lastIndexOf(",") + 1);
 		} else if (myType.equalsIgnoreCase("switch")) {
-			return myState.equalsIgnoreCase("off") ? "0" : "1";
+			return myState.equalsIgnoreCase("off") || myState.equalsIgnoreCase("NULL") ? "0" : "1";
 		}
 		return myState;
 	}

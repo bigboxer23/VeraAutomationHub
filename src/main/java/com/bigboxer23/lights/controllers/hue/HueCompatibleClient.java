@@ -1,6 +1,5 @@
 package com.bigboxer23.lights.controllers.hue;
 
-import com.bigboxer23.lights.controllers.scene.DaylightController;
 import com.bigboxer23.utils.http.OkHttpUtil;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;

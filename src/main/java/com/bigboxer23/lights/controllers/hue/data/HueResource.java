@@ -4,8 +4,7 @@ import lombok.Data;
 
 /** */
 @Data
-public class HueResource
-{
+public class HueResource {
 	private String id;
 
 	private HueSceneStatus status;

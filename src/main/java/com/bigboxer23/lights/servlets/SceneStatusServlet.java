@@ -5,6 +5,7 @@ import com.bigboxer23.lights.controllers.climate.ClimateController;
 import com.bigboxer23.lights.controllers.elastic.ElasticAnalyticsController;
 import com.bigboxer23.lights.controllers.frontdoor.FrontDoorController;
 import com.bigboxer23.lights.controllers.garage.GarageController;
+import com.bigboxer23.lights.controllers.hue.HueV2Controller;
 import com.bigboxer23.lights.controllers.meural.MeuralController;
 import com.bigboxer23.lights.controllers.openHAB.OpenHABController;
 import com.bigboxer23.lights.controllers.scene.DaylightController;
@@ -43,6 +44,8 @@ public class SceneStatusServlet extends HubContext {
 
 	private MeuralController meuralController;
 
+	private HueV2Controller hueController;
+
 	protected SceneStatusServlet(
 			GarageController garageController,
 			FrontDoorController frontDoorController,
@@ -52,7 +55,8 @@ public class SceneStatusServlet extends HubContext {
 			OpenHABController openHABController,
 			MeuralController meuralController,
 			ElasticAnalyticsController elasticAnalyticsController,
-			ClimateController climateController) {
+			ClimateController climateController,
+			HueV2Controller hueController) {
 		super(
 				garageController,
 				frontDoorController,
@@ -63,6 +67,7 @@ public class SceneStatusServlet extends HubContext {
 		this.meuralController = meuralController;
 		myElasticAnalyticsController = elasticAnalyticsController;
 		myClimateController = climateController;
+		this.hueController = hueController;
 	}
 
 	@GetMapping(value = "/SceneStatus", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,6 +89,7 @@ public class SceneStatusServlet extends HubContext {
 		myClimateController.getClimateData(aHouseStatus);
 		myFrontDoorController.getStatus(aHouseStatus);
 		meuralController.getStatus(aHouseStatus);
+		hueController.getSceneData(aHouseStatus);
 		fillSmartRooms(aHouseStatus);
 		return aHouseStatus;
 	}
