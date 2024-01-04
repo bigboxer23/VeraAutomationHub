@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.1.5</version>
+    <version>3.2.1</version>
     <relativePath/>
     <!-- lookup parent from repository -->
   </parent>
@@ -21,7 +21,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>17</java.version>
+    <java.version>21</java.version>
     <outputFolder>${project.build.directory}/${project.artifactId}</outputFolder>
   </properties>
 
@@ -67,53 +67,33 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
-      <version>6.1.4</version>
+      <version>6.2.1</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-config</artifactId>
-      <version>6.1.4</version>
+      <version>6.2.1</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
-      <version>6.1.4</version>
+      <version>6.2.1</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.10.1</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>33.0.0-jre</version>
     </dependency>
-    <!-- <dependency>
-      <groupId>org.elasticsearch</groupId>
-      <artifactId>elasticsearch</artifactId>
-      <version>6.8.23</version>
-    </dependency>-->
     <dependency>
       <groupId>org.elasticsearch.client</groupId>
       <artifactId>elasticsearch-rest-high-level-client</artifactId>
       <version>7.17.13</version>
     </dependency>
-    <!--<dependency>
-      <groupId>org.elasticsearch.client</groupId>
-      <artifactId>elasticsearch-rest-client</artifactId>
-      <version>6.8.23</version>
-      <scope>compile</scope>
-	    <exclusions>
-		    <exclusion>
-			    <groupId>org.elasticsearch.client</groupId>
-			    <artifactId>elasticsearch-rest-client</artifactId>
-			    <version>8.7.1</version>
-		    </exclusion>
-	    </exclusions>
-    </dependency>-->
     <dependency>
       <groupId>com.google.api-client</groupId>
       <artifactId>google-api-client</artifactId>
@@ -132,7 +112,7 @@
     <dependency>
       <groupId>com.bigboxer23</groupId>
       <artifactId>utils</artifactId>
-      <version>2.0.16</version>
+      <version>2.0.19</version>
     </dependency>
   </dependencies>
   <repositories>
@@ -161,7 +141,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.12.1</version>
         <configuration>
-          <release>17</release>
+          <release>21</release>
         </configuration>
       </plugin>
       <plugin>
@@ -175,9 +155,9 @@
             <version>0.1.55</version>
           </dependency>
           <dependency>
-            <groupId>ant</groupId>
+            <groupId>org.apache.ant</groupId>
             <artifactId>ant-jsch</artifactId>
-            <version>1.6.5</version>
+            <version>1.10.14</version>
           </dependency>
         </dependencies>
         <executions>
@@ -217,15 +197,17 @@
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
-        <version>2.30.0</version>
+        <version>2.41.1</version>
         <configuration>
           <java>
             <googleJavaFormat>
-              <version>1.15.0</version>
+              <version>1.17.0</version>
               <style>AOSP</style>
               <reflowLongStrings>true</reflowLongStrings>
             </googleJavaFormat>
-            <palantirJavaFormat/>
+            <palantirJavaFormat>
+              <version>2.35.0</version>
+            </palantirJavaFormat>
             <indent>
               <tabs>true</tabs>
               <spacesPerTab>4</spacesPerTab>
