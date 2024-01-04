@@ -121,7 +121,6 @@ public class GCalendarController extends HubContext {
 					.setOrderBy("startTime")
 					.setSingleEvents(true)
 					.execute();
-			anEvents.getItems().forEach(theEvent -> System.out.println(theEvent.getSummary()));
 			myOpenHABController.setVacationMode(findMatchingEvents("Vacation", anEvents, kVacationKeywords));
 			myOpenHABController.setPTOMode(findMatchingEvents("PTO", anEvents, kPTOKeywords));
 			myLogger.info("Calendar information fetched and parsed");

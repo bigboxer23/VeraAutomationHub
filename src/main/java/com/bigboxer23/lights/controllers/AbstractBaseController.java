@@ -18,7 +18,7 @@ public class AbstractBaseController {
 		try (Response response = OkHttpUtil.getSynchronous(theUrl, null)) {
 			String body = response.body().string();
 			if (!response.isSuccessful()) {
-				throw new IOException("call to " + theUrl + "failed. " + body);
+				throw new IOException("call to " + theUrl + " failed. " + body);
 			}
 			return getBuilder().create().fromJson(body, theClass);
 		} catch (IOException e) {

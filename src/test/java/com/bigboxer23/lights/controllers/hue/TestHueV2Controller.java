@@ -1,9 +1,6 @@
 package com.bigboxer23.lights.controllers.hue;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import com.bigboxer23.lights.controllers.hue.data.HueAPIResponse;
-import java.io.IOException;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +16,12 @@ public class TestHueV2Controller {
 	private HueV2Controller component;
 
 	@Test
-	public void getZones() throws IOException
-	{
-		HueAPIResponse response = component.getZones();
-		assertNotNull(response);
+	public void getZones() {
+		assertFalse(component.getZones().isEmpty());
 	}
+
 	@Test
-	public void getScenes() throws IOException {
-		HueAPIResponse response = component.getScenes();
-		assertNotNull(response);
+	public void getScenes() {
+		assertFalse(component.getScenes().isEmpty());
 	}
 }

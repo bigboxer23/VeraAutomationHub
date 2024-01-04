@@ -4,7 +4,6 @@ import lombok.Data;
 
 /** */
 @Data
-public class HueAPIResponse
-{
+public class HueAPIResponse {
 	private HueResource[] data;
 }

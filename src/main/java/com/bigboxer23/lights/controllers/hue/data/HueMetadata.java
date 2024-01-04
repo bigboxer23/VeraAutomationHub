@@ -4,8 +4,7 @@ import lombok.Data;
 
 /** */
 @Data
-public class HueMetadata
-{
+public class HueMetadata {
 	private String name;
 
 	private String archetype;

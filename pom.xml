@@ -21,7 +21,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>21</java.version>
+    <java.version>17</java.version>
     <outputFolder>${project.build.directory}/${project.artifactId}</outputFolder>
   </properties>
 
@@ -141,7 +141,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.12.1</version>
         <configuration>
-          <release>21</release>
+          <release>17</release>
         </configuration>
       </plugin>
       <plugin>
@@ -169,8 +169,15 @@
             <phase>package</phase>
             <configuration>
               <target>
-                <scp file="${project.basedir}/target/VeraAutomationHub-2.0.0.jar" keyfile="${user.home}/.ssh/id_rsa" passphrase="" todir="pi@${host}:/home/pi/com/bigboxer23/VeraAutomationHub/2.0.0" trust="true"/>
-                <sshexec command="sudo systemctl restart automation-hub.service" host="${host}" keyfile="${user.home}/.ssh/id_rsa" trust="true" username="pi"/>
+                <exec executable="scp">
+                  <arg value="target/VeraAutomationHub-2.0.0.jar"/>
+                  <arg value="pi@${host}:/home/pi/com/bigboxer23/VeraAutomationHub/2.0.0"/>
+                </exec>
+                <exec executable="ssh">
+                  <arg value="-tt"/>
+                  <arg value="pi@${host}"/>
+                  <arg value="sudo systemctl restart automation-hub.service"/>
+                </exec>
               </target>
             </configuration>
           </execution>
