@@ -5,7 +5,6 @@ import com.bigboxer23.lights.controllers.hue.data.HueResource;
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.utils.http.OkHttpUtil;
-import com.squareup.moshi.Moshi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,7 +16,6 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +36,6 @@ public class HueV2Controller {
 	private static final String BASE_URL = "https://{0}/clip/v2/{1}";
 
 	private static final String AUTH_HEADER = "hue-application-key";
-
-	private final Moshi moshi = new Moshi.Builder().build();
 
 	@Value("${hueAPIKey}")
 	private String API_KEY;
@@ -107,13 +103,10 @@ public class HueV2Controller {
 					return builder;
 				},
 				HueCompatibleClient.getClient())) {
-			ResponseBody body = response.body();
-			return body == null
-					? Collections.emptyList()
-					: Optional.ofNullable(moshi.adapter(HueAPIResponse.class).fromJson(body.string()))
-							.map(HueAPIResponse::getData)
-							.map(Arrays::asList)
-							.orElse(Collections.emptyList());
+			return OkHttpUtil.getBody(response, HueAPIResponse.class)
+					.map(HueAPIResponse::getData)
+					.map(Arrays::asList)
+					.orElse(Collections.emptyList());
 		} catch (IOException e) {
 			logger.error("getResource " + url, e);
 			return Collections.emptyList();
