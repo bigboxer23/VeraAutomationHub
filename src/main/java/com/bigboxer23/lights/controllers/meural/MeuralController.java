@@ -4,7 +4,6 @@ import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.utils.http.OkHttpCallback;
 import com.bigboxer23.utils.http.OkHttpUtil;
-import com.squareup.moshi.Moshi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -38,8 +37,6 @@ public class MeuralController {
 	private String meuralServer;
 
 	private VeraDeviceVO meuralStatus;
-
-	private final Moshi moshi = new Moshi.Builder().build();
 
 	@PostMapping(value = "/S/meural/nextPicture", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(
@@ -202,9 +199,9 @@ public class MeuralController {
 	})
 	public int getSource() throws IOException {
 		try (Response response = OkHttpUtil.getSynchronous(meuralServer + "/getCurrentSource", null)) {
-			return moshi.adapter(MeuralIntegerResponse.class)
-					.fromJson(response.body().string())
-					.getResponse();
+			return OkHttpUtil.getBody(response, MeuralIntegerResponse.class)
+					.map(MeuralIntegerResponse::getResponse)
+					.orElse(-1);
 		}
 	}
 
@@ -219,9 +216,9 @@ public class MeuralController {
 	})
 	public boolean isAwake() throws IOException {
 		try (Response response = OkHttpUtil.getSynchronous(meuralServer + "/isAsleep", null)) {
-			return moshi.adapter(MeuralResponse.class)
-					.fromJson(response.body().string())
-					.getResponse();
+			return OkHttpUtil.getBody(response, MeuralResponse.class)
+					.map(MeuralResponse::getResponse)
+					.orElse(false);
 		}
 	}
 
