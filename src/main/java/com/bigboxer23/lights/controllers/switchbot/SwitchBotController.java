@@ -5,6 +5,7 @@ import com.bigboxer23.switch_bot.IDeviceTypes;
 import com.bigboxer23.switch_bot.SwitchBotApi;
 import com.bigboxer23.switch_bot.data.Device;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 /** */
@@ -33,7 +35,7 @@ public class SwitchBotController {
 
 	private SwitchBotApi api;
 
-	private SwitchBotApi getSwitchbotAPI() throws IOException {
+	public SwitchBotApi getSwitchbotAPI() throws IOException {
 		if (api == null) {
 			logger.info("initializing switchbot API");
 			api = SwitchBotApi.getInstance(token, secret);
@@ -62,7 +64,7 @@ public class SwitchBotController {
 	})
 	public void openCurtains() throws IOException {
 		logger.info("open curtain requested");
-		getSwitchbotAPI().getDeviceApi().sendDeviceControlCommands(getCurtainId(), IDeviceCommands.OPEN_CURTAIN);
+		getSwitchbotAPI().getDeviceApi().sendDeviceControlCommands(getCurtainId(), IDeviceCommands.CURTAIN_OPEN);
 	}
 
 	@GetMapping(value = "/S/switchbot/closeCurtain", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -73,6 +75,26 @@ public class SwitchBotController {
 	})
 	public void closeCurtains() throws IOException {
 		logger.info("close curtain requested");
-		getSwitchbotAPI().getDeviceApi().sendDeviceControlCommands(getCurtainId(), IDeviceCommands.CLOSE_CURTAIN);
+		getSwitchbotAPI().getDeviceApi().sendDeviceControlCommands(getCurtainId(), IDeviceCommands.CURTAIN_CLOSE);
+	}
+
+	@GetMapping(value = "/S/switchbot/plugmini/{deviceId}/{command}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "control plug mini", description = "call switchbot api to control plug mini")
+	@ApiResponses({
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
+	})
+	public void plugMini(
+			@Parameter(description = "deviceId to run command on") @PathVariable(value = "deviceId") String deviceId,
+			@Parameter(description = "command to run.  Possible values [0-100, ON, OFF]")
+					@PathVariable(value = "command")
+					String command)
+			throws IOException {
+		logger.info(deviceId + ":" + command + " plug-mini requested");
+		getSwitchbotAPI()
+				.getDeviceApi()
+				.sendDeviceControlCommands(
+						deviceId,
+						"on".equalsIgnoreCase(command) ? IDeviceCommands.PLUG_MINI_ON : IDeviceCommands.PLUG_MINI_OFF);
 	}
 }
