@@ -16,7 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 
 /**
- * Controller listens for empty events from humidifier and triggers a pump to add water to the tank and turn the humidifier back on
+ * Controller listens for empty events from humidifier and triggers a pump to add water to the tank
+ * and turn the humidifier back on
  */
 @Controller
 public class GoveeHumidifierController implements InitializingBean {

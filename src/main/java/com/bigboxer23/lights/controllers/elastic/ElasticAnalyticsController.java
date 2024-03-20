@@ -38,7 +38,7 @@ public class ElasticAnalyticsController implements DisposableBean {
 		handleLightsData(theVeraHouseVO, aBulkRequest);
 		handleClimateData(theVeraHouseVO, aBulkRequest);
 		if (aBulkRequest.numberOfActions() > 0) {
-			myLogger.info("Sending Request to elastic");
+			myLogger.debug("Sending Request to elastic");
 			getClient().bulkAsync(aBulkRequest, RequestOptions.DEFAULT, new ActionListener<>() {
 				@Override
 				public void onResponse(BulkResponse theBulkItemResponses) {}
