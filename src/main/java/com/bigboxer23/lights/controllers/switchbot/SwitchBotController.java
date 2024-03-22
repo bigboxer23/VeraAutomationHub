@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +36,8 @@ public class SwitchBotController {
 	private String curtainId;
 
 	private SwitchBotApi api;
+
+	private Map<String, String> deviceIdToName;
 
 	public SwitchBotApi getSwitchbotAPI() throws IOException {
 		if (api == null) {
@@ -78,6 +82,15 @@ public class SwitchBotController {
 		getSwitchbotAPI().getDeviceApi().sendDeviceControlCommands(getCurtainId(), IDeviceCommands.CURTAIN_CLOSE);
 	}
 
+	private String getDeviceName(String deviceId) throws IOException {
+		if (deviceIdToName == null || !deviceIdToName.containsKey(deviceId)) {
+			logger.info("refreshing device id to name map");
+			deviceIdToName = getSwitchbotAPI().getDeviceApi().getDevices().stream()
+					.collect(Collectors.toMap(Device::getDeviceId, Device::getDeviceName));
+		}
+		return deviceIdToName.get(deviceId);
+	}
+
 	@GetMapping(value = "/S/switchbot/plugmini/{deviceId}/{command}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "control plug mini", description = "call switchbot api to control plug mini")
 	@ApiResponses({
@@ -90,7 +103,7 @@ public class SwitchBotController {
 					@PathVariable(value = "command")
 					String command)
 			throws IOException {
-		logger.info(deviceId + ":" + command + " plug-mini requested");
+		logger.info(getDeviceName(deviceId) + ":" + deviceId + ": " + command + " plug-mini requested");
 		getSwitchbotAPI()
 				.getDeviceApi()
 				.sendDeviceControlCommands(
