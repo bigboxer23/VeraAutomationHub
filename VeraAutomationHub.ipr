@@ -29,8 +29,6 @@
   <component name="CheckStyle-IDEA" serialisationVersion="2">
     <checkstyleVersion>8.2</checkstyleVersion>
     <scanScope>JavaOnly</scanScope>
-    <option name="thirdPartyClasspath" />
-    <option name="activeLocationIds" />
     <option name="locations">
       <list>
         <ConfigurationLocation id="bundled-sun-checks" type="BUNDLED" scope="All" description="Sun Checks">(bundled)</ConfigurationLocation>
@@ -316,16 +314,16 @@
         <root url="jar://$MAVEN_REPOSITORY$/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.bigboxer23:govee-java-api:1.1.3" type="java-imported" external-system-id="Maven">
-      <properties groupId="com.bigboxer23" artifactId="govee-java-api" version="1.1.3" />
+    <library name="Maven: com.bigboxer23:govee-java-api:1.1.4" type="java-imported" external-system-id="Maven">
+      <properties groupId="com.bigboxer23" artifactId="govee-java-api" version="1.1.4" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/govee-java-api/1.1.3/govee-java-api-1.1.3.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/govee-java-api/1.1.4/govee-java-api-1.1.4.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/govee-java-api/1.1.3/govee-java-api-1.1.3-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/govee-java-api/1.1.4/govee-java-api-1.1.4-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/govee-java-api/1.1.3/govee-java-api-1.1.3-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/govee-java-api/1.1.4/govee-java-api-1.1.4-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.bigboxer23:switchbotapi-java:1.1.3" type="java-imported" external-system-id="Maven">
