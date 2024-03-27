@@ -7,6 +7,7 @@ import com.bigboxer23.govee.data.GoveeDeviceCommandResponse;
 import com.bigboxer23.govee.data.GoveeEvent;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
+import com.bigboxer23.utils.command.RetryingCommand;
 import com.google.gson.*;
 import java.io.IOException;
 import org.slf4j.Logger;
@@ -77,10 +78,15 @@ public class GoveeHumidifierController implements InitializingBean {
 		public void run() {
 			try {
 				logger.info("starting pump " + pumpId);
-				switchbotController
-						.getSwitchbotAPI()
-						.getDeviceApi()
-						.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_ON);
+				RetryingCommand.execute(
+						() -> {
+							switchbotController
+									.getSwitchbotAPI()
+									.getDeviceApi()
+									.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_ON);
+							return null;
+						},
+						pumpId);
 				Thread.sleep(5 * 1000);
 
 				logger.info("starting humidifier " + humidifierId);
@@ -89,18 +95,28 @@ public class GoveeHumidifierController implements InitializingBean {
 				Thread.sleep(2 * 60 * 1000); // 2 min
 
 				logger.info("stopping pump " + pumpId);
-				switchbotController
-						.getSwitchbotAPI()
-						.getDeviceApi()
-						.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_OFF);
+				RetryingCommand.execute(
+						() -> {
+							switchbotController
+									.getSwitchbotAPI()
+									.getDeviceApi()
+									.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_OFF);
+							return null;
+						},
+						pumpId);
 			} catch (IOException | InterruptedException e) {
 				logger.error("error refilling humidifier, attempting to turn off pump " + pumpId, e);
 				try {
 					Thread.sleep(5 * 1000); // 5 sec
-					switchbotController
-							.getSwitchbotAPI()
-							.getDeviceApi()
-							.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_OFF);
+					RetryingCommand.execute(
+							() -> {
+								switchbotController
+										.getSwitchbotAPI()
+										.getDeviceApi()
+										.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_OFF);
+								return null;
+							},
+							pumpId);
 				} catch (IOException | InterruptedException e2) {
 					logger.error("error turning off pump " + pumpId, e2);
 				}

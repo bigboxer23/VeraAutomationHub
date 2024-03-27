@@ -4,6 +4,7 @@ import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.switch_bot.IDeviceTypes;
 import com.bigboxer23.switch_bot.SwitchBotApi;
 import com.bigboxer23.switch_bot.data.Device;
+import com.bigboxer23.utils.command.RetryingCommand;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -50,12 +51,14 @@ public class SwitchBotController {
 	private String getCurtainId() throws IOException {
 		if (curtainId == null) {
 			logger.info("fetching curtain id");
-			curtainId = getSwitchbotAPI().getDeviceApi().getDevices().stream()
-					.filter(device -> IDeviceTypes.CURTAIN.equals(device.getDeviceType()))
-					.filter(Device::isMaster)
-					.findAny()
-					.map(Device::getDeviceId)
-					.orElse(null);
+			curtainId = RetryingCommand.execute(
+					() -> getSwitchbotAPI().getDeviceApi().getDevices().stream()
+							.filter(device -> IDeviceTypes.CURTAIN.equals(device.getDeviceType()))
+							.filter(Device::isMaster)
+							.findAny()
+							.map(Device::getDeviceId)
+							.orElse(null),
+					"CurtainIdFetch");
 		}
 		return curtainId;
 	}
@@ -68,7 +71,14 @@ public class SwitchBotController {
 	})
 	public void openCurtains() throws IOException {
 		logger.info("open curtain requested");
-		getSwitchbotAPI().getDeviceApi().sendDeviceControlCommands(getCurtainId(), IDeviceCommands.CURTAIN_OPEN);
+		RetryingCommand.execute(
+				() -> {
+					getSwitchbotAPI()
+							.getDeviceApi()
+							.sendDeviceControlCommands(getCurtainId(), IDeviceCommands.CURTAIN_OPEN);
+					return null;
+				},
+				getCurtainId());
 	}
 
 	@GetMapping(value = "/S/switchbot/closeCurtain", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -79,7 +89,14 @@ public class SwitchBotController {
 	})
 	public void closeCurtains() throws IOException {
 		logger.info("close curtain requested");
-		getSwitchbotAPI().getDeviceApi().sendDeviceControlCommands(getCurtainId(), IDeviceCommands.CURTAIN_CLOSE);
+		RetryingCommand.execute(
+				() -> {
+					getSwitchbotAPI()
+							.getDeviceApi()
+							.sendDeviceControlCommands(getCurtainId(), IDeviceCommands.CURTAIN_CLOSE);
+					return null;
+				},
+				getCurtainId());
 	}
 
 	private String getDeviceName(String deviceId) throws IOException {
@@ -102,12 +119,20 @@ public class SwitchBotController {
 			@Parameter(description = "command to run.  Possible values [0-100, ON, OFF]")
 					@PathVariable(value = "command")
 					String command)
-			throws IOException {
+			throws IOException, InterruptedException {
 		logger.info(getDeviceName(deviceId) + ":" + deviceId + ": " + command + " plug-mini requested");
-		getSwitchbotAPI()
-				.getDeviceApi()
-				.sendDeviceControlCommands(
-						deviceId,
-						"on".equalsIgnoreCase(command) ? IDeviceCommands.PLUG_MINI_ON : IDeviceCommands.PLUG_MINI_OFF);
+		RetryingCommand.execute(
+				() -> {
+					getSwitchbotAPI()
+							.getDeviceApi()
+							.sendDeviceControlCommands(
+									deviceId,
+									"on".equalsIgnoreCase(command)
+											? IDeviceCommands.PLUG_MINI_ON
+											: IDeviceCommands.PLUG_MINI_OFF);
+
+					return null;
+				},
+				deviceId);
 	}
 }
