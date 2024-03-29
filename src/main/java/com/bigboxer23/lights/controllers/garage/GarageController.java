@@ -49,7 +49,7 @@ public class GarageController extends AbstractBaseController implements ITempera
 			@Parameter(description = "used with SetAutoCloseDelay. Seconds to set delay for", required = false)
 					@PathVariable(value = "delay", required = false)
 					Long delay) {
-		myLogger.error("Garage Door change requested: " + command);
+		myLogger.info("Garage Door change requested: " + command);
 		myGarageData = fromJson(myGarageURL + "/" + command + (delay != null ? "/" + delay : ""), VeraDeviceVO.class);
 		myGarageData.setName("Garage Opener");
 		myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
