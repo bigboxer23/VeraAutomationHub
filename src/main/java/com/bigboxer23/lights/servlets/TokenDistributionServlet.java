@@ -87,7 +87,7 @@ public class TokenDistributionServlet {
 	})
 	public TokenResponse getToken(HttpServletResponse theResponse, HttpServletRequest theRequest) throws IOException {
 		if (myTokenValidTime + kTokenValidTime > System.currentTimeMillis()) {
-			myLogger.error("Token distributed to " + theRequest.getRemoteAddr());
+			myLogger.warn("Token distributed to " + theRequest.getRemoteAddr());
 			Cookie anAuthCookie = new Cookie("t", myToken);
 			anAuthCookie.setHttpOnly(true);
 			anAuthCookie.setSecure(true);

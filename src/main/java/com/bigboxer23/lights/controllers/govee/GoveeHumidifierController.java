@@ -28,7 +28,7 @@ public class GoveeHumidifierController implements InitializingBean {
 	@Value("${humidfier_to_pump_map}")
 	private String MAP_KEY;
 
-	private JsonObject humidifierToPumpMap;
+	private HumidifierData data;
 
 	private static final Logger logger = LoggerFactory.getLogger(GoveeHumidifierController.class);
 
@@ -40,19 +40,21 @@ public class GoveeHumidifierController implements InitializingBean {
 
 	private void setupListeners() {
 		logger.warn("starting govee event listener");
-		humidifierToPumpMap = JsonParser.parseString(MAP_KEY).getAsJsonObject();
+		data = new GsonBuilder().create().fromJson(MAP_KEY, HumidifierData.class);
 		GoveeApi.getInstance(API_KEY).subscribeToGoveeEvents(new GoveeEventSubscriber() {
 			@Override
 			public void messageReceived(GoveeEvent event) {
 				if (event.isLackWaterEvent()) {
 					logger.warn(
 							"no water: " + event.getModel() + " " + event.getDeviceId() + " " + event.getDeviceName());
-					JsonPrimitive pump = humidifierToPumpMap.getAsJsonPrimitive(event.getDeviceId());
-					if (pump == null) {
-						logger.warn("No pump for " + event.getDeviceId());
+					HumidifierCluster cluster = data.get(event.getDeviceId());
+					if (cluster == null) {
+						logger.warn("No cluster for " + event.getDeviceId());
 						return;
 					}
-					new Thread(new RefillAction(pump.getAsString(), event.getModel(), event.getDeviceId())).start();
+					new Thread(new RefillAction(
+									cluster.getPump(), event.getModel(), event.getDeviceId(), cluster.getOutlet()))
+							.start();
 				}
 			}
 		});
@@ -68,15 +70,28 @@ public class GoveeHumidifierController implements InitializingBean {
 		private final String humidifierModel;
 		private final String humidifierId;
 
-		public RefillAction(String pumpId, String humidifierModel, String humidifierId) {
+		private final String humidifierOutletId;
+
+		public RefillAction(String pumpId, String humidifierModel, String humidifierId, String humidifierOutletId) {
 			this.pumpId = pumpId;
 			this.humidifierModel = humidifierModel;
 			this.humidifierId = humidifierId;
+			this.humidifierOutletId = humidifierOutletId;
 		}
 
 		@Override
 		public void run() {
 			try {
+				logger.info("manual turn off of humidifier " + humidifierOutletId);
+				RetryingCommand.execute(
+						() -> {
+							switchbotController
+									.getSwitchbotAPI()
+									.getDeviceApi()
+									.sendDeviceControlCommands(humidifierOutletId, IDeviceCommands.PLUG_MINI_OFF);
+							return null;
+						},
+						humidifierOutletId);
 				logger.info("starting pump " + pumpId);
 				RetryingCommand.execute(
 						() -> {
@@ -89,10 +104,23 @@ public class GoveeHumidifierController implements InitializingBean {
 						pumpId);
 				Thread.sleep(5 * 1000);
 
+				logger.info("manual turn on of humidifier " + humidifierOutletId);
+				RetryingCommand.execute(
+						() -> {
+							switchbotController
+									.getSwitchbotAPI()
+									.getDeviceApi()
+									.sendDeviceControlCommands(humidifierOutletId, IDeviceCommands.PLUG_MINI_ON);
+							return null;
+						},
+						humidifierOutletId);
+
+				Thread.sleep(60 * 1000); // 1 min
 				logger.info("starting humidifier " + humidifierId);
 				GoveeDeviceCommandResponse response = GoveeApi.getInstance(API_KEY)
 						.sendDeviceCommand(IHumidifierCommands.turnOn(humidifierModel, humidifierId));
-				Thread.sleep(2 * 60 * 1000); // 2 min
+
+				Thread.sleep(60 * 1000); // 1 min
 
 				logger.info("stopping pump " + pumpId);
 				RetryingCommand.execute(
