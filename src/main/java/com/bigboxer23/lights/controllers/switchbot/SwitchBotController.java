@@ -102,8 +102,10 @@ public class SwitchBotController {
 	private String getDeviceName(String deviceId) throws IOException {
 		if (deviceIdToName == null || !deviceIdToName.containsKey(deviceId)) {
 			logger.info("refreshing device id to name map");
-			deviceIdToName = getSwitchbotAPI().getDeviceApi().getDevices().stream()
-					.collect(Collectors.toMap(Device::getDeviceId, Device::getDeviceName));
+			deviceIdToName = RetryingCommand.execute(
+					() -> getSwitchbotAPI().getDeviceApi().getDevices().stream()
+							.collect(Collectors.toMap(Device::getDeviceId, Device::getDeviceName)),
+					"list devices");
 		}
 		return deviceIdToName.get(deviceId);
 	}
