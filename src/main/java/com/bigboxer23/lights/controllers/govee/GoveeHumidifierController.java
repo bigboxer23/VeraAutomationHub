@@ -3,7 +3,6 @@ package com.bigboxer23.lights.controllers.govee;
 import com.bigboxer23.govee.GoveeApi;
 import com.bigboxer23.govee.GoveeEventSubscriber;
 import com.bigboxer23.govee.IHumidifierCommands;
-import com.bigboxer23.govee.data.GoveeDeviceCommandResponse;
 import com.bigboxer23.govee.data.GoveeEvent;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
@@ -117,8 +116,13 @@ public class GoveeHumidifierController implements InitializingBean {
 
 				Thread.sleep(60 * 1000); // 1 min
 				logger.info("starting humidifier " + humidifierId);
-				GoveeDeviceCommandResponse response = GoveeApi.getInstance(API_KEY)
-						.sendDeviceCommand(IHumidifierCommands.turnOn(humidifierModel, humidifierId));
+				RetryingCommand.execute(
+						() -> {
+							GoveeApi.getInstance(API_KEY)
+									.sendDeviceCommand(IHumidifierCommands.turnOn(humidifierModel, humidifierId));
+							return null;
+						},
+						humidifierId);
 
 				Thread.sleep(60 * 1000); // 1 min
 
