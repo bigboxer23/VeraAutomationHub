@@ -7,8 +7,11 @@ import com.bigboxer23.govee.data.GoveeEvent;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.utils.command.RetryingCommand;
+import com.bigboxer23.utils.mail.MailSender;
 import com.google.gson.*;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -27,11 +30,22 @@ public class GoveeHumidifierController implements InitializingBean {
 	@Value("${humidfier_to_pump_map}")
 	private String MAP_KEY;
 
+	@Value("${goveeToEmail}")
+	private String toEmail;
+
+	@Value("${goveeFromEmail}")
+	private String fromEmail;
+
+	@Value("${goveeFromEmailPassword}")
+	private String fromPassword;
+
 	private HumidifierData data;
 
 	private static final Logger logger = LoggerFactory.getLogger(GoveeHumidifierController.class);
 
 	private final SwitchBotController switchbotController;
+
+	private Map<String, Long> goveeEvents = new HashMap<>();
 
 	public GoveeHumidifierController(SwitchBotController switchbotController) {
 		this.switchbotController = switchbotController;
@@ -51,12 +65,31 @@ public class GoveeHumidifierController implements InitializingBean {
 						logger.warn("No cluster for " + event.getDeviceId());
 						return;
 					}
-					new Thread(new RefillAction(
-									cluster.getPump(), event.getModel(), event.getDeviceId(), cluster.getOutlet()))
-							.start();
+					if (!isLastEventRecent(event.getDeviceId(), event.getDeviceName())) {
+						new Thread(new RefillAction(
+										cluster.getPump(), event.getModel(), event.getDeviceId(), cluster.getOutlet()))
+								.start();
+					}
 				}
 			}
 		});
+	}
+
+	private boolean isLastEventRecent(String deviceId, String deviceName) {
+		Long lastEvent = goveeEvents.get(deviceId);
+		goveeEvents.put(deviceId, System.currentTimeMillis() + (1000 * 60 * 15)); // 15min
+		boolean isRecent = lastEvent != null && System.currentTimeMillis() <= lastEvent;
+		if (isRecent) {
+			logger.error("govee event recent " + lastEvent + ":" + System.currentTimeMillis());
+			MailSender.sendGmail(
+					toEmail,
+					fromEmail,
+					fromPassword,
+					deviceName + "  reservoir may be empty",
+					"Reservoir for " + deviceName + " may be empty, please check & fill.",
+					null);
+		}
+		return isRecent;
 	}
 
 	@Override
