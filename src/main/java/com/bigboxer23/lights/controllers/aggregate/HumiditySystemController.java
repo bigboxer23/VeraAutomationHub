@@ -68,6 +68,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 			@Parameter(description = "deviceName (for logging only)") @PathVariable(value = "deviceName")
 					String deviceName,
 			@Parameter(description = "deviceModel") @PathVariable(value = "deviceModel") String deviceModel) {
+		logger.info(deviceId + " requested via web api");
 		outOfWaterEvent(deviceId, deviceName, deviceModel);
 	}
 
