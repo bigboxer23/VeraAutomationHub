@@ -9,5 +9,9 @@ public class HumidifierCluster {
 
 	private String humidifier;
 
+	private String humidifierModel;
+
 	private String outlet;
+
+	private String humiditySensor;
 }

@@ -3,22 +3,27 @@ package com.bigboxer23.lights.controllers.aggregate;
 import com.bigboxer23.govee.IHumidifierCommands;
 import com.bigboxer23.lights.controllers.govee.GoveeHumidifierController;
 import com.bigboxer23.lights.controllers.govee.HumidifierCluster;
-import com.bigboxer23.lights.controllers.govee.HumidifierData;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.utils.command.RetryingCommand;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +40,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 
 	private final GoveeHumidifierController goveeController;
 
-	private HumidifierData data;
+	private final Map<String, HumidifierCluster> humidifierMap = new HashMap<>();
 
 	@Value("${humidfier_to_pump_map}")
 	private String MAP_KEY;
@@ -49,7 +54,9 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 
 	@Override
 	public void afterPropertiesSet() {
-		data = new GsonBuilder().create().fromJson(MAP_KEY, HumidifierData.class);
+		List<HumidifierCluster> humidityClusters =
+				new GsonBuilder().create().fromJson(MAP_KEY, new TypeToken<List<HumidifierCluster>>() {}.getType());
+		humidityClusters.forEach(cluster -> humidifierMap.put(cluster.getHumidifier(), cluster));
 	}
 
 	@GetMapping(
@@ -72,9 +79,50 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 		outOfWaterEvent(deviceId, deviceName, deviceModel);
 	}
 
+	@Scheduled(fixedDelay = 600000) // 10min
+	public void manualCheck() {
+		logger.info("checking humidity");
+		humidifierMap.values().stream()
+				.filter(cluster -> !StringUtils.isEmpty(cluster.getHumiditySensor()))
+				.forEach(cluster -> {
+					try {
+						int humidity = RetryingCommand.execute(
+								() -> switchbotController
+										.getSwitchbotAPI()
+										.getDeviceApi()
+										.getDeviceStatus(cluster.getHumiditySensor())
+										.getHumidity(),
+								cluster.getHumiditySensor());
+						logger.info(cluster.getHumiditySensor() + " humidity " + humidity);
+						if (humidity < 55) {
+							logger.info("low humidity detected");
+							float watts = RetryingCommand.execute(
+									() -> switchbotController
+											.getSwitchbotAPI()
+											.getDeviceApi()
+											.getDeviceStatus(cluster.getOutlet())
+											.getWatts(),
+									cluster.getOutlet());
+							if (watts > 3) {
+								logger.info("humidifier is running, detected wattage: " + watts);
+								return;
+							}
+							new Thread(new RefillAction(
+											cluster.getPump(),
+											cluster.getHumidifierModel(),
+											cluster.getHumidifier(),
+											cluster.getOutlet()))
+									.start();
+						}
+					} catch (IOException e) {
+						logger.error("error ", e);
+					}
+				});
+	}
+
 	@Override
 	public void outOfWaterEvent(String deviceId, String deviceName, String deviceModel) {
-		HumidifierCluster cluster = data.get(deviceId);
+		HumidifierCluster cluster = humidifierMap.get(deviceId);
 		if (cluster == null) {
 			logger.warn("No cluster for " + deviceId);
 			return;
