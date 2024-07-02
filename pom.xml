@@ -112,7 +112,7 @@
     <dependency>
       <groupId>com.bigboxer23</groupId>
       <artifactId>switchbotapi-java</artifactId>
-      <version>1.1.5</version>
+      <version>1.1.6</version>
     </dependency>
     <dependency>
       <groupId>com.bigboxer23</groupId>
