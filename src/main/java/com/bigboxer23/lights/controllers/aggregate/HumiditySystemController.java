@@ -1,10 +1,8 @@
 package com.bigboxer23.lights.controllers.aggregate;
 
-import com.bigboxer23.govee.IHumidifierCommands;
 import com.bigboxer23.lights.controllers.govee.GoveeHumidifierController;
 import com.bigboxer23.lights.controllers.govee.HumidifierCluster;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
-import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.utils.command.RetryingCommand;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -108,14 +106,34 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 								return;
 							}
 							new Thread(new RefillAction(
+											switchbotController,
+											goveeController,
 											cluster.getPump(),
 											cluster.getHumidifierModel(),
 											cluster.getHumidifier(),
 											cluster.getOutlet()))
 									.start();
+						} else if (humidity > 80) {
+							float watts = RetryingCommand.execute(
+									() -> switchbotController
+											.getSwitchbotAPI()
+											.getDeviceApi()
+											.getDeviceStatus(cluster.getOutlet())
+											.getWatts(),
+									cluster.getOutlet());
+							if (watts > 10) {
+								logger.info("humidifier should not be running, humidify is too"
+										+ " high "
+										+ watts
+										+ " "
+										+ humidity);
+								new Thread(new HumidifierResetAction(
+												goveeController, cluster.getHumidifierModel(), cluster.getHumidifier()))
+										.start();
+							}
 						}
 					} catch (IOException e) {
-						logger.error("error ", e);
+						logger.error("manualCheck: ", e);
 					}
 				});
 	}
@@ -127,98 +145,13 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 			logger.warn("No cluster for " + deviceId);
 			return;
 		}
-		new Thread(new RefillAction(cluster.getPump(), deviceModel, deviceId, cluster.getOutlet())).start();
-	}
-
-	private class RefillAction implements Runnable {
-		private final String pumpId;
-		private final String humidifierModel;
-		private final String humidifierId;
-
-		private final String humidifierOutletId;
-
-		public RefillAction(String pumpId, String humidifierModel, String humidifierId, String humidifierOutletId) {
-			this.pumpId = pumpId;
-			this.humidifierModel = humidifierModel;
-			this.humidifierId = humidifierId;
-			this.humidifierOutletId = humidifierOutletId;
-		}
-
-		@Override
-		public void run() {
-			try {
-				logger.info("manual turn off of humidifier " + humidifierOutletId);
-				RetryingCommand.execute(
-						() -> {
-							switchbotController
-									.getSwitchbotAPI()
-									.getDeviceApi()
-									.sendDeviceControlCommands(humidifierOutletId, IDeviceCommands.PLUG_MINI_OFF);
-							return null;
-						},
-						humidifierOutletId);
-				logger.info("starting pump " + pumpId);
-				RetryingCommand.execute(
-						() -> {
-							switchbotController
-									.getSwitchbotAPI()
-									.getDeviceApi()
-									.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_ON);
-							return null;
-						},
-						pumpId);
-				Thread.sleep(5 * 1000);
-
-				logger.info("manual turn on of humidifier " + humidifierOutletId);
-				RetryingCommand.execute(
-						() -> {
-							switchbotController
-									.getSwitchbotAPI()
-									.getDeviceApi()
-									.sendDeviceControlCommands(humidifierOutletId, IDeviceCommands.PLUG_MINI_ON);
-							return null;
-						},
-						humidifierOutletId);
-
-				Thread.sleep(60 * 1000); // 1 min
-				logger.info("starting humidifier " + humidifierId);
-				RetryingCommand.execute(
-						() -> {
-							goveeController.sendDeviceCommand(
-									IHumidifierCommands.turnOn(humidifierModel, humidifierId));
-							return null;
-						},
-						humidifierId);
-
-				Thread.sleep(60 * 1000); // 1 min
-
-				logger.info("stopping pump " + pumpId);
-				RetryingCommand.execute(
-						() -> {
-							switchbotController
-									.getSwitchbotAPI()
-									.getDeviceApi()
-									.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_OFF);
-							return null;
-						},
-						pumpId);
-			} catch (IOException | InterruptedException e) {
-				logger.error("error refilling humidifier, attempting to turn off pump " + pumpId, e);
-				try {
-					Thread.sleep(5 * 1000); // 5 sec
-					RetryingCommand.execute(
-							() -> {
-								switchbotController
-										.getSwitchbotAPI()
-										.getDeviceApi()
-										.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_OFF);
-								return null;
-							},
-							pumpId);
-				} catch (IOException | InterruptedException e2) {
-					logger.error("error turning off pump " + pumpId, e2);
-				}
-			}
-		}
+		new Thread(new RefillAction(
+						switchbotController,
+						goveeController,
+						cluster.getPump(),
+						deviceModel,
+						deviceId,
+						cluster.getOutlet()))
+				.start();
 	}
 }
