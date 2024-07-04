@@ -92,7 +92,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 										.getHumidity(),
 								cluster.getHumiditySensor());
 						logger.info(cluster.getHumiditySensor() + " humidity " + humidity);
-						if (humidity < 55) {
+						if (humidity < 60) {
 							logger.info("low humidity detected");
 							float watts = RetryingCommand.execute(
 									() -> switchbotController
@@ -113,7 +113,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 											cluster.getHumidifier(),
 											cluster.getOutlet()))
 									.start();
-						} else if (humidity > 80) {
+						} else if (humidity > 78) {
 							float watts = RetryingCommand.execute(
 									() -> switchbotController
 											.getSwitchbotAPI()
