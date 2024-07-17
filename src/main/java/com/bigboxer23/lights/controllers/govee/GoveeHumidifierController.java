@@ -36,6 +36,9 @@ public class GoveeHumidifierController implements InitializingBean {
 	@Value("${goveeFromEmailPassword}")
 	private String fromPassword;
 
+	@Value("${goveePushEnabled}")
+	private boolean isEnabled;
+
 	private static final Logger logger = LoggerFactory.getLogger(GoveeHumidifierController.class);
 
 	private final Map<String, Long> goveeEvents = new HashMap<>();
@@ -52,6 +55,10 @@ public class GoveeHumidifierController implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() {
+		if (!isEnabled) {
+			logger.warn("govee event listener not enabled");
+			return;
+		}
 		logger.warn("starting govee event listener");
 		GoveeApi.getInstance(API_KEY).subscribeToGoveeEvents(new GoveeEventSubscriber() {
 			@Override
@@ -68,7 +75,7 @@ public class GoveeHumidifierController implements InitializingBean {
 		});
 	}
 
-	private boolean isLastEventRecent(String deviceId, String deviceName) {
+	public boolean isLastEventRecent(String deviceId, String deviceName) {
 		Long lastEvent = goveeEvents.get(deviceId);
 		goveeEvents.put(deviceId, System.currentTimeMillis() + (1000 * 60 * 15)); // 15min
 		boolean isRecent = lastEvent != null && System.currentTimeMillis() <= lastEvent;

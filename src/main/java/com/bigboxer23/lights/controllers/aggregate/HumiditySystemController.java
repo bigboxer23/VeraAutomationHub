@@ -78,7 +78,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 	}
 
 	@Scheduled(fixedDelay = 600000) // 10min
-	public void manualCheck() {
+	public void checkAfterInterval() {
 		logger.info("checking humidity");
 		humidifierMap.values().stream()
 				.filter(cluster -> !StringUtils.isEmpty(cluster.getHumiditySensor()))
@@ -105,15 +105,9 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 								logger.info("humidifier is running, detected wattage: " + watts);
 								return;
 							}
-							new Thread(new RefillAction(
-											switchbotController,
-											goveeController,
-											cluster.getPump(),
-											cluster.getHumidifierModel(),
-											cluster.getHumidifier(),
-											cluster.getOutlet()))
-									.start();
-						} else if (humidity > 78) {
+							outOfWaterEvent(
+									cluster.getHumidifier(), cluster.getHumidifier(), cluster.getHumidifierModel());
+						} else if (humidity > 73) {
 							float watts = RetryingCommand.execute(
 									() -> switchbotController
 											.getSwitchbotAPI()
@@ -145,13 +139,15 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 			logger.warn("No cluster for " + deviceId);
 			return;
 		}
-		new Thread(new RefillAction(
-						switchbotController,
-						goveeController,
-						cluster.getPump(),
-						deviceModel,
-						deviceId,
-						cluster.getOutlet()))
-				.start();
+		if (!goveeController.isLastEventRecent(deviceId, deviceName)) {
+			new Thread(new RefillAction(
+							switchbotController,
+							goveeController,
+							cluster.getPump(),
+							deviceModel,
+							deviceId,
+							cluster.getOutlet()))
+					.start();
+		}
 	}
 }
