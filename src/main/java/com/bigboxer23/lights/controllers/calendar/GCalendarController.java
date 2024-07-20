@@ -80,6 +80,7 @@ public class GCalendarController extends HubContext {
 				daylightController,
 				veraController,
 				openHABController);
+		fetchCalendarStatus();
 	}
 
 	private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
@@ -124,8 +125,8 @@ public class GCalendarController extends HubContext {
 			myOpenHABController.setVacationMode(findMatchingEvents("Vacation", anEvents, kVacationKeywords));
 			myOpenHABController.setPTOMode(findMatchingEvents("PTO", anEvents, kPTOKeywords));
 			myLogger.info("Calendar information fetched and parsed");
-		} catch (GeneralSecurityException | IOException theE) {
-			theE.printStackTrace();
+		} catch (GeneralSecurityException | IOException e) {
+			myLogger.error("fetchCalendarStatus:", e);
 		}
 	}
 
