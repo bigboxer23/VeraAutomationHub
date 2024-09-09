@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ public class SwitchBotController {
 	@Value("${switchbot_secret}")
 	private String secret;
 
-	private String curtainId;
+	private List<String> curtains;
 
 	private SwitchBotApi api;
 
@@ -48,19 +49,19 @@ public class SwitchBotController {
 		return api;
 	}
 
-	private String getCurtainId() throws IOException {
-		if (curtainId == null) {
+	private List<String> getCurtains() throws IOException {
+		if (curtains == null) {
 			logger.info("fetching curtain id");
-			curtainId = RetryingCommand.execute(
+			curtains = RetryingCommand.execute(
 					() -> getSwitchbotAPI().getDeviceApi().getDevices().stream()
 							.filter(device -> IDeviceTypes.CURTAIN.equals(device.getDeviceType()))
-							.filter(Device::isMaster)
-							.findAny()
+							/*.filter(Device::isMaster)
+							.findAny()*/
 							.map(Device::getDeviceId)
-							.orElse(null),
+							.toList(),
 					"CurtainIdFetch");
 		}
-		return curtainId;
+		return curtains;
 	}
 
 	@GetMapping(value = "/S/switchbot/openCurtain", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -71,14 +72,16 @@ public class SwitchBotController {
 	})
 	public void openCurtains() throws IOException {
 		logger.info("open curtain requested");
-		RetryingCommand.execute(
-				() -> {
-					getSwitchbotAPI()
-							.getDeviceApi()
-							.sendDeviceControlCommands(getCurtainId(), IDeviceCommands.CURTAIN_OPEN);
-					return null;
-				},
-				getCurtainId());
+		for (String curtainId : getCurtains()) {
+			RetryingCommand.execute(
+					() -> {
+						getSwitchbotAPI()
+								.getDeviceApi()
+								.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_OPEN);
+						return null;
+					},
+					curtainId);
+		}
 	}
 
 	@GetMapping(value = "/S/switchbot/closeCurtain", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -89,14 +92,16 @@ public class SwitchBotController {
 	})
 	public void closeCurtains() throws IOException {
 		logger.info("close curtain requested");
-		RetryingCommand.execute(
-				() -> {
-					getSwitchbotAPI()
-							.getDeviceApi()
-							.sendDeviceControlCommands(getCurtainId(), IDeviceCommands.CURTAIN_CLOSE);
-					return null;
-				},
-				getCurtainId());
+		for (String curtainId : getCurtains()) {
+			RetryingCommand.execute(
+					() -> {
+						getSwitchbotAPI()
+								.getDeviceApi()
+								.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_CLOSE);
+						return null;
+					},
+					curtainId);
+		}
 	}
 
 	private String getDeviceName(String deviceId) throws IOException {
