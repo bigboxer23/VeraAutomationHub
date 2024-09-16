@@ -30,7 +30,7 @@ public class FanSystemController {
 		this.switchbotController = switchbotController;
 	}
 
-	@Scheduled(fixedDelay = 3600000) // every 6 hours
+	@Scheduled(cron = "0 0 */6 * * *") // every 6 hours
 	public void runFans() throws IOException, InterruptedException {
 		logger.info("Turning on fan system");
 		RetryingCommand.execute(
