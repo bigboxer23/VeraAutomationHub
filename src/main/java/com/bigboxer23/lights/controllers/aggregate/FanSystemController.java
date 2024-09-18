@@ -3,22 +3,33 @@ package com.bigboxer23.lights.controllers.aggregate;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.utils.command.RetryingCommand;
+import com.bigboxer23.utils.file.FilePersistedBoolean;
 import com.bigboxer23.utils.time.ITimeConstants;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /** */
-@Controller
+@RestController
 public class FanSystemController {
 	private static final Logger logger = LoggerFactory.getLogger(FanSystemController.class);
 
 	/** id of the switchbot switch device */
 	@Value("${fanSwitchId}")
 	private String fanSwitchId;
+
+	private final FilePersistedBoolean disabled = new FilePersistedBoolean("FanService");
 
 	/** Minutes to run fan */
 	@Value("${fanDuration}")
@@ -32,6 +43,9 @@ public class FanSystemController {
 
 	@Scheduled(cron = "0 0 */6 * * *") // every 6 hours
 	public void runFans() throws IOException, InterruptedException {
+		if (disabled.get()) {
+			return;
+		}
 		logger.info("Turning on fan system");
 		RetryingCommand.execute(
 				() -> {
@@ -55,5 +69,20 @@ public class FanSystemController {
 					return null;
 				},
 				fanSwitchId);
+	}
+
+	@PostMapping(value = "/S/FanSystem/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "enable or disable the fan service")
+	@ApiResponses({
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
+	})
+	public void triggerHumidifierRefillAndRestart(
+			@Parameter(description = "Enable or disable the fan controller from running")
+					@PathVariable(value = "enable")
+					boolean enable) {
+		logger.info(enable + " fan system requested via web api");
+		disabled.set(!enable);
 	}
 }
