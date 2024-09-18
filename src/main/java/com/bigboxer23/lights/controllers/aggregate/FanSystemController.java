@@ -39,6 +39,7 @@ public class FanSystemController {
 
 	public FanSystemController(SwitchBotController switchbotController) {
 		this.switchbotController = switchbotController;
+		logger.info("FanSystemController initialized and enabled: " + !disabled.get());
 	}
 
 	@Scheduled(cron = "0 0 */6 * * *") // every 6 hours
@@ -72,8 +73,7 @@ public class FanSystemController {
 	}
 
 	@PostMapping(value = "/S/FanSystem/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@Operation(
-			summary = "enable or disable the fan service")
+	@Operation(summary = "enable or disable the fan service")
 	@ApiResponses({
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
