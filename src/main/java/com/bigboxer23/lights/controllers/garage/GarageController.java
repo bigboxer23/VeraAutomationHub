@@ -43,7 +43,7 @@ public class GarageController extends AbstractBaseController implements ITempera
 	public String doAction(
 			@Parameter(
 							description = "command to run.  Possible values [Open, Close, Status2,"
-									+ " SetAutoCloseDelay, DisableAutoClose]")
+									+ " SetAutoCloseDelay, DisableAutoClose, ToggleOpenClosed]")
 					@PathVariable(value = "command")
 					String command,
 			@Parameter(description = "used with SetAutoCloseDelay. Seconds to set delay for", required = false)
