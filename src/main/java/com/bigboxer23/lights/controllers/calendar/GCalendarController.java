@@ -29,10 +29,7 @@ import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -163,7 +160,8 @@ public class GCalendarController extends HubContext {
 					.truncatedTo(ChronoUnit.MINUTES)
 					.withMinute(30)
 					.withHour(22)
-					.atZone(ZoneId.of(event.getEnd().getTimeZone()))
+					.atZone(ZoneId.of(Optional.ofNullable(event.getEnd().getTimeZone())
+							.orElseGet(() -> ZoneId.systemDefault().getId())))
 					.toInstant());
 			boolean found = event.getEnd() != null
 					&& event.getEnd().getDateTime() != null
