@@ -26,8 +26,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +48,7 @@ import org.springframework.stereotype.Component;
 @Component
 @EnableAutoConfiguration
 public class GCalendarController extends HubContext {
-	private static final Logger myLogger = LoggerFactory.getLogger(GCalendarController.class);
+	private static final Logger logger = LoggerFactory.getLogger(GCalendarController.class);
 
 	private static final JsonFactory kJSON_FACTORY = GsonFactory.getDefaultInstance();
 
@@ -84,7 +88,7 @@ public class GCalendarController extends HubContext {
 	}
 
 	private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-		myLogger.info("Getting gCal creds");
+		logger.info("Getting gCal creds");
 		// Load client secrets.
 		InputStream aCredStream = GCalendarController.class.getResourceAsStream("/credentials.json");
 		GoogleClientSecrets aClientSecrets =
@@ -99,7 +103,7 @@ public class GCalendarController extends HubContext {
 				.setDataStoreFactory(new FileDataStoreFactory(new java.io.File("tokens")))
 				.setAccessType("offline")
 				.build();
-		myLogger.info("Starting local server receiver");
+		logger.info("Starting local server receiver");
 		return new AuthorizationCodeInstalledApp(
 						aFlow, new LocalServerReceiver.Builder().setPort(8890).build())
 				.authorize("user");
@@ -107,41 +111,68 @@ public class GCalendarController extends HubContext {
 
 	@Scheduled(cron = "0 0 0 ? * *") // Run every day at 12am
 	private void fetchCalendarStatus() {
-		myLogger.info("Fetching calendar information");
+		logger.info("Fetching calendar information");
 		try {
 			NetHttpTransport aTransport = GoogleNetHttpTransport.newTrustedTransport();
 			Calendar aCalendar = new Calendar.Builder(aTransport, kJSON_FACTORY, getCredentials(aTransport))
 					.setApplicationName("Calendar Fetch")
 					.build();
-			Events anEvents = aCalendar
+			Date dayStart = Date.from(LocalDateTime.now()
+					.truncatedTo(ChronoUnit.MINUTES)
+					.withMinute(0)
+					.withHour(0)
+					.atZone(ZoneId.systemDefault())
+					.toInstant());
+
+			Events events = aCalendar
 					.events()
 					.list("primary")
 					.setMaxResults(25)
-					.setTimeMin(new DateTime(System.currentTimeMillis()))
-					.setTimeMax(new DateTime(System.currentTimeMillis() + 86400000)) // +1 day
+					.setTimeMin(new DateTime(dayStart.getTime()))
+					.setTimeMax(new DateTime(dayStart.getTime() + 86400000)) // +1 day
 					.setOrderBy("startTime")
 					.setSingleEvents(true)
 					.execute();
-			myOpenHABController.setVacationMode(findMatchingEvents("Vacation", anEvents, kVacationKeywords));
-			myOpenHABController.setPTOMode(findMatchingEvents("PTO", anEvents, kPTOKeywords));
-			myLogger.info("Calendar information fetched and parsed");
+			myOpenHABController.setVacationMode(findMatchingEvents("Vacation", events, kVacationKeywords));
+			myOpenHABController.setPTOMode(findMatchingEvents("PTO", events, kPTOKeywords));
+			myOpenHABController.setExtendedEveningMode(findLateEvents(events));
+			logger.info("Calendar information fetched and parsed");
 		} catch (GeneralSecurityException | IOException e) {
-			myLogger.error("fetchCalendarStatus:", e);
+			logger.error("fetchCalendarStatus:", e);
 		}
 	}
 
 	private boolean findMatchingEvents(String theType, Events theEvents, List<String> theKeywords) {
 		return theEvents.getItems().stream()
 				.anyMatch(theEvent -> theKeywords.stream().anyMatch(theWord -> {
-					myLogger.debug(theEvent.getSummary());
+					logger.debug(theEvent.getSummary());
 					boolean aFound = (theEvent.getSummary() != null
 									&& theEvent.getSummary().toLowerCase().contains(theWord))
 							|| (theEvent.getDescription() != null
 									&& theEvent.getDescription().toLowerCase().contains(theWord));
 					if (aFound) {
-						myLogger.warn(theType + " enabled: " + theEvent.getSummary());
+						logger.warn(theType + " enabled: " + theEvent.getSummary());
 					}
 					return aFound;
 				}));
+	}
+
+	private boolean findLateEvents(Events events) {
+		return events.getItems().stream().anyMatch(event -> {
+			Date tenThirty = Date.from(LocalDateTime.now()
+					.truncatedTo(ChronoUnit.MINUTES)
+					.withMinute(30)
+					.withHour(22)
+					.atZone(ZoneId.of(event.getEnd().getTimeZone()))
+					.toInstant());
+			boolean found = event.getEnd() != null
+					&& event.getEnd().getDateTime() != null
+					&& event.getEnd().getDateTime().getValue()
+							>= tenThirty.toInstant().toEpochMilli();
+			if (found) {
+				logger.warn("findLateEvents enabled: " + event.getSummary());
+			}
+			return found;
+		});
 	}
 }

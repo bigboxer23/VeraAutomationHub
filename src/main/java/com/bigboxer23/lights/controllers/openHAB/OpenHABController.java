@@ -99,6 +99,10 @@ public class OpenHABController extends AbstractBaseController {
 		setModeFromCalendar(thePTOMode, "IsPTO");
 	}
 
+	public void setExtendedEveningMode(boolean extendedEveningMode) {
+		setModeFromCalendar(extendedEveningMode, "IsExtendedEvening");
+	}
+
 	private void setModeFromCalendar(boolean theMode, String theDevice) {
 		myLogger.info(theDevice + " requested: " + theMode);
 		doAction(theDevice, theMode ? "ON" : "OFF");
