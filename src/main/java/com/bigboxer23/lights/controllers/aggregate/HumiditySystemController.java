@@ -139,6 +139,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 			logger.warn("No cluster for " + deviceId);
 			return;
 		}
+		logger.info("Out of water event triggered " + deviceName + ":" + deviceId);
 		if (!goveeController.isLastEventRecent(deviceId, deviceName)) {
 			new Thread(new RefillAction(
 							switchbotController,
