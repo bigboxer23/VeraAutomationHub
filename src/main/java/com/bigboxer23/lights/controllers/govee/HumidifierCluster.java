@@ -14,4 +14,6 @@ public class HumidifierCluster {
 	private String outlet;
 
 	private String humiditySensor;
+
+	private int lowHumidityPoint = 60;
 }
