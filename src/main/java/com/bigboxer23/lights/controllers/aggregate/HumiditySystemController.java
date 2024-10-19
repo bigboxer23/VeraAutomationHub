@@ -92,8 +92,8 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 										.getHumidity(),
 								cluster.getHumiditySensor());
 						logger.info(cluster.getHumiditySensor() + " humidity " + humidity);
-						if (humidity < 60) {
-							logger.info("low humidity detected");
+						if (humidity < cluster.getLowHumidityPoint()) {
+							logger.info("low humidity detected " + humidity + ":" + cluster.getLowHumidityPoint());
 							float watts = RetryingCommand.execute(
 									() -> switchbotController
 											.getSwitchbotAPI()
@@ -107,7 +107,8 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 							}
 							outOfWaterEvent(
 									cluster.getHumidifier(), cluster.getHumidifier(), cluster.getHumidifierModel());
-						} else if (humidity > 73) {
+						} else if (humidity > 73) { // Govee seems to have a bug where the humidifier
+							// doesn't turn off, so we manually cycle again
 							float watts = RetryingCommand.execute(
 									() -> switchbotController
 											.getSwitchbotAPI()
