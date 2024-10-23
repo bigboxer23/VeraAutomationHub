@@ -43,6 +43,8 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 	@Value("${humidfier_to_pump_map}")
 	private String MAP_KEY;
 
+	private int HUMIDIFIER_RUNNING_WATTAGE = 10;
+
 	public HumiditySystemController(
 			SwitchBotController switchbotController, GoveeHumidifierController goveeController) {
 		this.switchbotController = switchbotController;
@@ -101,7 +103,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 											.getDeviceStatus(cluster.getOutlet())
 											.getWatts(),
 									cluster.getOutlet());
-							if (watts > 3) {
+							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
 								logger.info("humidifier is running, detected wattage: " + watts);
 								return;
 							}
@@ -116,7 +118,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 											.getDeviceStatus(cluster.getOutlet())
 											.getWatts(),
 									cluster.getOutlet());
-							if (watts > 10) {
+							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
 								logger.info("humidifier should not be running, humidify is too"
 										+ " high "
 										+ watts
