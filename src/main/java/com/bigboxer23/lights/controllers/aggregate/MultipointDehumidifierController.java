@@ -63,7 +63,7 @@ public class MultipointDehumidifierController implements InitializingBean {
 								.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_ON);
 						return null;
 					},
-					dehumidifierId);
+					switchbotController.getIdentifier(dehumidifierId));
 		} else if (humidity < lowHumidity && isHumidifierPowerOn()) {
 			logger.info("turning off dehumidifier " + dehumidifierId);
 			RetryingCommand.execute(
@@ -74,7 +74,7 @@ public class MultipointDehumidifierController implements InitializingBean {
 								.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_OFF);
 						return null;
 					},
-					dehumidifierId);
+					switchbotController.getIdentifier(dehumidifierId));
 		}
 	}
 
@@ -84,7 +84,7 @@ public class MultipointDehumidifierController implements InitializingBean {
 								.getSwitchbotAPI()
 								.getDeviceApi()
 								.getDeviceStatus(dehumidifierId),
-						dehumidifierId)
+						switchbotController.getIdentifier(dehumidifierId))
 				.isPowerOn();
 	}
 
@@ -98,7 +98,7 @@ public class MultipointDehumidifierController implements InitializingBean {
 										.getSwitchbotAPI()
 										.getDeviceApi()
 										.getDeviceStatus(id),
-								id);
+								switchbotController.getIdentifier(id));
 					} catch (IOException e) {
 						logger.error("", e);
 						throw new RuntimeException(e);
