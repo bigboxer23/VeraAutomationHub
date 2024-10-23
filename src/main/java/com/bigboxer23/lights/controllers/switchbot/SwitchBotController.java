@@ -13,8 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,14 +37,21 @@ public class SwitchBotController {
 
 	private SwitchBotApi api;
 
-	private Map<String, String> deviceIdToName;
-
 	public SwitchBotApi getSwitchbotAPI() throws IOException {
 		if (api == null) {
 			logger.info("initializing switchbot API");
 			api = SwitchBotApi.getInstance(token, secret);
 		}
 		return api;
+	}
+
+	public String getIdentifier(String deviceId) {
+		try {
+			deviceId = deviceId + ":" + getSwitchbotAPI().getDeviceApi().getDeviceNameFromId(deviceId);
+		} catch (IOException e) {
+			logger.error("getIdentifier", e);
+		}
+		return deviceId;
 	}
 
 	private List<String> getCurtains() throws IOException {
@@ -80,7 +85,7 @@ public class SwitchBotController {
 								.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_OPEN);
 						return null;
 					},
-					curtainId);
+					getIdentifier(curtainId));
 		}
 	}
 
@@ -100,19 +105,8 @@ public class SwitchBotController {
 								.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_CLOSE);
 						return null;
 					},
-					curtainId);
+					getIdentifier(curtainId));
 		}
-	}
-
-	private String getDeviceName(String deviceId) throws IOException {
-		if (deviceIdToName == null || !deviceIdToName.containsKey(deviceId)) {
-			logger.info("refreshing device id to name map");
-			deviceIdToName = RetryingCommand.execute(
-					() -> getSwitchbotAPI().getDeviceApi().getDevices().stream()
-							.collect(Collectors.toMap(Device::getDeviceId, Device::getDeviceName)),
-					"list devices");
-		}
-		return deviceIdToName.get(deviceId);
 	}
 
 	@GetMapping(value = "/S/switchbot/plugmini/{deviceId}/{command}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -127,7 +121,7 @@ public class SwitchBotController {
 					@PathVariable(value = "command")
 					String command)
 			throws IOException, InterruptedException {
-		logger.info(getDeviceName(deviceId) + ":" + deviceId + ": " + command + " plug-mini requested");
+		logger.info(getIdentifier(deviceId) + ": " + command + " plug-mini requested");
 		RetryingCommand.execute(
 				() -> {
 					getSwitchbotAPI()
@@ -140,6 +134,6 @@ public class SwitchBotController {
 
 					return null;
 				},
-				deviceId);
+				getIdentifier(deviceId));
 	}
 }

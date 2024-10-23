@@ -92,7 +92,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 										.getDeviceApi()
 										.getDeviceStatus(cluster.getHumiditySensor())
 										.getHumidity(),
-								cluster.getHumiditySensor());
+								switchbotController.getIdentifier(cluster.getHumiditySensor()));
 						logger.info(cluster.getHumiditySensor() + " humidity " + humidity);
 						if (humidity < cluster.getLowHumidityPoint()) {
 							logger.info("low humidity detected " + humidity + ":" + cluster.getLowHumidityPoint());
@@ -102,7 +102,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 											.getDeviceApi()
 											.getDeviceStatus(cluster.getOutlet())
 											.getWatts(),
-									cluster.getOutlet());
+									switchbotController.getIdentifier(cluster.getOutlet()));
 							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
 								logger.info("humidifier is running, detected wattage: " + watts);
 								return;
@@ -117,7 +117,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 											.getDeviceApi()
 											.getDeviceStatus(cluster.getOutlet())
 											.getWatts(),
-									cluster.getOutlet());
+									switchbotController.getIdentifier(cluster.getOutlet()));
 							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
 								logger.info("humidifier should not be running, humidify is too"
 										+ " high "

@@ -42,7 +42,7 @@ public class FanSystemController {
 		logger.info("FanSystemController initialized and enabled: " + !disabled.get());
 	}
 
-	@Scheduled(cron = "0 0 */4 * * *") // every 6 hours
+	@Scheduled(cron = "0 0 */2 * * *") // every 2 hours
 	public void runFans() throws IOException, InterruptedException {
 		if (disabled.get()) {
 			return;
@@ -56,7 +56,7 @@ public class FanSystemController {
 							.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_ON);
 					return null;
 				},
-				fanSwitchId);
+				switchbotController.getIdentifier(fanSwitchId));
 
 		logger.debug("sleeping fan system controller");
 		Thread.sleep(fanDuration * ITimeConstants.MINUTE);
@@ -69,7 +69,7 @@ public class FanSystemController {
 							.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_OFF);
 					return null;
 				},
-				fanSwitchId);
+				switchbotController.getIdentifier(fanSwitchId));
 	}
 
 	@PostMapping(value = "/S/FanSystem/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
