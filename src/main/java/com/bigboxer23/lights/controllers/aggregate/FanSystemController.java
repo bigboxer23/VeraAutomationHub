@@ -42,7 +42,7 @@ public class FanSystemController {
 		logger.info("FanSystemController initialized and enabled: " + !disabled.get());
 	}
 
-	@Scheduled(cron = "0 0 */2 * * *") // every 2 hours
+	@Scheduled(cron = "0 0 */1 * * *") // every hour
 	public void runFans() throws IOException, InterruptedException {
 		if (disabled.get()) {
 			return;
