@@ -7,6 +7,7 @@ import com.bigboxer23.govee.data.GoveeDeviceStatusRequest;
 import com.bigboxer23.govee.data.GoveeEvent;
 import com.bigboxer23.lights.controllers.aggregate.IHumidityEventHandler;
 import com.bigboxer23.utils.mail.MailSender;
+import com.bigboxer23.utils.time.ITimeConstants;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ public class GoveeHumidifierController implements InitializingBean {
 	private static final Logger logger = LoggerFactory.getLogger(GoveeHumidifierController.class);
 
 	private final Map<String, Long> goveeEvents = new HashMap<>();
+	private final Map<String, Long> mailSent = new HashMap<>();
 
 	private final List<IHumidityEventHandler> handlers = new ArrayList<>();
 
@@ -76,18 +78,22 @@ public class GoveeHumidifierController implements InitializingBean {
 	}
 
 	public boolean isLastEventRecent(String deviceId, String deviceName) {
-		Long lastEvent = goveeEvents.get(deviceId);
-		goveeEvents.put(deviceId, System.currentTimeMillis() + (1000 * 60 * 15)); // 15min
-		boolean isRecent = lastEvent != null && System.currentTimeMillis() <= lastEvent;
+		Long lastEvent = goveeEvents.getOrDefault(deviceId, Long.MIN_VALUE);
+		goveeEvents.put(deviceId, System.currentTimeMillis() + ITimeConstants.FIFTEEN_MINUTES);
+		boolean isRecent = System.currentTimeMillis() <= lastEvent;
 		if (isRecent) {
 			logger.error("govee event recent " + lastEvent + ":" + System.currentTimeMillis());
-			MailSender.sendGmail(
-					toEmail,
-					fromEmail,
-					fromPassword,
-					deviceName + "  reservoir may be empty",
-					"Reservoir for " + deviceName + " may be empty, please check & fill.",
-					null);
+			Long lastMailEvent = mailSent.getOrDefault(deviceId, Long.MIN_VALUE);
+			mailSent.put(deviceId, System.currentTimeMillis() + ITimeConstants.HOUR);
+			if (System.currentTimeMillis() > lastMailEvent) {
+				MailSender.sendGmail(
+						toEmail,
+						fromEmail,
+						fromPassword,
+						deviceName + "  reservoir may be empty",
+						"Reservoir for " + deviceName + " may be empty, please check & fill.",
+						null);
+			}
 		}
 		return isRecent;
 	}
