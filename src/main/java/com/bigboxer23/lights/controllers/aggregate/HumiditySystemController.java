@@ -110,7 +110,12 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 								return;
 							}
 							outOfWaterEvent(
-									cluster.getHumidifier(), cluster.getHumidifier(), cluster.getHumidifierModel());
+									cluster.getHumidifier(),
+									switchbotController
+											.getSwitchbotAPI()
+											.getDeviceApi()
+											.getDeviceNameFromId(cluster.getHumidifier()),
+									cluster.getHumidifierModel());
 						} else if (humidity > 73) { // Govee seems to have a bug where the humidifier
 							// doesn't turn off, so we manually cycle again
 							float watts = RetryingCommand.execute(
@@ -144,7 +149,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 			logger.warn("No cluster for " + deviceId);
 			return;
 		}
-		logger.info("Out of water event triggered " + deviceName + ":" + deviceId);
+		logger.info("Out of water event triggered " + deviceName + " : " + deviceId);
 		if (!goveeController.isLastEventRecent(deviceId, deviceName)) {
 			new Thread(new RefillAction(
 							switchbotController,
