@@ -97,4 +97,8 @@ public class GoveeHumidifierController implements InitializingBean {
 		}
 		return isRecent;
 	}
+
+	public String getDeviceNameFromId(String deviceId) {
+		return GoveeApi.getInstance(API_KEY).getDeviceNameFromId(deviceId);
+	}
 }

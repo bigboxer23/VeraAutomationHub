@@ -2,6 +2,7 @@ package com.bigboxer23.lights.controllers.aggregate;
 
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
+import com.bigboxer23.switch_bot.data.IApiResponse;
 import com.bigboxer23.utils.command.RetryingCommand;
 import com.bigboxer23.utils.file.FilePersistedBoolean;
 import com.bigboxer23.utils.time.ITimeConstants;
@@ -42,7 +43,7 @@ public class FanSystemController {
 		logger.info("FanSystemController initialized and enabled: " + !disabled.get());
 	}
 
-	@Scheduled(cron = "0 0 */1 * * *") // every hour
+	@Scheduled(cron = "0 */15 * * * *") // every hour
 	public void runFans() throws IOException, InterruptedException {
 		if (disabled.get()) {
 			return;
@@ -50,7 +51,7 @@ public class FanSystemController {
 		logger.info("Turning on fan system");
 		RetryingCommand.execute(
 				() -> {
-					switchbotController
+					IApiResponse response = switchbotController
 							.getSwitchbotAPI()
 							.getDeviceApi()
 							.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_ON);
