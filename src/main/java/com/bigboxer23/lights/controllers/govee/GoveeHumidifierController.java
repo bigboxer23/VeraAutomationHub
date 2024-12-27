@@ -101,4 +101,8 @@ public class GoveeHumidifierController implements InitializingBean {
 	public String getDeviceNameFromId(String deviceId) {
 		return GoveeApi.getInstance(API_KEY).getDeviceNameFromId(deviceId);
 	}
+
+	public String getIdentifier(String deviceId) {
+		return deviceId + ":" + getDeviceNameFromId(deviceId);
+	}
 }
