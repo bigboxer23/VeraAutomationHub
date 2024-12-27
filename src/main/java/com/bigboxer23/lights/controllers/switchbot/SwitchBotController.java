@@ -56,7 +56,6 @@ public class SwitchBotController {
 
 	private List<String> getCurtains() throws IOException {
 		if (curtains == null) {
-			logger.info("fetching curtain id");
 			curtains = RetryingCommand.execute(
 					() -> getSwitchbotAPI().getDeviceApi().getDevices().stream()
 							.filter(device -> IDeviceTypes.CURTAIN.equals(device.getDeviceType()))
@@ -64,7 +63,7 @@ public class SwitchBotController {
 							.findAny()*/
 							.map(Device::getDeviceId)
 							.toList(),
-					"CurtainIdFetch");
+					"Fetching CurtainIdFetch");
 		}
 		return curtains;
 	}
@@ -76,7 +75,6 @@ public class SwitchBotController {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public void openCurtains() throws IOException {
-		logger.info("open curtain requested");
 		for (String curtainId : getCurtains()) {
 			RetryingCommand.execute(
 					() -> {
@@ -85,7 +83,7 @@ public class SwitchBotController {
 								.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_OPEN);
 						return null;
 					},
-					getIdentifier(curtainId));
+					"Open " + getIdentifier(curtainId));
 		}
 	}
 
@@ -96,7 +94,6 @@ public class SwitchBotController {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public void closeCurtains() throws IOException {
-		logger.info("close curtain requested");
 		for (String curtainId : getCurtains()) {
 			RetryingCommand.execute(
 					() -> {
@@ -105,7 +102,7 @@ public class SwitchBotController {
 								.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_CLOSE);
 						return null;
 					},
-					getIdentifier(curtainId));
+					"Close " + getIdentifier(curtainId));
 		}
 	}
 
@@ -121,7 +118,6 @@ public class SwitchBotController {
 					@PathVariable(value = "command")
 					String command)
 			throws IOException, InterruptedException {
-		logger.info(getIdentifier(deviceId) + ": " + command + " plug-mini requested");
 		RetryingCommand.execute(
 				() -> {
 					getSwitchbotAPI()
@@ -134,6 +130,6 @@ public class SwitchBotController {
 
 					return null;
 				},
-				getIdentifier(deviceId));
+				command + " " + getIdentifier(deviceId));
 	}
 }

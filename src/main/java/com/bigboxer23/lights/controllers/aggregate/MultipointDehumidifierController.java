@@ -54,7 +54,6 @@ public class MultipointDehumidifierController implements InitializingBean {
 		double humidity = getHumidity();
 		logger.info("humidity: " + humidity);
 		if (humidity > highHumidity && !isHumidifierPowerOn()) {
-			logger.info("turning on dehumidifier " + dehumidifierId);
 			RetryingCommand.execute(
 					() -> {
 						switchbotController
@@ -63,9 +62,8 @@ public class MultipointDehumidifierController implements InitializingBean {
 								.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_ON);
 						return null;
 					},
-					switchbotController.getIdentifier(dehumidifierId));
+					"On " + switchbotController.getIdentifier(dehumidifierId));
 		} else if (humidity < lowHumidity && isHumidifierPowerOn()) {
-			logger.info("turning off dehumidifier " + dehumidifierId);
 			RetryingCommand.execute(
 					() -> {
 						switchbotController
@@ -74,7 +72,7 @@ public class MultipointDehumidifierController implements InitializingBean {
 								.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_OFF);
 						return null;
 					},
-					switchbotController.getIdentifier(dehumidifierId));
+					"Off " + switchbotController.getIdentifier(dehumidifierId));
 		}
 	}
 
@@ -84,12 +82,11 @@ public class MultipointDehumidifierController implements InitializingBean {
 								.getSwitchbotAPI()
 								.getDeviceApi()
 								.getDeviceStatus(dehumidifierId),
-						switchbotController.getIdentifier(dehumidifierId))
+						"Get power " + switchbotController.getIdentifier(dehumidifierId))
 				.isPowerOn();
 	}
 
 	private double getHumidity() {
-		logger.debug("checking humidity");
 		return sensorIds.stream()
 				.map(id -> {
 					try {
@@ -98,9 +95,9 @@ public class MultipointDehumidifierController implements InitializingBean {
 										.getSwitchbotAPI()
 										.getDeviceApi()
 										.getDeviceStatus(id),
-								switchbotController.getIdentifier(id));
+								"Get humidity " + switchbotController.getIdentifier(id));
 					} catch (IOException e) {
-						logger.error("", e);
+						logger.error("getHumidity", e);
 						throw new RuntimeException(e);
 					}
 				})
