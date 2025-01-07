@@ -59,7 +59,8 @@ public class SceneStatusServlet extends HubContext {
 			MeuralController meuralController,
 			ElasticAnalyticsController elasticAnalyticsController,
 			ClimateController climateController,
-			HueV2Controller hueController, EconetController econetController) {
+			HueV2Controller hueController,
+			EconetController econetController) {
 		super(
 				garageController,
 				frontDoorController,

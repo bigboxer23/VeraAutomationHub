@@ -10,12 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
-/**
- *
- */
+/** */
 @Controller
-public class EconetController
-{
+public class EconetController {
 	private static final Logger logger = LoggerFactory.getLogger(EconetController.class);
 
 	private EcoNetAPI ecoNetAPI;
@@ -36,12 +33,13 @@ public class EconetController
 		return ecoNetAPI;
 	}
 
-	@Scheduled(fixedDelay = 30000) //5min
+	@Scheduled(fixedDelay = 30000) // 5min
 	private void fetchWaterHeaterStatus() {
 		try {
 			logger.debug("Fetching water heater status...");
 			getEcoNetAPI().fetchUserData().ifPresent(data -> {
-				Equipment equipment = data.getResults().getLocations().get(0).getEquipments().get(0);
+				Equipment equipment =
+						data.getResults().getLocations().get(0).getEquipments().get(0);
 				waterHeaterData.setHumidity(equipment.getTankStatus());
 				waterHeaterData.setLevel(equipment.getCompressorStatus());
 			});
@@ -55,7 +53,8 @@ public class EconetController
 		if (waterHeaterData != null && house != null && house.getRooms() != null) {
 			house.getRooms().stream()
 					.filter(room -> room.getName().equals("Climate"))
-					.findAny().ifPresent(room -> room.addDevice(waterHeaterData));
+					.findAny()
+					.ifPresent(room -> room.addDevice(waterHeaterData));
 		}
 	}
 }
