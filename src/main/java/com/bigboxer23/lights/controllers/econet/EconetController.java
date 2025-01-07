@@ -42,6 +42,7 @@ public class EconetController {
 						data.getResults().getLocations().get(0).getEquipments().get(0);
 				waterHeaterData.setHumidity(equipment.getTankStatus());
 				waterHeaterData.setLevel(equipment.getCompressorStatus());
+				waterHeaterData.setTemperature(equipment.getSetpoint().getValue() + "");
 			});
 			logger.debug("Fetched water heater status...");
 		} catch (Exception e) {
