@@ -2,8 +2,10 @@ package com.bigboxer23.lights.controllers.econet;
 
 import com.bigboxer23.eco_net.EcoNetAPI;
 import com.bigboxer23.eco_net.data.Equipment;
+import com.bigboxer23.eco_net.data.ValueHolder;
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
+import java.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +35,7 @@ public class EconetController {
 		return ecoNetAPI;
 	}
 
-	@Scheduled(fixedDelay = 30000) // 5min
+	@Scheduled(fixedDelay = 300000) // 5min
 	private void fetchWaterHeaterStatus() {
 		try {
 			logger.debug("Fetching water heater status...");
@@ -43,6 +45,20 @@ public class EconetController {
 				waterHeaterData.setHumidity(equipment.getTankStatus());
 				waterHeaterData.setLevel(equipment.getCompressorStatus());
 				waterHeaterData.setTemperature(equipment.getSetpoint().getValue() + "");
+				LocalDate today = LocalDate.now();
+				getEcoNetAPI()
+						.fetchEnergyUsage(
+								equipment.getDeviceName(),
+								equipment.getSerialNumber(),
+								today.getDayOfMonth(),
+								today.getMonthValue(),
+								today.getYear())
+						.ifPresent(energyUsage -> {
+							float kwh = energyUsage.getResults().getEnergyUsage().getData().stream()
+									.map(ValueHolder::getValue)
+									.reduce(0.0f, Float::sum);
+							waterHeaterData.setLevel(kwh + "");
+						});
 			});
 			logger.debug("Fetched water heater status...");
 		} catch (Exception e) {
