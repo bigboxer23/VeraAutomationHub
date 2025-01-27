@@ -2,6 +2,7 @@ package com.bigboxer23.lights.controllers.openHAB;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
+import java.util.Optional;
 
 /** An OpenHAB device (item) */
 public class OpenHABItem {
@@ -47,7 +48,20 @@ public class OpenHABItem {
 		} else if (myType.equalsIgnoreCase("switch")) {
 			return myState.equalsIgnoreCase("off") || myState.equalsIgnoreCase("NULL") ? "0" : "1";
 		}
+		if (myType.equalsIgnoreCase("group")
+				&& myName.toLowerCase().contains("motion")
+				&& myItems.stream().anyMatch(item -> getItemIdentifier(item).equalsIgnoreCase(myLabel + " sensor"))) {
+			return myItems.stream()
+					.filter(item -> getItemIdentifier(item).equalsIgnoreCase(myLabel + " sensor"))
+					.findAny()
+					.map(OpenHABItem::getState)
+					.orElse(myState);
+		}
 		return myState;
+	}
+
+	private String getItemIdentifier(OpenHABItem item) {
+		return Optional.ofNullable(item.getLabel()).orElse(item.getName());
 	}
 
 	public int getIntLevel() {
