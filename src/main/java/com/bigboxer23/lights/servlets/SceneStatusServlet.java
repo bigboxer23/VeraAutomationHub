@@ -18,8 +18,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.HttpURLConnection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.MediaType;
@@ -32,8 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableAutoConfiguration
 @Tag(name = "Scene Status", description = "Return a JSON object that describes the state of all the house's items")
 public class SceneStatusServlet extends HubContext {
-	private static final Logger myLogger = LoggerFactory.getLogger(SceneStatusServlet.class);
-
 	private long myLastUpdate = -1;
 
 	@Value("${scene.update.interval}")

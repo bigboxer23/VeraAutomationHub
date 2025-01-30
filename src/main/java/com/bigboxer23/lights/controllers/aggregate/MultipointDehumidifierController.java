@@ -7,8 +7,7 @@ import com.bigboxer23.utils.command.RetryingCommand;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,21 +18,28 @@ import org.springframework.stereotype.Component;
  * will turn on or off a switchbot smart switch which should be connected to a dehumidifier based on
  * the reading and defined low/high values of RH
  */
+@Slf4j
 @Component
 public class MultipointDehumidifierController implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(MultipointDehumidifierController.class);
-
 	@Value("${dehumidifierId}")
 	private String dehumidifierId;
 
 	@Value("${sensorIds}")
 	private String sensorIdString;
 
-	@Value("${lowHumidity}")
+	@Value("${dehumidifierLowHumidity}")
 	private float lowHumidity;
 
-	@Value("${highHumidity}")
+	@Value("${dehumidifierHighHumidity}")
 	private float highHumidity;
+
+	@Value("${humidifierLowHumidity}")
+	private float humidifierLowHumidity;
+
+	@Value("${humidifierHighHumidity}")
+	private float humidifierHighHumidity;
+
+	private boolean humidityMode = true;
 
 	private List<String> sensorIds;
 
@@ -41,7 +47,7 @@ public class MultipointDehumidifierController implements InitializingBean {
 
 	public MultipointDehumidifierController(SwitchBotController switchbotController) {
 		this.switchbotController = switchbotController;
-		logger.info("MultipointDehumidifierController initialized");
+		log.info("MultipointDehumidifierController initialized");
 	}
 
 	@Override
@@ -52,7 +58,39 @@ public class MultipointDehumidifierController implements InitializingBean {
 	@Scheduled(fixedDelay = 300000) // 5min
 	private void checkHumidity() throws IOException {
 		double humidity = getHumidity();
-		logger.info("humidity: " + humidity);
+		log.info("humidity: " + humidity);
+		if (humidityMode) {
+			humidifierImpl(humidity);
+			return;
+		}
+		dehumidifierImpl(humidity);
+	}
+
+	private void humidifierImpl(double humidity) throws IOException {
+		if (humidity > humidifierHighHumidity && isHumidifierPowerOn()) {
+			RetryingCommand.execute(
+					() -> {
+						switchbotController
+								.getSwitchbotAPI()
+								.getDeviceApi()
+								.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_OFF);
+						return null;
+					},
+					"Off " + switchbotController.getIdentifier(dehumidifierId));
+		} else if (humidity < humidifierLowHumidity && !isHumidifierPowerOn()) {
+			RetryingCommand.execute(
+					() -> {
+						switchbotController
+								.getSwitchbotAPI()
+								.getDeviceApi()
+								.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_ON);
+						return null;
+					},
+					"On " + switchbotController.getIdentifier(dehumidifierId));
+		}
+	}
+
+	private void dehumidifierImpl(double humidity) throws IOException {
 		if (humidity > highHumidity && !isHumidifierPowerOn()) {
 			RetryingCommand.execute(
 					() -> {
@@ -97,7 +135,7 @@ public class MultipointDehumidifierController implements InitializingBean {
 										.getDeviceStatus(id),
 								"Get humidity " + switchbotController.getIdentifier(id));
 					} catch (IOException e) {
-						logger.error("getHumidity", e);
+						log.error("getHumidity", e);
 						throw new RuntimeException(e);
 					}
 				})

@@ -7,14 +7,12 @@ import com.bigboxer23.utils.http.OkHttpUtil;
 import com.google.gson.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** controller for a philips hue light system */
+@Slf4j
 public class HueController implements ISystemController {
-	private static final Logger myLogger = LoggerFactory.getLogger(HueController.class);
-
 	/** Username to access lights with */
 	private static final String kUserName = System.getProperty("hueUserName", "test");
 
@@ -114,13 +112,13 @@ public class HueController implements ISystemController {
 	 */
 	private void getAllLightsCache() {
 		if (myStatusObject == null || (System.currentTimeMillis() - myStatusTime) > kCachingDelay) {
-			myLogger.trace("Getting new status");
+			log.trace("Getting new status");
 			myStatusTime = System.currentTimeMillis();
 			try {
 				OkHttpUtil.get(getBaseUrl() + "/lights/", new OkHttpCallback() {
 					@Override
 					public void onResponseBodyString(Call call, String stringBody) {
-						myLogger.trace("Status: " + stringBody);
+						log.trace("Status: " + stringBody);
 						myStatusObject = JsonParser.parseString(stringBody);
 					}
 				});

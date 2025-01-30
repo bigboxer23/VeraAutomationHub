@@ -1,6 +1,5 @@
 package com.bigboxer23.lights.controllers.frontdoor;
 
-import com.bigboxer23.lights.controllers.AbstractBaseController;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.utils.http.OkHttpCallback;
 import com.bigboxer23.utils.http.OkHttpUtil;
@@ -11,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.HttpURLConnection;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -20,9 +20,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 /** */
+@Slf4j
 @Tag(name = "Front Door Controller", description = "Service to control the front door camera")
 @RestController
-public class FrontDoorController extends AbstractBaseController {
+public class FrontDoorController {
 	@Value("${frontDoor.url}")
 	private String myFrontDoorURL;
 
@@ -43,12 +44,12 @@ public class FrontDoorController extends AbstractBaseController {
 	})
 	public String doAction(
 			@Parameter(description = "time in seconds to pause") @PathVariable(value = "delay") Long delay) {
-		myLogger.info("front door change requested: " + delay);
+		log.info("front door change requested: " + delay);
 		OkHttpUtil.get(myFrontDoorURL + "/pause/" + delay, new OkHttpCallback() {
 			public void onResponseBodyString(Call call, String responseBody) {
 				myFrontDoorPauseTime =
 						Optional.ofNullable(responseBody).map(Integer::parseInt).orElse(0);
-				myLogger.info("front door changed");
+				log.info("front door changed");
 			}
 		});
 		return null;
@@ -56,13 +57,13 @@ public class FrontDoorController extends AbstractBaseController {
 
 	@Scheduled(fixedDelay = 10000)
 	private void fetchFrontDoorStatus() {
-		myLogger.debug("Fetching front door status");
+		log.debug("Fetching front door status");
 		OkHttpUtil.get(myFrontDoorURL + "/isPaused", new OkHttpCallback() {
 			@Override
 			public void onResponseBodyString(Call call, String responseBody) {
 				myFrontDoorPauseTime =
 						Optional.ofNullable(responseBody).map(Integer::parseInt).orElse(0);
-				myLogger.debug("Fetched front door status " + myFrontDoorPauseTime);
+				log.debug("Fetched front door status " + myFrontDoorPauseTime);
 			}
 		});
 	}

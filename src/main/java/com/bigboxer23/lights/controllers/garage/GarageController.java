@@ -1,10 +1,10 @@
 package com.bigboxer23.lights.controllers.garage;
 
-import com.bigboxer23.lights.controllers.AbstractBaseController;
 import com.bigboxer23.lights.controllers.ITemperatureController;
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.lights.data.WeatherData;
+import com.bigboxer23.lights.util.GsonUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,9 +23,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Control garage pi */
+@Slf4j
 @Tag(name = "Garage Controller", description = "Service to control the garage door pi")
 @RestController
-public class GarageController extends AbstractBaseController implements ITemperatureController {
+public class GarageController implements ITemperatureController {
 	@Value("${garage.url}")
 	private String myGarageURL;
 
@@ -49,8 +51,9 @@ public class GarageController extends AbstractBaseController implements ITempera
 			@Parameter(description = "used with SetAutoCloseDelay. Seconds to set delay for", required = false)
 					@PathVariable(value = "delay", required = false)
 					Long delay) {
-		myLogger.info("Garage Door change requested: " + command);
-		myGarageData = fromJson(myGarageURL + "/" + command + (delay != null ? "/" + delay : ""), VeraDeviceVO.class);
+		log.info("Garage Door change requested: " + command);
+		myGarageData =
+				GsonUtil.fromJson(myGarageURL + "/" + command + (delay != null ? "/" + delay : ""), VeraDeviceVO.class);
 		myGarageData.setName("Garage Opener");
 		myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
 		return null;
@@ -78,16 +81,16 @@ public class GarageController extends AbstractBaseController implements ITempera
 	@Scheduled(fixedDelay = 5000)
 	private void fetchGarageStatus() {
 		try {
-			myLogger.debug("Fetching new garage data");
-			myGarageData = fromJson(myGarageURL + "/Status2", VeraDeviceVO.class);
+			log.debug("Fetching new garage data");
+			myGarageData = GsonUtil.fromJson(myGarageURL + "/Status2", VeraDeviceVO.class);
 			if (myGarageData == null) {
-				myLogger.info("Couldn't get status from garage node...");
+				log.info("Couldn't get status from garage node...");
 				return;
 			}
 			myGarageData.setName("Garage Opener");
-			myLogger.debug("Fetched new garage data");
+			log.debug("Fetched new garage data");
 		} catch (Exception e) {
-			myLogger.error("FetchGarageStatus", e);
+			log.error("FetchGarageStatus", e);
 		}
 	}
 }

@@ -18,8 +18,7 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,11 +29,10 @@ import org.springframework.web.bind.annotation.RestController;
  * controller for receiving a notification from some source and triggering an alert to scenes that
  * care about it
  */
+@Slf4j
 @Tag(name = "Notification Controller", description = "Service to fire pulsing notifications to devices")
 @RestController
 public class NotificationController extends HubContext {
-	protected static final Logger myLogger = LoggerFactory.getLogger(NotificationController.class);
-
 	@Value("${veraUrl}")
 	private String kVeraHubUrl;
 
@@ -92,16 +90,16 @@ public class NotificationController extends HubContext {
 					@PathVariable(value = "deviceId", required = false)
 					String deviceId) {
 		if ((System.currentTimeMillis() - myNotificationGap * 1000 * 60) < myLastNotification) {
-			myLogger.info("Not triggering notification, not enough gap yet.");
+			log.info("Not triggering notification, not enough gap yet.");
 			return null;
 		}
-		myLogger.info("Notification received.");
+		log.info("Notification received.");
 		List<OpenHABItem> anItems = getItems(deviceId);
 		if (anItems == null || anItems.isEmpty()) {
-			myLogger.info("No items to notify.");
+			log.info("No items to notify.");
 			return null;
 		}
-		myLogger.info("Doing Notification.");
+		log.info("Doing Notification.");
 		doPulseNotification(anItems);
 		return null;
 	}
@@ -123,7 +121,7 @@ public class NotificationController extends HubContext {
 				.filter(theVeraDeviceVO -> theVeraDeviceVO.getIntLevel() > 0)
 				.forEach(theDevice -> {
 					myLastNotification = System.currentTimeMillis();
-					myLogger.info(theDevice.getName() + " " + theDevice.getLevel());
+					log.info(theDevice.getName() + " " + theDevice.getLevel());
 					getExecutors().execute(() -> {
 						try {
 							myOpenHABController.setLevel(theDevice.getName(), theDevice.getIntLevel() / 2);
@@ -132,7 +130,7 @@ public class NotificationController extends HubContext {
 							Thread.sleep(kZWaveTiming * 8);
 							myOpenHABController.setLevel(theDevice.getName(), theDevice.getIntLevel());
 						} catch (InterruptedException theE) {
-							myLogger.warn("doPulseNotification", theE);
+							log.warn("doPulseNotification", theE);
 							theE.printStackTrace();
 						}
 					});

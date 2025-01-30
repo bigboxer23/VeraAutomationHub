@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * calling protected APIs. By default the url is not callable until explicitly enabled for a single
  * fetch in a defined time period by the enableTokenFetch
  */
+@Slf4j
 @RestController
 @EnableAutoConfiguration
 @Tag(
@@ -46,8 +49,6 @@ public class TokenDistributionServlet {
 
 	@Value("${auth.token.window}")
 	private long kTokenValidTime;
-
-	private static final Logger myLogger = LoggerFactory.getLogger(TokenDistributionServlet.class);
 
 	/** Enable calling the getToken endpoint */
 	@GetMapping(value = "/enableTokenFetch", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -63,7 +64,7 @@ public class TokenDistributionServlet {
 	})
 	public void enableTokenRequest(HttpServletRequest theRequest) {
 		myTokenValidTime = System.currentTimeMillis();
-		myLogger.error("Enabling token access, requested by " + theRequest.getRemoteAddr());
+		log.error("Enabling token access, requested by " + theRequest.getRemoteAddr());
 	}
 
 	/**
@@ -87,7 +88,7 @@ public class TokenDistributionServlet {
 	})
 	public TokenResponse getToken(HttpServletResponse theResponse, HttpServletRequest theRequest) throws IOException {
 		if (myTokenValidTime + kTokenValidTime > System.currentTimeMillis()) {
-			myLogger.warn("Token distributed to " + theRequest.getRemoteAddr());
+			log.warn("Token distributed to " + theRequest.getRemoteAddr());
 			Cookie anAuthCookie = new Cookie("t", myToken);
 			anAuthCookie.setHttpOnly(true);
 			anAuthCookie.setSecure(true);

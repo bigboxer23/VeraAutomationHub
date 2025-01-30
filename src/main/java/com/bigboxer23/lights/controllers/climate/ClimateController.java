@@ -1,15 +1,17 @@
 package com.bigboxer23.lights.controllers.climate;
 
-import com.bigboxer23.lights.controllers.AbstractBaseController;
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
+import com.bigboxer23.lights.util.GsonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /** Controller to integrate with https://github.com/bigboxer23/climate-service project service */
+@Slf4j
 @Component
-public class ClimateController extends AbstractBaseController {
+public class ClimateController {
 	@Value("${climate.url}")
 	private String myClimateServiceUrl;
 
@@ -32,15 +34,15 @@ public class ClimateController extends AbstractBaseController {
 	@Scheduled(fixedDelay = 30000)
 	private void fetchClimateData() {
 		try {
-			myLogger.debug("Fetching new climate data");
-			myClimateData = fromJson(myClimateServiceUrl + "/climate", ClimateData.class);
+			log.debug("Fetching new climate data");
+			myClimateData = GsonUtil.fromJson(myClimateServiceUrl + "/climate", ClimateData.class);
 			if (myClimateData == null) {
-				myLogger.info("Couldn't get status from climate node...");
+				log.info("Couldn't get status from climate node...");
 				return;
 			}
-			myLogger.debug("Fetched new climate data");
+			log.debug("Fetched new climate data");
 		} catch (Exception e) {
-			myLogger.error("fetchClimateData", e);
+			log.error("fetchClimateData", e);
 		}
 	}
 }

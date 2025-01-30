@@ -1,17 +1,19 @@
 package com.bigboxer23.lights.controllers.vera;
 
-import com.bigboxer23.lights.controllers.AbstractBaseController;
 import com.bigboxer23.lights.controllers.ISystemController;
+import com.bigboxer23.lights.util.GsonUtil;
 import com.bigboxer23.utils.http.OkHttpCallback;
 import com.bigboxer23.utils.http.OkHttpUtil;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /** Vera controller to make requests to a vera UI7 device */
+@Slf4j
 @Component
-public class VeraController extends AbstractBaseController implements ISystemController {
+public class VeraController implements ISystemController {
 	/** Location of Vera Hub, assume locally running on default port */
 	@Value("${veraUrl}")
 	private String kVeraHubUrl;
@@ -31,10 +33,10 @@ public class VeraController extends AbstractBaseController implements ISystemCon
 	private VeraHouseVO myStatus;
 
 	public VeraHouseVO getStatus() {
-		myLogger.debug("Getting Vera Status");
-		VeraHouseVO aHouseStatus = fromJson(kVeraHubUrl + "/data_request?id=sdata", VeraHouseVO.class);
+		log.debug("Getting Vera Status");
+		VeraHouseVO aHouseStatus = GsonUtil.fromJson(kVeraHubUrl + "/data_request?id=sdata", VeraHouseVO.class);
 		setStatus(aHouseStatus);
-		myLogger.debug("Got Vera Status");
+		log.debug("Got Vera Status");
 		return aHouseStatus;
 	}
 

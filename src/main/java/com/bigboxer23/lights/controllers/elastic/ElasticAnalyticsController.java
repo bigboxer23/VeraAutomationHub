@@ -5,6 +5,7 @@ import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.lights.controllers.vera.VeraRoomVO;
 import java.io.IOException;
 import java.util.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -13,13 +14,12 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /** Send statistics about house status to an elasticsearch backend */
+@Slf4j
 @Component
 public class ElasticAnalyticsController implements DisposableBean {
 	@Value("${elastic.url}")
@@ -31,28 +31,26 @@ public class ElasticAnalyticsController implements DisposableBean {
 
 	private RestHighLevelClient myClient;
 
-	private static final Logger myLogger = LoggerFactory.getLogger(ElasticAnalyticsController.class);
-
 	public void logStatusEvent(VeraHouseVO theVeraHouseVO) {
 		BulkRequest aBulkRequest = new BulkRequest();
 		handleLightsData(theVeraHouseVO, aBulkRequest);
 		handleClimateData(theVeraHouseVO, aBulkRequest);
 		if (aBulkRequest.numberOfActions() > 0) {
-			myLogger.debug("Sending Request to elastic");
+			log.debug("Sending Request to elastic");
 			getClient().bulkAsync(aBulkRequest, RequestOptions.DEFAULT, new ActionListener<>() {
 				@Override
 				public void onResponse(BulkResponse theBulkItemResponses) {}
 
 				@Override
 				public void onFailure(Exception e) {
-					myLogger.debug("logStatusEvent:", e);
+					log.debug("logStatusEvent:", e);
 				}
 			});
 		}
 	}
 
 	private void handleLightsData(VeraHouseVO theVeraHouseVO, BulkRequest theRequest) {
-		myLogger.debug("handleLightsData");
+		log.debug("handleLightsData");
 		theVeraHouseVO.getRooms().stream()
 				.filter(theRoom -> !theRoom.getName().equalsIgnoreCase("scenes"))
 				.filter(theRoom -> theRoom.getDevices() == null
@@ -92,7 +90,7 @@ public class ElasticAnalyticsController implements DisposableBean {
 	}
 
 	private void handleClimateData(VeraHouseVO theVeraHouseVO, BulkRequest theRequest) {
-		myLogger.debug("handleClimateData");
+		log.debug("handleClimateData");
 		theVeraHouseVO.getRooms().stream()
 				.filter(theRoom -> theRoom.getName().equalsIgnoreCase("climate"))
 				.findAny()
@@ -205,7 +203,7 @@ public class ElasticAnalyticsController implements DisposableBean {
 	@Override
 	public void destroy() throws IOException {
 		if (myClient != null) {
-			myLogger.debug("closing elastic client");
+			log.debug("closing elastic client");
 			myClient.close();
 		}
 	}
