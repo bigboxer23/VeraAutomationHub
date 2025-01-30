@@ -1,20 +1,16 @@
-package com.bigboxer23.lights.controllers;
+package com.bigboxer23.lights.util;
 
 import com.bigboxer23.utils.http.OkHttpUtil;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import java.io.IOException;
 import okhttp3.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-/** encapsulate common logging code */
-public class AbstractBaseController {
-	protected static final Logger myLogger = LoggerFactory.getLogger(AbstractBaseController.class);
+/** */
+public class GsonUtil {
+	private static GsonBuilder builder;
 
-	private GsonBuilder myBuilder;
-
-	protected <T> T fromJson(String theUrl, Class<T> theClass) throws JsonSyntaxException {
+	public static <T> T fromJson(String theUrl, Class<T> theClass) throws JsonSyntaxException {
 		try (Response response = OkHttpUtil.getSynchronous(theUrl, null)) {
 			String body = response.body().string();
 			if (!response.isSuccessful()) {
@@ -26,10 +22,10 @@ public class AbstractBaseController {
 		}
 	}
 
-	private GsonBuilder getBuilder() {
-		if (myBuilder == null) {
-			myBuilder = new GsonBuilder();
+	private static GsonBuilder getBuilder() {
+		if (builder == null) {
+			builder = new GsonBuilder();
 		}
-		return myBuilder;
+		return builder;
 	}
 }

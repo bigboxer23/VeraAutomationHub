@@ -1,6 +1,5 @@
 package com.bigboxer23.lights.controllers.climate.openweathermap;
 
-import com.bigboxer23.lights.controllers.AbstractBaseController;
 import com.bigboxer23.utils.http.OkHttpCallback;
 import com.bigboxer23.utils.http.OkHttpUtil;
 import com.google.gson.JsonObject;
@@ -8,14 +7,16 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /** Fetch weather date from OpenWeatherMap api, forward to OpenHab Items */
+@Slf4j
 @Component
-public class OpenWeatherMapController extends AbstractBaseController {
+public class OpenWeatherMapController {
 	private static final String kOpenWeatherMapUrl =
 			"https://api.openweathermap.org/data/2.5/weather?lat={0}&lon={1}&APPID={2}";
 
@@ -33,7 +34,7 @@ public class OpenWeatherMapController extends AbstractBaseController {
 
 	@Scheduled(fixedDelay = 900000) // 15min
 	private void fetchClimateData() {
-		myLogger.debug("Fetching OpenWeatherMap data");
+		log.debug("Fetching OpenWeatherMap data");
 		OkHttpUtil.get(
 				MessageFormat.format(kOpenWeatherMapUrl, myLatitude, myLongitude, myOpenWeatherMapAPIKey),
 				new OkHttpCallback() {
@@ -57,9 +58,9 @@ public class OpenWeatherMapController extends AbstractBaseController {
 							sendDataToOpenHab(
 									"OutsideHumidity",
 									weatherData.get("humidity").getAsFloat());
-							myLogger.debug("OpenWeatherMap data successfully updated");
+							log.debug("OpenWeatherMap data successfully updated");
 						} catch (IOException e) {
-							myLogger.warn("fetchClimateData:", e);
+							log.warn("fetchClimateData:", e);
 						}
 					}
 				});

@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,13 +20,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Get value from hue bridge */
+@Slf4j
 @Tag(name = "Daylight Controller", description = "returns if it is daylight or not")
 @RestController
 public class DaylightController extends HueController {
-	private static final Logger myLogger = LoggerFactory.getLogger(DaylightController.class);
-
-	public static final String kControllerEndpoint = "Daylight";
-
 	@GetMapping(value = "/S/Daylight", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(
 			summary = "returns if it is daylight or not",
@@ -48,7 +47,7 @@ public class DaylightController extends HueController {
 			if (!response.isSuccessful()) {
 				throw new IOException("call to " + getBaseUrl() + "/sensors/1 failed. " + body);
 			}
-			myLogger.debug(body);
+			log.debug(body);
 			JsonElement anElement = JsonParser.parseString(body);
 			return anElement
 					.getAsJsonObject()
@@ -57,7 +56,7 @@ public class DaylightController extends HueController {
 					.get("daylight")
 					.getAsBoolean();
 		} catch (IOException e) {
-			myLogger.warn("isDaylight: ", e);
+			log.warn("isDaylight: ", e);
 		}
 		return false;
 	}

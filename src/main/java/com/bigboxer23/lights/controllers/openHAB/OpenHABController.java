@@ -1,6 +1,6 @@
 package com.bigboxer23.lights.controllers.openHAB;
 
-import com.bigboxer23.lights.controllers.AbstractBaseController;
+import com.bigboxer23.lights.util.GsonUtil;
 import com.bigboxer23.utils.http.OkHttpCallback;
 import com.bigboxer23.utils.http.OkHttpUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +14,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.RequestBody;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -23,9 +24,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Control OpenHab instance via REST URL */
+@Slf4j
 @Tag(name = "OpenHAB Controller", description = "Service to send commands to OpenHAB")
 @RestController
-public class OpenHABController extends AbstractBaseController {
+public class OpenHABController {
 	/** Location of OpenHAB */
 	@Value("${openHABUrl}")
 	private String kOpenHABUrl;
@@ -33,10 +35,10 @@ public class OpenHABController extends AbstractBaseController {
 	private Set<String> mySmartRooms;
 
 	public OpenHABHouse getStatus() {
-		myLogger.debug("Getting OpenHAB Status");
+		log.debug("Getting OpenHAB Status");
 		OpenHABHouse aHouseStatus =
-				fromJson(kOpenHABUrl + "/rest/items?type=Group&tags=Room&recursive=true", OpenHABHouse.class);
-		myLogger.debug("Got OpenHAB Status");
+				GsonUtil.fromJson(kOpenHABUrl + "/rest/items?type=Group&tags=Room&recursive=true", OpenHABHouse.class);
+		log.debug("Got OpenHAB Status");
 		return aHouseStatus;
 	}
 
@@ -66,7 +68,7 @@ public class OpenHABController extends AbstractBaseController {
 				builder.post(RequestBody.create(URLDecoder.decode(command, StandardCharsets.UTF_8.displayName())
 						.getBytes(StandardCharsets.UTF_8)));
 			} catch (UnsupportedEncodingException theE) {
-				myLogger.warn("OpenHABController:doAction", theE);
+				log.warn("OpenHABController:doAction", theE);
 			}
 			return builder;
 		});
@@ -74,11 +76,11 @@ public class OpenHABController extends AbstractBaseController {
 	}
 
 	public OpenHABHouse getItemsByTag(String theTag) {
-		return fromJson(kOpenHABUrl + "/rest/items?tags=" + theTag, OpenHABHouse.class);
+		return GsonUtil.fromJson(kOpenHABUrl + "/rest/items?tags=" + theTag, OpenHABHouse.class);
 	}
 
 	public List<OpenHABItem> getItemByName(String theName) {
-		OpenHABItem anItem = fromJson(kOpenHABUrl + "/rest/items/" + theName, OpenHABItem.class);
+		OpenHABItem anItem = GsonUtil.fromJson(kOpenHABUrl + "/rest/items/" + theName, OpenHABItem.class);
 		return anItem == null || anItem.getName() == null ? null : Collections.singletonList(anItem);
 	}
 
@@ -104,22 +106,23 @@ public class OpenHABController extends AbstractBaseController {
 	}
 
 	private void setModeFromCalendar(boolean theMode, String theDevice) {
-		myLogger.info(theDevice + " requested: " + theMode);
+		log.info(theDevice + " requested: " + theMode);
 		doAction(theDevice, theMode ? "ON" : "OFF");
 	}
 
 	@Scheduled(fixedDelay = 5000)
 	private void fetchSmartRooms() {
 		try {
-			myLogger.debug("Getting Smart Rooms");
-			mySmartRooms = Optional.ofNullable(fromJson(kOpenHABUrl + "/rest/items?tags=SmartRoom", OpenHABHouse.class))
+			log.debug("Getting Smart Rooms");
+			mySmartRooms = Optional.ofNullable(
+							GsonUtil.fromJson(kOpenHABUrl + "/rest/items?tags=SmartRoom", OpenHABHouse.class))
 					.orElse(new OpenHABHouse())
 					.stream()
 					.map(OpenHABItem::getName)
 					.collect(Collectors.toSet());
-			myLogger.debug("Retrieved Smart Rooms");
+			log.debug("Retrieved Smart Rooms");
 		} catch (Exception e) {
-			myLogger.error("fetchSmartRooms", e);
+			log.error("fetchSmartRooms", e);
 		}
 	}
 }
