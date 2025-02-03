@@ -13,8 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Controller;
  * Controller listens for empty events from humidifier and triggers a pump to add water to the tank
  * and turn the humidifier back on
  */
+@Slf4j
 @Controller
 public class GoveeHumidifierController implements InitializingBean {
 	@Value("${govee_api_key}")
@@ -40,8 +40,6 @@ public class GoveeHumidifierController implements InitializingBean {
 	@Value("${goveePushEnabled}")
 	private boolean isEnabled;
 
-	private static final Logger logger = LoggerFactory.getLogger(GoveeHumidifierController.class);
-
 	private final Map<String, Long> goveeEvents = new HashMap<>();
 	private final Map<String, Long> mailSent = new HashMap<>();
 
@@ -58,16 +56,15 @@ public class GoveeHumidifierController implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() {
 		if (!isEnabled) {
-			logger.warn("govee event listener not enabled");
+			log.warn("govee event listener not enabled");
 			return;
 		}
-		logger.warn("starting govee event listener");
+		log.warn("starting govee event listener");
 		GoveeApi.getInstance(API_KEY).subscribeToGoveeEvents(new GoveeEventSubscriber() {
 			@Override
 			public void messageReceived(GoveeEvent event) {
 				if (event.isLackWaterEvent()) {
-					logger.warn(
-							"no water: " + event.getModel() + " " + event.getDeviceId() + " " + event.getDeviceName());
+					log.warn("no water: " + event.getModel() + " " + event.getDeviceId() + " " + event.getDeviceName());
 					if (!isLastEventRecent(event.getDeviceId(), event.getDeviceName())) {
 						handlers.forEach(handler ->
 								handler.outOfWaterEvent(event.getDeviceId(), event.getDeviceName(), event.getModel()));
@@ -82,7 +79,7 @@ public class GoveeHumidifierController implements InitializingBean {
 		goveeEvents.put(deviceId, System.currentTimeMillis() + ITimeConstants.FIFTEEN_MINUTES);
 		boolean isRecent = System.currentTimeMillis() <= lastEvent;
 		if (isRecent) {
-			logger.error("govee event recent " + lastEvent + ":" + System.currentTimeMillis());
+			log.error("govee event recent " + lastEvent + ":" + System.currentTimeMillis());
 			Long lastMailEvent = mailSent.getOrDefault(deviceId, Long.MIN_VALUE);
 			mailSent.put(deviceId, System.currentTimeMillis() + ITimeConstants.HOUR);
 			if (System.currentTimeMillis() > lastMailEvent) {

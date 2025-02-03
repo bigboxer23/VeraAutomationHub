@@ -13,8 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,11 +21,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 /** */
+@Slf4j
 @Tag(name = "Switchbot Service", description = "Expose APIs needed to interface w/switchbot devices")
 @RestController
 public class SwitchBotController {
-	private static final Logger logger = LoggerFactory.getLogger(SwitchBotController.class);
-
 	@Value("${switchbot_token}")
 	private String token;
 
@@ -39,7 +37,7 @@ public class SwitchBotController {
 
 	public SwitchBotApi getSwitchbotAPI() throws IOException {
 		if (api == null) {
-			logger.info("initializing switchbot API");
+			log.info("initializing switchbot API");
 			api = SwitchBotApi.getInstance(token, secret);
 		}
 		return api;
@@ -49,7 +47,7 @@ public class SwitchBotController {
 		try {
 			deviceId = deviceId + ":" + getSwitchbotAPI().getDeviceApi().getDeviceNameFromId(deviceId);
 		} catch (IOException e) {
-			logger.error("getIdentifier", e);
+			log.error("getIdentifier", e);
 		}
 		return deviceId;
 	}

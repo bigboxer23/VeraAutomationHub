@@ -17,9 +17,8 @@ import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,11 +27,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /** */
+@Slf4j
 @Tag(name = "Meural Service", description = "Expose APIs needed to change source, art, etc on our Meural device.")
 @RestController
 public class MeuralController {
-	private static final Logger logger = LoggerFactory.getLogger(MeuralController.class);
-
 	@Value("${meuralServer}")
 	private String meuralServer;
 
@@ -81,7 +79,7 @@ public class MeuralController {
 		try {
 			callMeural("/updateOpenAIPrompt?prompt=" + URLEncoder.encode(prompt, "UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			logger.warn("updateOpenAIPrompt", e);
+			log.warn("updateOpenAIPrompt", e);
 		}
 	}
 
@@ -249,22 +247,22 @@ public class MeuralController {
 	}
 
 	private void callMeural(String url) {
-		logger.info("meural requested: " + url);
+		log.info("meural requested: " + url);
 		OkHttpUtil.post(meuralServer + url, new OkHttpCallback());
 	}
 
 	@Scheduled(fixedDelay = 5000)
 	private void fetchMeuralStatus() {
 		try {
-			logger.debug("Fetching meural data");
+			log.debug("Fetching meural data");
 			boolean isAwake = isAwake();
 			int source = getSource();
 			meuralStatus = new VeraDeviceVO("Meural", isAwake ? 0 : 1);
 			meuralStatus.setStatus("" + source);
 			meuralStatus.setTemperature(getOpenAIPrompt());
-			logger.debug("Fetched meural data");
+			log.debug("Fetched meural data");
 		} catch (Exception e) {
-			logger.error("fetchMeuralStatus", e);
+			log.error("fetchMeuralStatus", e);
 		}
 	}
 

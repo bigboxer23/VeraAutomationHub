@@ -30,8 +30,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -42,11 +41,10 @@ import org.springframework.stereotype.Component;
  * <p>Based off the quickstart google cal api example. credentials.json file needs to be placed into
  * src/main/resources
  */
+@Slf4j
 @Component
 @EnableAutoConfiguration
 public class GCalendarController extends HubContext {
-	private static final Logger logger = LoggerFactory.getLogger(GCalendarController.class);
-
 	private static final JsonFactory kJSON_FACTORY = GsonFactory.getDefaultInstance();
 
 	private static List<String> kVacationKeywords = new ArrayList<String>() {
@@ -85,7 +83,7 @@ public class GCalendarController extends HubContext {
 	}
 
 	private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-		logger.info("Getting gCal creds");
+		log.info("Getting gCal creds");
 		// Load client secrets.
 		InputStream aCredStream = GCalendarController.class.getResourceAsStream("/credentials.json");
 		GoogleClientSecrets aClientSecrets =
@@ -100,7 +98,7 @@ public class GCalendarController extends HubContext {
 				.setDataStoreFactory(new FileDataStoreFactory(new java.io.File("tokens")))
 				.setAccessType("offline")
 				.build();
-		logger.info("Starting local server receiver");
+		log.info("Starting local server receiver");
 		return new AuthorizationCodeInstalledApp(
 						aFlow, new LocalServerReceiver.Builder().setPort(8890).build())
 				.authorize("user");
@@ -108,7 +106,7 @@ public class GCalendarController extends HubContext {
 
 	@Scheduled(cron = "0 0 0 ? * *") // Run every day at 12am
 	private void fetchCalendarStatus() {
-		logger.info("Fetching calendar information");
+		log.info("Fetching calendar information");
 		try {
 			NetHttpTransport aTransport = GoogleNetHttpTransport.newTrustedTransport();
 			Calendar aCalendar = new Calendar.Builder(aTransport, kJSON_FACTORY, getCredentials(aTransport))
@@ -133,22 +131,22 @@ public class GCalendarController extends HubContext {
 			myOpenHABController.setVacationMode(findMatchingEvents("Vacation", events, kVacationKeywords));
 			myOpenHABController.setPTOMode(findMatchingEvents("PTO", events, kPTOKeywords));
 			myOpenHABController.setExtendedEveningMode(findLateEvents(events));
-			logger.info("Calendar information fetched and parsed");
+			log.info("Calendar information fetched and parsed");
 		} catch (GeneralSecurityException | IOException e) {
-			logger.error("fetchCalendarStatus:", e);
+			log.error("fetchCalendarStatus:", e);
 		}
 	}
 
 	private boolean findMatchingEvents(String theType, Events theEvents, List<String> theKeywords) {
 		return theEvents.getItems().stream()
 				.anyMatch(theEvent -> theKeywords.stream().anyMatch(theWord -> {
-					logger.debug(theEvent.getSummary());
+					log.debug(theEvent.getSummary());
 					boolean aFound = (theEvent.getSummary() != null
 									&& theEvent.getSummary().toLowerCase().contains(theWord))
 							|| (theEvent.getDescription() != null
 									&& theEvent.getDescription().toLowerCase().contains(theWord));
 					if (aFound) {
-						logger.warn(theType + " enabled: " + theEvent.getSummary());
+						log.warn(theType + " enabled: " + theEvent.getSummary());
 					}
 					return aFound;
 				}));
@@ -168,7 +166,7 @@ public class GCalendarController extends HubContext {
 					&& event.getEnd().getDateTime().getValue()
 							>= tenThirty.toInstant().toEpochMilli();
 			if (found) {
-				logger.warn("findLateEvents enabled: " + event.getSummary());
+				log.warn("findLateEvents enabled: " + event.getSummary());
 			}
 			return found;
 		});

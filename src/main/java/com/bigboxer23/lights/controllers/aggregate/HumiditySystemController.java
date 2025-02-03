@@ -15,9 +15,8 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -30,9 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
  * Controller for managing a system of devices from different ecosystems to do a refill of a
  * humidifier on command
  */
+@Slf4j
 @RestController
 public class HumiditySystemController implements InitializingBean, IHumidityEventHandler {
-	private static final Logger logger = LoggerFactory.getLogger(HumiditySystemController.class);
 
 	private final SwitchBotController switchbotController;
 
@@ -75,13 +74,13 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 			@Parameter(description = "deviceName (for logging only)") @PathVariable(value = "deviceName")
 					String deviceName,
 			@Parameter(description = "deviceModel") @PathVariable(value = "deviceModel") String deviceModel) {
-		logger.info(deviceId + " requested via web api");
+		log.info(deviceId + " requested via web api");
 		outOfWaterEvent(deviceId, deviceName, deviceModel);
 	}
 
 	@Scheduled(fixedDelay = 600000) // 10min
 	public void checkAfterInterval() {
-		logger.info("checking humidity");
+		log.info("checking humidity");
 		humidifierMap.values().stream()
 				.filter(cluster -> !StringUtils.isEmpty(cluster.getHumiditySensor()))
 				.forEach(cluster -> {
@@ -93,11 +92,11 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 										.getDeviceStatus(cluster.getHumiditySensor())
 										.getHumidity(),
 								"Get humidity " + switchbotController.getIdentifier(cluster.getHumiditySensor()));
-						logger.info(switchbotController.getIdentifier(cluster.getHumiditySensor())
+						log.info(switchbotController.getIdentifier(cluster.getHumiditySensor())
 								+ " humidity "
 								+ humidity);
 						if (humidity < cluster.getLowHumidityPoint()) {
-							logger.info("low humidity detected " + humidity + ":" + cluster.getLowHumidityPoint());
+							log.info("low humidity detected " + humidity + ":" + cluster.getLowHumidityPoint());
 							float watts = RetryingCommand.execute(
 									() -> switchbotController
 											.getSwitchbotAPI()
@@ -106,7 +105,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 											.getWatts(),
 									"Get watts " + switchbotController.getIdentifier(cluster.getOutlet()));
 							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
-								logger.info("humidifier is running, detected wattage: " + watts);
+								log.info("humidifier is running, detected wattage: " + watts);
 								return;
 							}
 							outOfWaterEvent(
@@ -123,7 +122,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 											.getWatts(),
 									"Get watts " + switchbotController.getIdentifier(cluster.getOutlet()));
 							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
-								logger.info("humidifier should not be running, humidify is too"
+								log.info("humidifier should not be running, humidify is too"
 										+ " high "
 										+ watts
 										+ " "
@@ -134,7 +133,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 							}
 						}
 					} catch (IOException e) {
-						logger.error("manualCheck: ", e);
+						log.error("manualCheck: ", e);
 					}
 				});
 	}
@@ -143,10 +142,10 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 	public void outOfWaterEvent(String deviceId, String deviceName, String deviceModel) {
 		HumidifierCluster cluster = humidifierMap.get(deviceId);
 		if (cluster == null) {
-			logger.warn("No cluster for " + deviceId);
+			log.warn("No cluster for " + deviceId);
 			return;
 		}
-		logger.info("Out of water event triggered " + deviceName + " : " + deviceId);
+		log.info("Out of water event triggered " + deviceName + " : " + deviceId);
 		if (!goveeController.isLastEventRecent(deviceId, deviceName)) {
 			new Thread(new RefillAction(
 							switchbotController,

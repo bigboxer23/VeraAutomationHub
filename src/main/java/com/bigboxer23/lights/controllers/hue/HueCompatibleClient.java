@@ -6,13 +6,12 @@ import java.security.NoSuchAlgorithmException;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** */
+@Slf4j
 public class HueCompatibleClient {
-	private static final Logger logger = LoggerFactory.getLogger(HueCompatibleClient.class);
 	private static OkHttpClient instance;
 
 	public static OkHttpClient getClient() {
@@ -39,7 +38,7 @@ public class HueCompatibleClient {
 						.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
 						.build();
 			} catch (NoSuchAlgorithmException | KeyManagementException e) {
-				logger.warn("getInstance", e);
+				log.warn("getInstance", e);
 				throw new RuntimeException(e);
 			}
 		}
