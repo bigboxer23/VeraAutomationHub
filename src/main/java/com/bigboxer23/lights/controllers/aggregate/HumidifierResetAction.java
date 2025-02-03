@@ -4,16 +4,14 @@ import com.bigboxer23.govee.IHumidifierCommands;
 import com.bigboxer23.lights.controllers.govee.GoveeHumidifierController;
 import com.bigboxer23.utils.command.RetryingCommand;
 import java.io.IOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Govee humidifier sometimes "sticks" on when in auto mode. This action resets the humidity control
  * if detected its stuck open
  */
+@Slf4j
 public class HumidifierResetAction implements Runnable {
-	private static final Logger logger = LoggerFactory.getLogger(HumidifierResetAction.class);
-
 	private final GoveeHumidifierController goveeController;
 
 	private final String humidifierModel;
@@ -44,7 +42,7 @@ public class HumidifierResetAction implements Runnable {
 					},
 					"Set 70% " + goveeController.getIdentifier(humidifierId));
 		} catch (InterruptedException | IOException e) {
-			logger.error("HumidifierResetAction", e);
+			log.error("HumidifierResetAction", e);
 		}
 	}
 }

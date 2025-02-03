@@ -16,23 +16,20 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 /** */
+@Slf4j
 @Tag(
 		name = "Hue V2 Controller",
 		description = "Controller to control hue scenes or other constructs without going through the" + " native app.")
 @RestController
 public class HueV2Controller {
-
-	private static final Logger logger = LoggerFactory.getLogger(HueV2Controller.class);
-
 	private static final String BASE_URL = "https://{0}/clip/v2/{1}";
 
 	private static final String AUTH_HEADER = "hue-application-key";
@@ -108,7 +105,7 @@ public class HueV2Controller {
 					.map(Arrays::asList)
 					.orElse(Collections.emptyList());
 		} catch (IOException e) {
-			logger.error("getResource " + url, e);
+			log.error("getResource " + url, e);
 			return Collections.emptyList();
 		}
 	}

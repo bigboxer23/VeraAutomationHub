@@ -6,17 +6,15 @@ import com.bigboxer23.eco_net.data.ValueHolder;
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import java.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
 /** */
+@Slf4j
 @Controller
 public class EconetController {
-	private static final Logger logger = LoggerFactory.getLogger(EconetController.class);
-
 	private EcoNetAPI ecoNetAPI;
 
 	@Value("${econet_email}")
@@ -38,7 +36,7 @@ public class EconetController {
 	@Scheduled(fixedDelay = 300000) // 5min
 	private void fetchWaterHeaterStatus() {
 		try {
-			logger.debug("Fetching water heater status...");
+			log.debug("Fetching water heater status...");
 			getEcoNetAPI().fetchUserData().ifPresent(data -> {
 				Equipment equipment =
 						data.getResults().getLocations().get(0).getEquipments().get(0);
@@ -60,9 +58,9 @@ public class EconetController {
 							waterHeaterData.setLevel(kwh + "");
 						});
 			});
-			logger.debug("Fetched water heater status...");
+			log.debug("Fetched water heater status...");
 		} catch (Exception e) {
-			logger.error("fetchWaterHeaterStatus", e);
+			log.error("fetchWaterHeaterStatus", e);
 		}
 	}
 

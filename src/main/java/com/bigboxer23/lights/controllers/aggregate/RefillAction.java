@@ -6,13 +6,11 @@ import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.utils.command.RetryingCommand;
 import java.io.IOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /** */
+@Slf4j
 public class RefillAction implements Runnable {
-	private static final Logger logger = LoggerFactory.getLogger(RefillAction.class);
-
 	private final SwitchBotController switchbotController;
 
 	private final GoveeHumidifierController goveeController;
@@ -90,7 +88,7 @@ public class RefillAction implements Runnable {
 					},
 					"Off " + switchbotController.getIdentifier(pumpId));
 		} catch (IOException | InterruptedException e) {
-			logger.error("error refilling humidifier, attempting to turn off pump " + pumpId, e);
+			log.error("error refilling humidifier, attempting to turn off pump " + pumpId, e);
 			try {
 				Thread.sleep(5 * 1000); // 5 sec
 				RetryingCommand.execute(
@@ -103,7 +101,7 @@ public class RefillAction implements Runnable {
 						},
 						"Off " + switchbotController.getIdentifier(pumpId));
 			} catch (IOException | InterruptedException e2) {
-				logger.error("error turning off pump " + pumpId, e2);
+				log.error("error turning off pump " + pumpId, e2);
 			}
 		}
 	}
