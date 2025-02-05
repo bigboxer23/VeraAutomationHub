@@ -18,8 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /** */
@@ -128,7 +128,7 @@ public class BMController {
 				"Off " + switchbotController.getIdentifier(fanSwitchId));
 	}
 
-	@PostMapping(value = "/S/BMController/FanService/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/S/BMController/FanService/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "enable or disable the BM Fan service")
 	@ApiResponses({
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
@@ -142,7 +142,7 @@ public class BMController {
 		faeDisabled.set(!enable);
 	}
 
-	@PostMapping(value = "/S/BMController/Lights/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/S/BMController/Lights/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "enable or disable the BM lights")
 	@ApiResponses({
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
@@ -155,7 +155,7 @@ public class BMController {
 		lightsDisabled.set(!enable);
 	}
 
-	@PostMapping(value = "/S/BMController/IncubationHeater/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/S/BMController/IncubationHeater/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "enable or disable the BM incubation heater")
 	@ApiResponses({
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
@@ -169,7 +169,7 @@ public class BMController {
 		incubatorController.disable(!enable);
 	}
 
-	@PostMapping(value = "/S/BMController/Humidity/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/S/BMController/Humidity/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "enable or disable the BM humidity")
 	@ApiResponses({
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),

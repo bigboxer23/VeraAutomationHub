@@ -58,6 +58,17 @@ public abstract class AbstractEnvironmentController {
 		boolean shouldTurnOn = !powerOn
 				&& ((!cluster.isDehumidifier() && averageEnvFactor < cluster.getLow())
 						|| (cluster.isDehumidifier() && averageEnvFactor > cluster.getHigh()));
+		log.info(switchBotController.getIdentifier(cluster.getSwitchId())
+				+ " "
+				+ averageEnvFactor
+				+ " "
+				+ cluster.getHigh()
+				+ " "
+				+ cluster.getLow()
+				+ " "
+				+ shouldTurnOff
+				+ " "
+				+ shouldTurnOn);
 		if (shouldTurnOff || shouldTurnOn) {
 			String action = shouldTurnOff ? "turn off " : "turn on ";
 			RetryingCommand.execute(
