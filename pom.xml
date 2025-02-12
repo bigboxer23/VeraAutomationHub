@@ -107,12 +107,12 @@
     <dependency>
       <groupId>com.bigboxer23</groupId>
       <artifactId>utils</artifactId>
-      <version>2.0.39</version>
+      <version>2.0.40</version>
     </dependency>
     <dependency>
       <groupId>com.bigboxer23</groupId>
       <artifactId>switchbotapi-java</artifactId>
-      <version>1.1.9</version>
+      <version>1.2.0</version>
     </dependency>
     <dependency>
       <groupId>com.bigboxer23</groupId>

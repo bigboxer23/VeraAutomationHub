@@ -5,14 +5,11 @@ import com.bigboxer23.govee.GoveeEventSubscriber;
 import com.bigboxer23.govee.data.GoveeDeviceCommandResponse;
 import com.bigboxer23.govee.data.GoveeDeviceStatusRequest;
 import com.bigboxer23.govee.data.GoveeEvent;
+import com.bigboxer23.lights.controllers.EmailController;
 import com.bigboxer23.lights.controllers.aggregate.IHumidityEventHandler;
-import com.bigboxer23.utils.mail.MailSender;
-import com.bigboxer23.utils.time.ITimeConstants;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,22 +25,16 @@ public class GoveeHumidifierController implements InitializingBean {
 	@Value("${govee_api_key}")
 	private String API_KEY;
 
-	@Value("${goveeToEmail}")
-	private String toEmail;
-
-	@Value("${goveeFromEmail}")
-	private String fromEmail;
-
-	@Value("${goveeFromEmailPassword}")
-	private String fromPassword;
-
 	@Value("${goveePushEnabled}")
 	private boolean isEnabled;
 
-	private final Map<String, Long> goveeEvents = new HashMap<>();
-	private final Map<String, Long> mailSent = new HashMap<>();
+	private EmailController emailController;
 
 	private final List<IHumidityEventHandler> handlers = new ArrayList<>();
+
+	public GoveeHumidifierController(EmailController controller) {
+		emailController = controller;
+	}
 
 	public void addHandler(IHumidityEventHandler handler) {
 		handlers.add(handler);
@@ -65,34 +56,13 @@ public class GoveeHumidifierController implements InitializingBean {
 			public void messageReceived(GoveeEvent event) {
 				if (event.isLackWaterEvent()) {
 					log.warn("no water: " + event.getModel() + " " + event.getDeviceId() + " " + event.getDeviceName());
-					if (!isLastEventRecent(event.getDeviceId(), event.getDeviceName())) {
+					if (!emailController.sendMessageThrottled(event.getDeviceId(), event.getDeviceName())) {
 						handlers.forEach(handler ->
 								handler.outOfWaterEvent(event.getDeviceId(), event.getDeviceName(), event.getModel()));
 					}
 				}
 			}
 		});
-	}
-
-	public boolean isLastEventRecent(String deviceId, String deviceName) {
-		Long lastEvent = goveeEvents.getOrDefault(deviceId, Long.MIN_VALUE);
-		goveeEvents.put(deviceId, System.currentTimeMillis() + ITimeConstants.FIFTEEN_MINUTES);
-		boolean isRecent = System.currentTimeMillis() <= lastEvent;
-		if (isRecent) {
-			log.error("govee event recent " + lastEvent + ":" + System.currentTimeMillis());
-			Long lastMailEvent = mailSent.getOrDefault(deviceId, Long.MIN_VALUE);
-			mailSent.put(deviceId, System.currentTimeMillis() + ITimeConstants.HOUR);
-			if (System.currentTimeMillis() > lastMailEvent) {
-				MailSender.sendGmail(
-						toEmail,
-						fromEmail,
-						fromPassword,
-						deviceName + "  reservoir may be empty",
-						"Reservoir for " + deviceName + " may be empty, please check & fill.",
-						null);
-			}
-		}
-		return isRecent;
 	}
 
 	public String getDeviceNameFromId(String deviceId) {

@@ -1,9 +1,12 @@
 package com.bigboxer23.lights.controllers.switchbot;
 
+import com.bigboxer23.lights.controllers.EmailController;
+import com.bigboxer23.lights.util.IErrorConstants;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.switch_bot.IDeviceTypes;
 import com.bigboxer23.switch_bot.SwitchBotApi;
 import com.bigboxer23.switch_bot.data.Device;
+import com.bigboxer23.utils.command.Command;
 import com.bigboxer23.utils.command.RetryingCommand;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,6 +37,12 @@ public class SwitchBotController {
 	private List<String> curtains;
 
 	private SwitchBotApi api;
+
+	private EmailController emailController;
+
+	public SwitchBotController(EmailController emailController) {
+		this.emailController = emailController;
+	}
 
 	public SwitchBotApi getSwitchbotAPI() throws IOException {
 		if (api == null) {
@@ -81,7 +90,8 @@ public class SwitchBotController {
 								.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_OPEN);
 						return null;
 					},
-					"Open " + getIdentifier(curtainId));
+					"Open " + getIdentifier(curtainId),
+					failureCommand(curtainId));
 		}
 	}
 
@@ -100,7 +110,8 @@ public class SwitchBotController {
 								.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_CLOSE);
 						return null;
 					},
-					"Close " + getIdentifier(curtainId));
+					"Close " + getIdentifier(curtainId),
+					failureCommand(curtainId));
 		}
 	}
 
@@ -115,7 +126,7 @@ public class SwitchBotController {
 			@Parameter(description = "command to run.  Possible values [0-100, ON, OFF]")
 					@PathVariable(value = "command")
 					String command)
-			throws IOException, InterruptedException {
+			throws IOException {
 		RetryingCommand.execute(
 				() -> {
 					getSwitchbotAPI()
@@ -128,6 +139,15 @@ public class SwitchBotController {
 
 					return null;
 				},
-				command + " " + getIdentifier(deviceId));
+				command + " " + getIdentifier(deviceId),
+				failureCommand(deviceId));
+	}
+
+	public Command<Void> failureCommand(String deviceId) {
+		return () -> {
+			emailController.sendMessageThrottled(
+					deviceId, getIdentifier(deviceId), IErrorConstants.emailSubject, IErrorConstants.emailBody);
+			return null;
+		};
 	}
 }

@@ -1,5 +1,6 @@
 package com.bigboxer23.lights.controllers.room;
 
+import com.bigboxer23.lights.controllers.EmailController;
 import com.bigboxer23.lights.controllers.aggregate.HeaterController;
 import com.bigboxer23.lights.controllers.aggregate.HumidityController;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
@@ -48,12 +49,15 @@ public class BMController {
 
 	private final SwitchBotController switchbotController;
 
+	private final EmailController emailController;
+
 	private HeaterController incubatorController;
 
 	private HumidityController humidityController;
 
-	public BMController(SwitchBotController switchbotController) {
+	public BMController(SwitchBotController switchbotController, EmailController emailController) {
 		this.switchbotController = switchbotController;
+		this.emailController = emailController;
 		log.info("BMController.FanSystem initialized and enabled: " + !faeDisabled.get());
 		log.info("BMController.Lights initialized and enabled: " + !lightsDisabled.get());
 	}
@@ -61,7 +65,7 @@ public class BMController {
 	@Scheduled(cron = "0 */5 * * * *")
 	public void humidityControl() throws IOException {
 		if (humidityController == null) {
-			humidityController = new HumidityController(switchbotController, humidifierMap);
+			humidityController = new HumidityController(switchbotController, emailController, humidifierMap);
 		}
 		humidityController.run();
 	}
@@ -69,7 +73,7 @@ public class BMController {
 	@Scheduled(cron = "0 */5 * * * *")
 	public void incubateControl() throws IOException {
 		if (incubatorController == null) {
-			incubatorController = new HeaterController(switchbotController, incubatorMap);
+			incubatorController = new HeaterController(switchbotController, emailController, incubatorMap);
 		}
 		incubatorController.run();
 	}
@@ -84,7 +88,8 @@ public class BMController {
 						.getSwitchbotAPI()
 						.getDeviceApi()
 						.sendDeviceControlCommands(lightSwitchId, IDeviceCommands.PLUG_MINI_ON),
-				"On " + switchbotController.getIdentifier(lightSwitchId));
+				"On " + switchbotController.getIdentifier(lightSwitchId),
+				switchbotController.failureCommand(lightSwitchId));
 	}
 
 	@Scheduled(cron = "0 0 20 * * ?")
@@ -97,7 +102,8 @@ public class BMController {
 						.getSwitchbotAPI()
 						.getDeviceApi()
 						.sendDeviceControlCommands(lightSwitchId, IDeviceCommands.PLUG_MINI_OFF),
-				"Off " + switchbotController.getIdentifier(lightSwitchId));
+				"Off " + switchbotController.getIdentifier(lightSwitchId),
+				switchbotController.failureCommand(lightSwitchId));
 	}
 
 	@Scheduled(cron = "0 */15 * * * *") // every 15 min
@@ -113,7 +119,8 @@ public class BMController {
 							.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_ON);
 					return null;
 				},
-				"On " + switchbotController.getIdentifier(fanSwitchId));
+				"On " + switchbotController.getIdentifier(fanSwitchId),
+				switchbotController.failureCommand(fanSwitchId));
 
 		log.debug("sleeping fan system controller");
 		Thread.sleep(fanDuration * ITimeConstants.MINUTE);
