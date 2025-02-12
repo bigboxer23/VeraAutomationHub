@@ -1,5 +1,6 @@
 package com.bigboxer23.lights.controllers.aggregate;
 
+import com.bigboxer23.lights.controllers.EmailController;
 import com.bigboxer23.lights.controllers.govee.GoveeHumidifierController;
 import com.bigboxer23.lights.controllers.govee.HumidifierCluster;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
@@ -37,6 +38,8 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 
 	private final GoveeHumidifierController goveeController;
 
+	private final EmailController emailController;
+
 	private final Map<String, HumidifierCluster> humidifierMap = new HashMap<>();
 
 	@Value("${humidfier_to_pump_map}")
@@ -45,10 +48,13 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 	private int HUMIDIFIER_RUNNING_WATTAGE = 10;
 
 	public HumiditySystemController(
-			SwitchBotController switchbotController, GoveeHumidifierController goveeController) {
+			SwitchBotController switchbotController,
+			GoveeHumidifierController goveeController,
+			EmailController emailController) {
 		this.switchbotController = switchbotController;
 		this.goveeController = goveeController;
 		this.goveeController.addHandler(this);
+		this.emailController = emailController;
 	}
 
 	@Override
@@ -91,7 +97,8 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 										.getDeviceApi()
 										.getDeviceStatus(cluster.getHumiditySensor())
 										.getHumidity(),
-								"Get humidity " + switchbotController.getIdentifier(cluster.getHumiditySensor()));
+								"Get humidity " + switchbotController.getIdentifier(cluster.getHumiditySensor()),
+								switchbotController.failureCommand(cluster.getHumiditySensor()));
 						log.info(switchbotController.getIdentifier(cluster.getHumiditySensor())
 								+ " humidity "
 								+ humidity);
@@ -103,7 +110,8 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 											.getDeviceApi()
 											.getDeviceStatus(cluster.getOutlet())
 											.getWatts(),
-									"Get watts " + switchbotController.getIdentifier(cluster.getOutlet()));
+									"Get watts " + switchbotController.getIdentifier(cluster.getOutlet()),
+									switchbotController.failureCommand(cluster.getOutlet()));
 							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
 								log.info("humidifier is running, detected wattage: " + watts);
 								return;
@@ -120,7 +128,8 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 											.getDeviceApi()
 											.getDeviceStatus(cluster.getOutlet())
 											.getWatts(),
-									"Get watts " + switchbotController.getIdentifier(cluster.getOutlet()));
+									"Get watts " + switchbotController.getIdentifier(cluster.getOutlet()),
+									switchbotController.failureCommand(cluster.getOutlet()));
 							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
 								log.info("humidifier should not be running, humidify is too"
 										+ " high "
@@ -146,7 +155,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 			return;
 		}
 		log.info("Out of water event triggered " + deviceName + " : " + deviceId);
-		if (!goveeController.isLastEventRecent(deviceId, deviceName)) {
+		if (!emailController.sendMessageThrottled(deviceId, deviceName)) {
 			new Thread(new RefillAction(
 							switchbotController,
 							goveeController,

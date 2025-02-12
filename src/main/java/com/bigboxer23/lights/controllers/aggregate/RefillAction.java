@@ -47,7 +47,8 @@ public class RefillAction implements Runnable {
 								.sendDeviceControlCommands(humidifierOutletId, IDeviceCommands.PLUG_MINI_OFF);
 						return null;
 					},
-					"Off " + switchbotController.getIdentifier(humidifierOutletId));
+					"Off " + switchbotController.getIdentifier(humidifierOutletId),
+					switchbotController.failureCommand(humidifierOutletId));
 			RetryingCommand.execute(
 					() -> {
 						switchbotController
@@ -56,7 +57,8 @@ public class RefillAction implements Runnable {
 								.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_ON);
 						return null;
 					},
-					"On " + switchbotController.getIdentifier(pumpId));
+					"On " + switchbotController.getIdentifier(pumpId),
+					switchbotController.failureCommand(pumpId));
 			Thread.sleep(5 * 1000);
 
 			RetryingCommand.execute(
@@ -67,7 +69,8 @@ public class RefillAction implements Runnable {
 								.sendDeviceControlCommands(humidifierOutletId, IDeviceCommands.PLUG_MINI_ON);
 						return null;
 					},
-					"On " + switchbotController.getIdentifier(humidifierOutletId));
+					"On " + switchbotController.getIdentifier(humidifierOutletId),
+					switchbotController.failureCommand(humidifierOutletId));
 
 			Thread.sleep(60 * 1000); // 1 min
 			RetryingCommand.execute(
@@ -75,7 +78,8 @@ public class RefillAction implements Runnable {
 						goveeController.sendDeviceCommand(IHumidifierCommands.turnOn(humidifierModel, humidifierId));
 						return null;
 					},
-					"On " + goveeController.getIdentifier(humidifierId));
+					"On " + goveeController.getIdentifier(humidifierId),
+					switchbotController.failureCommand(humidifierId));
 
 			Thread.sleep(60 * 1000); // 1 min
 			RetryingCommand.execute(
@@ -86,7 +90,8 @@ public class RefillAction implements Runnable {
 								.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_OFF);
 						return null;
 					},
-					"Off " + switchbotController.getIdentifier(pumpId));
+					"Off " + switchbotController.getIdentifier(pumpId),
+					switchbotController.failureCommand(pumpId));
 		} catch (IOException | InterruptedException e) {
 			log.error("error refilling humidifier, attempting to turn off pump " + pumpId, e);
 			try {
@@ -99,7 +104,8 @@ public class RefillAction implements Runnable {
 									.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_OFF);
 							return null;
 						},
-						"Off " + switchbotController.getIdentifier(pumpId));
+						"Off " + switchbotController.getIdentifier(pumpId),
+						switchbotController.failureCommand(pumpId));
 			} catch (IOException | InterruptedException e2) {
 				log.error("error turning off pump " + pumpId, e2);
 			}

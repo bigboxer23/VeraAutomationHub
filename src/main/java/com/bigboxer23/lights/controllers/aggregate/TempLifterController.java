@@ -20,7 +20,7 @@ public class TempLifterController {
 		this.switchbotController = switchbotController;
 	}
 
-	@Scheduled(cron = "0 0,5,10 */2 * * *")
+	@Scheduled(cron = "0 0,15 * * * *")
 	public void runFans() throws IOException, InterruptedException {
 		RetryingCommand.execute(
 				() -> {
@@ -30,7 +30,8 @@ public class TempLifterController {
 							.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_ON);
 					return null;
 				},
-				"On " + switchbotController.getIdentifier(fanSwitchId));
+				"On " + switchbotController.getIdentifier(fanSwitchId),
+				switchbotController.failureCommand(fanSwitchId));
 
 		log.debug("sleeping lifter system controller");
 		Thread.sleep(30000L);
@@ -42,6 +43,7 @@ public class TempLifterController {
 							.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_OFF);
 					return null;
 				},
-				"Off " + switchbotController.getIdentifier(fanSwitchId));
+				"Off " + switchbotController.getIdentifier(fanSwitchId),
+				switchbotController.failureCommand(fanSwitchId));
 	}
 }
