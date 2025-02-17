@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
 public class GCalendarController extends HubContext {
 	private static final JsonFactory kJSON_FACTORY = GsonFactory.getDefaultInstance();
 
-	private static List<String> kVacationKeywords = new ArrayList<String>() {
+	private static List<String> kVacationKeywords = new ArrayList<>() {
 		{
 			add("vacation");
 			add("paternity");
@@ -58,9 +58,10 @@ public class GCalendarController extends HubContext {
 		}
 	};
 
-	private static List<String> kPTOKeywords = new ArrayList<String>() {
+	private static List<String> kPTOKeywords = new ArrayList<>() {
 		{
 			add("pto");
+			add("no work");
 		}
 	};
 
