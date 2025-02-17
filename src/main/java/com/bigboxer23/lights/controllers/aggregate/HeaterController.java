@@ -13,11 +13,9 @@ public class HeaterController extends AbstractEnvironmentController {
 	}
 
 	@Override
-	public float getEnvironmentValue(SwitchBotController controller, String deviceId) throws IOException {
-		return EnvironmentUtils.celciusToFahrenheit(controller
-				.getSwitchbotAPI()
-				.getDeviceApi()
-				.getDeviceStatus(deviceId)
-				.getTemperature());
+	public float getEnvironmentValue(String identifier, String deviceId, SwitchBotController controller)
+			throws IOException {
+		return EnvironmentUtils.celciusToFahrenheit(
+				controller.getDeviceStatus(deviceId).getTemperature());
 	}
 }

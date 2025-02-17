@@ -6,6 +6,8 @@ import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.switch_bot.IDeviceTypes;
 import com.bigboxer23.switch_bot.SwitchBotApi;
 import com.bigboxer23.switch_bot.data.Device;
+import com.bigboxer23.switch_bot.data.DeviceCommand;
+import com.bigboxer23.switch_bot.data.IApiResponse;
 import com.bigboxer23.utils.command.Command;
 import com.bigboxer23.utils.command.RetryingCommand;
 import io.swagger.v3.oas.annotations.Operation;
@@ -127,20 +129,9 @@ public class SwitchBotController {
 					@PathVariable(value = "command")
 					String command)
 			throws IOException {
-		RetryingCommand.execute(
-				() -> {
-					getSwitchbotAPI()
-							.getDeviceApi()
-							.sendDeviceControlCommands(
-									deviceId,
-									"on".equalsIgnoreCase(command)
-											? IDeviceCommands.PLUG_MINI_ON
-											: IDeviceCommands.PLUG_MINI_OFF);
-
-					return null;
-				},
-				command + " " + getIdentifier(deviceId),
-				failureCommand(deviceId));
+		sendDeviceControlCommands(
+				deviceId,
+				"on".equalsIgnoreCase(command) ? IDeviceCommands.PLUG_MINI_ON : IDeviceCommands.PLUG_MINI_OFF);
 	}
 
 	public Command<Void> failureCommand(String deviceId) {
@@ -149,5 +140,21 @@ public class SwitchBotController {
 					deviceId, getIdentifier(deviceId), IErrorConstants.emailSubject, IErrorConstants.emailBody);
 			return null;
 		};
+	}
+
+	public Device getDeviceStatus(String deviceId) throws IOException {
+		return RetryingCommand.execute(
+				() -> getSwitchbotAPI().getDeviceApi().getDeviceStatus(deviceId),
+				"Device Status",
+				deviceId,
+				failureCommand(deviceId));
+	}
+
+	public IApiResponse sendDeviceControlCommands(String deviceId, DeviceCommand command) throws IOException {
+		return RetryingCommand.execute(
+				() -> getSwitchbotAPI().getDeviceApi().sendDeviceControlCommands(deviceId, command),
+				command.getCommand(),
+				deviceId,
+				failureCommand(deviceId));
 	}
 }

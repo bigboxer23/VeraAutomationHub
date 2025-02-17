@@ -4,7 +4,7 @@ import com.bigboxer23.lights.controllers.EmailController;
 import com.bigboxer23.lights.controllers.govee.GoveeHumidifierController;
 import com.bigboxer23.lights.controllers.govee.HumidifierCluster;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
-import com.bigboxer23.utils.command.RetryingCommand;
+import com.bigboxer23.utils.logging.LoggingUtil;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.swagger.v3.oas.annotations.Operation;
@@ -86,32 +86,23 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 
 	@Scheduled(fixedDelay = 600000) // 10min
 	public void checkAfterInterval() {
-		log.info("checking humidity");
+		log.info("checking cluster humidity");
 		humidifierMap.values().stream()
 				.filter(cluster -> !StringUtils.isEmpty(cluster.getHumiditySensor()))
 				.forEach(cluster -> {
+					LoggingUtil.addMethod("checkAfterInterval");
 					try {
-						int humidity = RetryingCommand.execute(
-								() -> switchbotController
-										.getSwitchbotAPI()
-										.getDeviceApi()
-										.getDeviceStatus(cluster.getHumiditySensor())
-										.getHumidity(),
-								"Get humidity " + switchbotController.getIdentifier(cluster.getHumiditySensor()),
-								switchbotController.failureCommand(cluster.getHumiditySensor()));
+						int humidity = switchbotController
+								.getDeviceStatus(cluster.getHumiditySensor())
+								.getHumidity();
 						log.info(switchbotController.getIdentifier(cluster.getHumiditySensor())
 								+ " humidity "
 								+ humidity);
 						if (humidity < cluster.getLowHumidityPoint()) {
 							log.info("low humidity detected " + humidity + ":" + cluster.getLowHumidityPoint());
-							float watts = RetryingCommand.execute(
-									() -> switchbotController
-											.getSwitchbotAPI()
-											.getDeviceApi()
-											.getDeviceStatus(cluster.getOutlet())
-											.getWatts(),
-									"Get watts " + switchbotController.getIdentifier(cluster.getOutlet()),
-									switchbotController.failureCommand(cluster.getOutlet()));
+							float watts = switchbotController
+									.getDeviceStatus(cluster.getOutlet())
+									.getWatts();
 							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
 								log.info("humidifier is running, detected wattage: " + watts);
 								return;
@@ -122,14 +113,10 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 									cluster.getHumidifierModel());
 						} else if (humidity > 73) { // Govee seems to have a bug where the humidifier
 							// doesn't turn off, so we manually cycle again
-							float watts = RetryingCommand.execute(
-									() -> switchbotController
-											.getSwitchbotAPI()
-											.getDeviceApi()
-											.getDeviceStatus(cluster.getOutlet())
-											.getWatts(),
-									"Get watts " + switchbotController.getIdentifier(cluster.getOutlet()),
-									switchbotController.failureCommand(cluster.getOutlet()));
+							float watts = switchbotController
+									.getDeviceStatus(cluster.getOutlet())
+									.getWatts();
+							log.info("humidifier wattage: " + watts);
 							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
 								log.info("humidifier should not be running, humidify is too"
 										+ " high "
@@ -145,6 +132,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 						log.error("manualCheck: ", e);
 					}
 				});
+		LoggingUtil.clearContext();
 	}
 
 	@Override

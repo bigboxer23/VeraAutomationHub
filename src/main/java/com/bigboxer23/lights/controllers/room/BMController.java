@@ -5,8 +5,6 @@ import com.bigboxer23.lights.controllers.aggregate.HeaterController;
 import com.bigboxer23.lights.controllers.aggregate.HumidityController;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
-import com.bigboxer23.switch_bot.data.IApiResponse;
-import com.bigboxer23.utils.command.RetryingCommand;
 import com.bigboxer23.utils.file.FilePersistedBoolean;
 import com.bigboxer23.utils.time.ITimeConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -83,13 +81,7 @@ public class BMController {
 		if (lightsDisabled.get()) {
 			return;
 		}
-		RetryingCommand.execute(
-				() -> switchbotController
-						.getSwitchbotAPI()
-						.getDeviceApi()
-						.sendDeviceControlCommands(lightSwitchId, IDeviceCommands.PLUG_MINI_ON),
-				"On " + switchbotController.getIdentifier(lightSwitchId),
-				switchbotController.failureCommand(lightSwitchId));
+		switchbotController.sendDeviceControlCommands(lightSwitchId, IDeviceCommands.PLUG_MINI_ON);
 	}
 
 	@Scheduled(cron = "0 0 20 * * ?")
@@ -97,13 +89,7 @@ public class BMController {
 		if (lightsDisabled.get()) {
 			return;
 		}
-		RetryingCommand.execute(
-				() -> switchbotController
-						.getSwitchbotAPI()
-						.getDeviceApi()
-						.sendDeviceControlCommands(lightSwitchId, IDeviceCommands.PLUG_MINI_OFF),
-				"Off " + switchbotController.getIdentifier(lightSwitchId),
-				switchbotController.failureCommand(lightSwitchId));
+		switchbotController.sendDeviceControlCommands(lightSwitchId, IDeviceCommands.PLUG_MINI_OFF);
 	}
 
 	@Scheduled(cron = "0 */15 * * * *") // every 15 min
@@ -111,28 +97,10 @@ public class BMController {
 		if (faeDisabled.get()) {
 			return;
 		}
-		RetryingCommand.execute(
-				() -> {
-					IApiResponse response = switchbotController
-							.getSwitchbotAPI()
-							.getDeviceApi()
-							.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_ON);
-					return null;
-				},
-				"On " + switchbotController.getIdentifier(fanSwitchId),
-				switchbotController.failureCommand(fanSwitchId));
-
+		switchbotController.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_ON);
 		log.debug("sleeping fan system controller");
 		Thread.sleep(fanDuration * ITimeConstants.MINUTE);
-		RetryingCommand.execute(
-				() -> {
-					switchbotController
-							.getSwitchbotAPI()
-							.getDeviceApi()
-							.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_OFF);
-					return null;
-				},
-				"Off " + switchbotController.getIdentifier(fanSwitchId));
+		switchbotController.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_OFF);
 	}
 
 	@GetMapping(value = "/S/BMController/FanService/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
