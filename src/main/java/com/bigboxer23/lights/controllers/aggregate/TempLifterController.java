@@ -2,7 +2,6 @@ package com.bigboxer23.lights.controllers.aggregate;
 
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
-import com.bigboxer23.utils.command.RetryingCommand;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,28 +21,9 @@ public class TempLifterController {
 
 	@Scheduled(cron = "0 0,15 * * * *")
 	public void runFans() throws IOException, InterruptedException {
-		RetryingCommand.execute(
-				() -> {
-					switchbotController
-							.getSwitchbotAPI()
-							.getDeviceApi()
-							.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_ON);
-					return null;
-				},
-				"On " + switchbotController.getIdentifier(fanSwitchId),
-				switchbotController.failureCommand(fanSwitchId));
-
+		switchbotController.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_ON);
 		log.debug("sleeping lifter system controller");
 		Thread.sleep(30000L);
-		RetryingCommand.execute(
-				() -> {
-					switchbotController
-							.getSwitchbotAPI()
-							.getDeviceApi()
-							.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_OFF);
-					return null;
-				},
-				"Off " + switchbotController.getIdentifier(fanSwitchId),
-				switchbotController.failureCommand(fanSwitchId));
+		switchbotController.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_OFF);
 	}
 }

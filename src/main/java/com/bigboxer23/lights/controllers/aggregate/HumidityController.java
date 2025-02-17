@@ -11,11 +11,8 @@ public class HumidityController extends AbstractEnvironmentController {
 	}
 
 	@Override
-	public float getEnvironmentValue(SwitchBotController controller, String deviceId) throws IOException {
-		return controller
-				.getSwitchbotAPI()
-				.getDeviceApi()
-				.getDeviceStatus(deviceId)
-				.getHumidity();
+	public float getEnvironmentValue(String identifier, String deviceId, SwitchBotController controller)
+			throws IOException {
+		return controller.getDeviceStatus(deviceId).getHumidity();
 	}
 }

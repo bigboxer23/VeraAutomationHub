@@ -3,7 +3,6 @@ package com.bigboxer23.lights.controllers.aggregate;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.switch_bot.data.Device;
-import com.bigboxer23.utils.command.RetryingCommand;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -68,78 +67,29 @@ public class MultipointDehumidifierController implements InitializingBean {
 
 	private void humidifierImpl(double humidity) throws IOException {
 		if (humidity > humidifierHighHumidity && isHumidifierPowerOn()) {
-			RetryingCommand.execute(
-					() -> {
-						switchbotController
-								.getSwitchbotAPI()
-								.getDeviceApi()
-								.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_OFF);
-						return null;
-					},
-					"Off " + switchbotController.getIdentifier(dehumidifierId),
-					switchbotController.failureCommand(dehumidifierId));
+			switchbotController.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_OFF);
 		} else if (humidity < humidifierLowHumidity && !isHumidifierPowerOn()) {
-			RetryingCommand.execute(
-					() -> {
-						switchbotController
-								.getSwitchbotAPI()
-								.getDeviceApi()
-								.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_ON);
-						return null;
-					},
-					"On " + switchbotController.getIdentifier(dehumidifierId),
-					switchbotController.failureCommand(dehumidifierId));
+			switchbotController.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_ON);
 		}
 	}
 
 	private void dehumidifierImpl(double humidity) throws IOException {
 		if (humidity > highHumidity && !isHumidifierPowerOn()) {
-			RetryingCommand.execute(
-					() -> {
-						switchbotController
-								.getSwitchbotAPI()
-								.getDeviceApi()
-								.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_ON);
-						return null;
-					},
-					"On " + switchbotController.getIdentifier(dehumidifierId),
-					switchbotController.failureCommand(dehumidifierId));
+			switchbotController.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_ON);
 		} else if (humidity < lowHumidity && isHumidifierPowerOn()) {
-			RetryingCommand.execute(
-					() -> {
-						switchbotController
-								.getSwitchbotAPI()
-								.getDeviceApi()
-								.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_OFF);
-						return null;
-					},
-					"Off " + switchbotController.getIdentifier(dehumidifierId),
-					switchbotController.failureCommand(dehumidifierId));
+			switchbotController.sendDeviceControlCommands(dehumidifierId, IDeviceCommands.PLUG_MINI_OFF);
 		}
 	}
 
 	private boolean isHumidifierPowerOn() throws IOException {
-		return RetryingCommand.execute(
-						() -> switchbotController
-								.getSwitchbotAPI()
-								.getDeviceApi()
-								.getDeviceStatus(dehumidifierId),
-						"Get power " + switchbotController.getIdentifier(dehumidifierId),
-						switchbotController.failureCommand(dehumidifierId))
-				.isPowerOn();
+		return switchbotController.getDeviceStatus(dehumidifierId).isPowerOn();
 	}
 
 	private double getHumidity() {
 		return sensorIds.stream()
 				.map(id -> {
 					try {
-						return RetryingCommand.execute(
-								() -> switchbotController
-										.getSwitchbotAPI()
-										.getDeviceApi()
-										.getDeviceStatus(id),
-								"Get humidity " + switchbotController.getIdentifier(id),
-								switchbotController.failureCommand(dehumidifierId));
+						return switchbotController.getDeviceStatus(id);
 					} catch (IOException e) {
 						log.error("getHumidity", e);
 						throw new RuntimeException(e);

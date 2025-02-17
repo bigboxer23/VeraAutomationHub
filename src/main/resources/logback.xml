@@ -9,6 +9,7 @@
 	<appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
 		<destination>${logbackserver}</destination>
 		<keepAliveDuration>5 minutes</keepAliveDuration>
+		<includeMdc>true</includeMdc>
 		<encoder class="net.logstash.logback.encoder.LogstashEncoder" />
 	</appender>
 	<logger name="com.bigboxer23" level="INFO"/>

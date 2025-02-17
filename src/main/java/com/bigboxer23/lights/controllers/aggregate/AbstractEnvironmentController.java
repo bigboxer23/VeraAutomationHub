@@ -4,7 +4,6 @@ import com.bigboxer23.lights.controllers.EmailController;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.switch_bot.data.Device;
-import com.bigboxer23.utils.command.RetryingCommand;
 import com.bigboxer23.utils.file.FilePersistedBoolean;
 import com.google.gson.GsonBuilder;
 import java.io.IOException;
@@ -29,7 +28,8 @@ public abstract class AbstractEnvironmentController {
 		disabled = new FilePersistedBoolean("AbstractEnvironmentController" + cluster.getSwitchId());
 	}
 
-	public abstract float getEnvironmentValue(SwitchBotController controller, String deviceId) throws IOException;
+	public abstract float getEnvironmentValue(String identifier, String deviceId, SwitchBotController controller)
+			throws IOException;
 
 	public void run() throws IOException {
 		if (disabled.get()) {
@@ -38,10 +38,7 @@ public abstract class AbstractEnvironmentController {
 		double averageEnvFactor = cluster.getEnvironmentDevices().stream()
 				.map(deviceId -> {
 					try {
-						return RetryingCommand.execute(
-								() -> getEnvironmentValue(switchBotController, deviceId),
-								"Get env: " + switchBotController.getIdentifier(deviceId),
-								switchBotController.failureCommand(deviceId));
+						return getEnvironmentValue("Get env", deviceId, switchBotController);
 					} catch (IOException e) {
 						log.error("AbstractEnvironmentController: ", e);
 					}
@@ -51,10 +48,7 @@ public abstract class AbstractEnvironmentController {
 				.mapToInt(Float::intValue)
 				.average()
 				.orElse(0.0);
-		Device device = RetryingCommand.execute(
-				() -> switchBotController.getSwitchbotAPI().getDeviceApi().getDeviceStatus(cluster.getSwitchId()),
-				"power on " + switchBotController.getIdentifier(cluster.getSwitchId()),
-				switchBotController.failureCommand(cluster.getSwitchId()));
+		Device device = switchBotController.getDeviceStatus(cluster.getSwitchId());
 		boolean shouldTurnOff = device.isPowerOn()
 				&& ((!cluster.isDehumidifier() && averageEnvFactor > cluster.getHigh())
 						|| (cluster.isDehumidifier() && averageEnvFactor < cluster.getLow()));
@@ -81,16 +75,9 @@ public abstract class AbstractEnvironmentController {
 					device.getDeviceId(), switchBotController.getIdentifier(device.getDeviceId()));
 		}
 		if (shouldTurnOff || shouldTurnOn) {
-			String action = shouldTurnOff ? "turn off " : "turn on ";
-			RetryingCommand.execute(
-					() -> switchBotController
-							.getSwitchbotAPI()
-							.getDeviceApi()
-							.sendDeviceControlCommands(
-									cluster.getSwitchId(),
-									shouldTurnOff ? IDeviceCommands.PLUG_MINI_OFF : IDeviceCommands.PLUG_MINI_ON),
-					action + switchBotController.getIdentifier(cluster.getSwitchId()),
-					switchBotController.failureCommand(cluster.getSwitchId()));
+			switchBotController.sendDeviceControlCommands(
+					cluster.getSwitchId(),
+					shouldTurnOff ? IDeviceCommands.PLUG_MINI_OFF : IDeviceCommands.PLUG_MINI_ON);
 		}
 	}
 
