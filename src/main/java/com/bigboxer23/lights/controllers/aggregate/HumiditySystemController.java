@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -90,21 +91,15 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 		humidifierMap.values().stream()
 				.filter(cluster -> !StringUtils.isEmpty(cluster.getHumiditySensor()))
 				.forEach(cluster -> {
-					LoggingUtil.addMethod("checkAfterInterval");
-					try {
+					try (MDC.MDCCloseable c = LoggingUtil.addMethod("checkAfterInterval")){
 						int humidity = switchbotController
 								.getDeviceStatus(cluster.getHumiditySensor())
 								.getHumidity();
-						log.info(switchbotController.getIdentifier(cluster.getHumiditySensor())
-								+ " humidity "
-								+ humidity);
 						if (humidity < cluster.getLowHumidityPoint()) {
-							log.info("low humidity detected " + humidity + ":" + cluster.getLowHumidityPoint());
 							float watts = switchbotController
 									.getDeviceStatus(cluster.getOutlet())
 									.getWatts();
 							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
-								log.info("humidifier is running, detected wattage: " + watts);
 								return;
 							}
 							outOfWaterEvent(
@@ -116,7 +111,6 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 							float watts = switchbotController
 									.getDeviceStatus(cluster.getOutlet())
 									.getWatts();
-							log.info("humidifier wattage: " + watts);
 							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
 								log.info("humidifier should not be running, humidify is too"
 										+ " high "
@@ -132,7 +126,6 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 						log.error("manualCheck: ", e);
 					}
 				});
-		LoggingUtil.clearContext();
 	}
 
 	@Override

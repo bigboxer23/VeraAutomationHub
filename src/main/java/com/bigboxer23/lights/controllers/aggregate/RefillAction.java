@@ -6,7 +6,10 @@ import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.utils.command.RetryingCommand;
 import java.io.IOException;
+
+import com.bigboxer23.utils.logging.LoggingUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 /** */
 @Slf4j
@@ -38,7 +41,7 @@ public class RefillAction implements Runnable {
 
 	@Override
 	public void run() {
-		try {
+		try (MDC.MDCCloseable c = LoggingUtil.addMethod("refillAction")){
 			switchbotController.sendDeviceControlCommands(humidifierOutletId, IDeviceCommands.PLUG_MINI_OFF);
 			switchbotController.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_ON);
 			Thread.sleep(5 * 1000);
