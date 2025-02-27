@@ -5,9 +5,8 @@ import com.bigboxer23.lights.controllers.govee.GoveeHumidifierController;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.utils.command.RetryingCommand;
-import java.io.IOException;
-
 import com.bigboxer23.utils.logging.LoggingUtil;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
@@ -41,7 +40,7 @@ public class RefillAction implements Runnable {
 
 	@Override
 	public void run() {
-		try (MDC.MDCCloseable c = LoggingUtil.addMethod("refillAction")){
+		try (MDC.MDCCloseable c = LoggingUtil.addMethod("refillAction")) {
 			switchbotController.sendDeviceControlCommands(humidifierOutletId, IDeviceCommands.PLUG_MINI_OFF);
 			switchbotController.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_ON);
 			Thread.sleep(5 * 1000);
@@ -49,13 +48,13 @@ public class RefillAction implements Runnable {
 			switchbotController.sendDeviceControlCommands(humidifierOutletId, IDeviceCommands.PLUG_MINI_ON);
 
 			Thread.sleep(60 * 1000); // 1 min
-			RetryingCommand.execute(
-					() -> {
+			RetryingCommand.builder()
+					.identifier("On " + goveeController.getIdentifier(humidifierId))
+					.failureCommand(switchbotController.failureCommand(humidifierId))
+					.buildAndExecute(() -> {
 						goveeController.sendDeviceCommand(IHumidifierCommands.turnOn(humidifierModel, humidifierId));
 						return null;
-					},
-					"On " + goveeController.getIdentifier(humidifierId),
-					switchbotController.failureCommand(humidifierId));
+					});
 			Thread.sleep(60 * 1000); // 1 min
 			switchbotController.sendDeviceControlCommands(pumpId, IDeviceCommands.PLUG_MINI_OFF);
 		} catch (IOException | InterruptedException e) {

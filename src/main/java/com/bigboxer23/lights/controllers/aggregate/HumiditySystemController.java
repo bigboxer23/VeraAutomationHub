@@ -91,7 +91,7 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 		humidifierMap.values().stream()
 				.filter(cluster -> !StringUtils.isEmpty(cluster.getHumiditySensor()))
 				.forEach(cluster -> {
-					try (MDC.MDCCloseable c = LoggingUtil.addMethod("checkAfterInterval")){
+					try (MDC.MDCCloseable c = LoggingUtil.addMethod("checkAfterInterval")) {
 						int humidity = switchbotController
 								.getDeviceStatus(cluster.getHumiditySensor())
 								.getHumidity();
