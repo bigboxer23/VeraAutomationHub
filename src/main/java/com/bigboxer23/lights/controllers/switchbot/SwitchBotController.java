@@ -68,14 +68,14 @@ public class SwitchBotController {
 
 	private List<String> getCurtains() throws IOException {
 		if (curtains == null) {
-			curtains = RetryingCommand.execute(
-					() -> getSwitchbotAPI().getDeviceApi().getDevices().stream()
+			curtains = RetryingCommand.builder()
+					.identifier("Fetching CurtainIdFetch")
+					.buildAndExecute(() -> getSwitchbotAPI().getDeviceApi().getDevices().stream()
 							.filter(device -> IDeviceTypes.CURTAIN.equals(device.getDeviceType()))
 							/*.filter(Device::isMaster)
 							.findAny()*/
 							.map(Device::getDeviceId)
-							.toList(),
-					"Fetching CurtainIdFetch");
+							.toList());
 		}
 		return curtains;
 	}
@@ -88,15 +88,15 @@ public class SwitchBotController {
 	})
 	public void openCurtains() throws IOException {
 		for (String curtainId : getCurtains()) {
-			RetryingCommand.execute(
-					() -> {
+			RetryingCommand.builder()
+					.identifier("Open " + getIdentifier(curtainId))
+					.failureCommand(failureCommand(curtainId))
+					.buildAndExecute(() -> {
 						getSwitchbotAPI()
 								.getDeviceApi()
 								.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_OPEN);
 						return null;
-					},
-					"Open " + getIdentifier(curtainId),
-					failureCommand(curtainId));
+					});
 		}
 	}
 
@@ -108,15 +108,15 @@ public class SwitchBotController {
 	})
 	public void closeCurtains() throws IOException {
 		for (String curtainId : getCurtains()) {
-			RetryingCommand.execute(
-					() -> {
+			RetryingCommand.builder()
+					.identifier("Close " + getIdentifier(curtainId))
+					.failureCommand(failureCommand(curtainId))
+					.buildAndExecute(() -> {
 						getSwitchbotAPI()
 								.getDeviceApi()
 								.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_CLOSE);
 						return null;
-					},
-					"Close " + getIdentifier(curtainId),
-					failureCommand(curtainId));
+					});
 		}
 	}
 
@@ -146,12 +146,10 @@ public class SwitchBotController {
 	}
 
 	public Device getDeviceStatus(String deviceId) throws IOException {
-
-		Device device = RetryingCommand.execute(
-				() -> getSwitchbotAPI().getDeviceApi().getDeviceStatus(deviceId),
-				"Device Status",
-				deviceId,
-				failureCommand(deviceId));
+		Device device = RetryingCommand.builder()
+				.identifier("Device Status " + getIdentifier(deviceId))
+				.failureCommand(failureCommand(deviceId))
+				.buildAndExecute(() -> getSwitchbotAPI().getDeviceApi().getDeviceStatus(deviceId));
 		try (MDC.MDCCloseable i = LoggingUtil.addDeviceId(device.getDeviceId());
 				MDC.MDCCloseable t = LoggingUtil.addTemperature(
 						device.getTemperature() != 0
@@ -169,11 +167,11 @@ public class SwitchBotController {
 		try (MDC.MDCCloseable i = LoggingUtil.addDeviceId(deviceId);
 				MDC.MDCCloseable t = LoggingUtil.addCommand(command.getCommand())) {
 			log.info("sendDeviceControlCommands: {}", getIdentifier(deviceId));
-			return RetryingCommand.execute(
-					() -> getSwitchbotAPI().getDeviceApi().sendDeviceControlCommands(deviceId, command),
-					command.getCommand(),
-					deviceId,
-					failureCommand(deviceId));
+			return RetryingCommand.builder()
+					.identifier(command.getCommand() + getIdentifier(deviceId))
+					.failureCommand(failureCommand(deviceId))
+					.buildAndExecute(
+							() -> getSwitchbotAPI().getDeviceApi().sendDeviceControlCommands(deviceId, command));
 		}
 	}
 }

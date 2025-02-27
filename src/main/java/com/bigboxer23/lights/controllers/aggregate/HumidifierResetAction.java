@@ -26,21 +26,21 @@ public class HumidifierResetAction implements Runnable {
 	@Override
 	public void run() {
 		try {
-			RetryingCommand.execute(
-					() -> {
+			RetryingCommand.builder()
+					.identifier("Set 50% " + goveeController.getIdentifier(humidifierId))
+					.buildAndExecute(() -> {
 						goveeController.sendDeviceCommand(
 								IHumidifierCommands.setAutoHumidityTargetPercent(humidifierModel, humidifierId, 50));
 						return null;
-					},
-					"Set 50% " + goveeController.getIdentifier(humidifierId));
+					});
 			Thread.sleep(5 * 1000);
-			RetryingCommand.execute(
-					() -> {
+			RetryingCommand.builder()
+					.identifier("Set 70% " + goveeController.getIdentifier(humidifierId))
+					.buildAndExecute(() -> {
 						goveeController.sendDeviceCommand(
 								IHumidifierCommands.setAutoHumidityTargetPercent(humidifierModel, humidifierId, 70));
 						return null;
-					},
-					"Set 70% " + goveeController.getIdentifier(humidifierId));
+					});
 		} catch (InterruptedException | IOException e) {
 			log.error("HumidifierResetAction", e);
 		}
