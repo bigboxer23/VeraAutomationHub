@@ -157,8 +157,9 @@ public class SwitchBotController {
 								: device.getTemperature());
 				MDC.MDCCloseable w = LoggingUtil.addWatts(device.getWatts());
 				MDC.MDCCloseable h = LoggingUtil.addHumidity(device.getHumidity());
-				MDC.MDCCloseable co2 = LoggingUtil.addCO2(device.getCo2())) {
-			log.info("Device Status: {}", getIdentifier(deviceId));
+				MDC.MDCCloseable co2 = LoggingUtil.addCO2(device.getCo2());
+				MDC.MDCCloseable s = LoggingUtil.addCommand("status")) {
+			log.info("Device Status: {}", getSwitchbotAPI().getDeviceApi().getDeviceNameFromId(deviceId));
 			return device;
 		}
 	}
@@ -166,7 +167,9 @@ public class SwitchBotController {
 	public IApiResponse sendDeviceControlCommands(String deviceId, DeviceCommand command) throws IOException {
 		try (MDC.MDCCloseable i = LoggingUtil.addDeviceId(deviceId);
 				MDC.MDCCloseable t = LoggingUtil.addCommand(command.getCommand())) {
-			log.info("sendDeviceControlCommands: {}", getIdentifier(deviceId));
+			log.info(
+					"sendDeviceControlCommands: {}",
+					getSwitchbotAPI().getDeviceApi().getDeviceNameFromId(deviceId));
 			return RetryingCommand.builder()
 					.identifier(command.getCommand() + getIdentifier(deviceId))
 					.failureCommand(failureCommand(deviceId))

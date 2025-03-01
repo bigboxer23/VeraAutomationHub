@@ -5,9 +5,11 @@ import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.switch_bot.data.Device;
 import com.bigboxer23.utils.file.FilePersistedBoolean;
+import com.bigboxer23.utils.logging.LoggingUtil;
 import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 /** */
 @Slf4j
@@ -56,17 +58,20 @@ public abstract class AbstractEnvironmentController {
 		boolean shouldTurnOn = !device.isPowerOn()
 				&& ((!cluster.isDehumidifier() && averageEnvFactor < cluster.getLow())
 						|| (cluster.isDehumidifier() && averageEnvFactor > cluster.getHigh()));
-		log.info(switchBotController.getIdentifier(cluster.getSwitchId())
-				+ " "
-				+ averageEnvFactor
-				+ " "
-				+ cluster.getHigh()
-				+ " "
-				+ cluster.getLow()
-				+ " "
-				+ shouldTurnOff
-				+ " "
-				+ shouldTurnOn);
+
+		try (MDC.MDCCloseable i = LoggingUtil.addDeviceId(cluster.getSwitchId());
+				MDC.MDCCloseable h =
+						LoggingUtil.addHumidity(Double.valueOf(averageEnvFactor).intValue())) {
+			log.info(switchBotController.getIdentifier(cluster.getSwitchId())
+					+ " "
+					+ cluster.getHigh()
+					+ " "
+					+ cluster.getLow()
+					+ " "
+					+ shouldTurnOff
+					+ " "
+					+ shouldTurnOn);
+		}
 		if (!cluster.isDehumidifier()
 				&& averageEnvFactor < cluster.getLow()
 				&& device.isPowerOn()
