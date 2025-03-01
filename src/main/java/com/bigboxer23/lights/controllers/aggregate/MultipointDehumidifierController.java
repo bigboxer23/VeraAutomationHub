@@ -3,10 +3,12 @@ package com.bigboxer23.lights.controllers.aggregate;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.switch_bot.data.Device;
+import com.bigboxer23.utils.logging.LoggingUtil;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -57,7 +59,12 @@ public class MultipointDehumidifierController implements InitializingBean {
 	@Scheduled(fixedDelay = 300000) // 5min
 	private void checkHumidity() throws IOException {
 		double humidity = getHumidity();
-		log.info("humidity: " + humidity);
+		try (MDC.MDCCloseable i = LoggingUtil.addDeviceId(dehumidifierId);
+				MDC.MDCCloseable h =
+						LoggingUtil.addHumidity(Double.valueOf(humidity).intValue());
+				MDC.MDCCloseable m = LoggingUtil.addMethod("checkHumidity")) {
+			log.info("check humidity");
+		}
 		if (humidityMode) {
 			humidifierImpl(humidity);
 			return;
