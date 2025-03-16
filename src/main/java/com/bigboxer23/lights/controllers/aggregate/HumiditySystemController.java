@@ -4,7 +4,9 @@ import com.bigboxer23.lights.controllers.EmailController;
 import com.bigboxer23.lights.controllers.govee.GoveeHumidifierController;
 import com.bigboxer23.lights.controllers.govee.HumidifierCluster;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
 import com.bigboxer23.utils.logging.LoggingUtil;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.swagger.v3.oas.annotations.Operation;
@@ -81,8 +83,10 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 			@Parameter(description = "deviceName (for logging only)") @PathVariable(value = "deviceName")
 					String deviceName,
 			@Parameter(description = "deviceModel") @PathVariable(value = "deviceModel") String deviceModel) {
-		log.info(deviceId + " requested via web api");
-		outOfWaterEvent(deviceId, deviceName, deviceModel);
+		try (MDC.MDCCloseable c = LoggingUtil.addDeviceId(deviceId)) {
+			log.info(deviceId + " requested via web api");
+			outOfWaterEvent(deviceId, deviceName, deviceModel);
+		}
 	}
 
 	@Scheduled(fixedDelay = 600000) // 10min
@@ -130,21 +134,26 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 
 	@Override
 	public void outOfWaterEvent(String deviceId, String deviceName, String deviceModel) {
-		HumidifierCluster cluster = humidifierMap.get(deviceId);
-		if (cluster == null) {
-			log.warn("No cluster for " + deviceId);
-			return;
-		}
-		log.info("Out of water event triggered " + deviceName + " : " + deviceId);
-		if (!emailController.sendMessageThrottled(deviceId, deviceName)) {
-			new Thread(new RefillAction(
-							switchbotController,
-							goveeController,
-							cluster.getPump(),
-							deviceModel,
-							deviceId,
-							cluster.getOutlet()))
-					.start();
+		try (WrappingCloseable c = LoggingContextBuilder.create()
+				.addDeviceId(deviceId)
+				.addMethod("outOfWaterEvent")
+				.build()) {
+			HumidifierCluster cluster = humidifierMap.get(deviceId);
+			if (cluster == null) {
+				log.warn("No cluster for " + deviceId);
+				return;
+			}
+			log.info("Out of water event triggered " + deviceName + " : " + deviceId);
+			if (!emailController.sendMessageThrottled(deviceId, deviceName)) {
+				new Thread(new RefillAction(
+								switchbotController,
+								goveeController,
+								cluster.getPump(),
+								deviceModel,
+								deviceId,
+								cluster.getOutlet()))
+						.start();
+			}
 		}
 	}
 }

@@ -29,8 +29,6 @@
   <component name="CheckStyle-IDEA" serialisationVersion="2">
     <checkstyleVersion>8.2</checkstyleVersion>
     <scanScope>JavaOnly</scanScope>
-    <option name="thirdPartyClasspath" />
-    <option name="activeLocationIds" />
     <option name="locations">
       <list>
         <ConfigurationLocation id="bundled-sun-checks" type="BUNDLED" scope="All" description="Sun Checks">(bundled)</ConfigurationLocation>
@@ -349,7 +347,19 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/utils/2.0.32/utils-2.0.32-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/utils/2.0.32/utils-2.0.32-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/switchbotapi-java/1.2.0/switchbotapi-java-1.2.0-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: com.bigboxer23:utils:2.2.1" type="java-imported" external-system-id="Maven">
+      <properties groupId="com.bigboxer23" artifactId="utils" version="2.2.1" baseVersion="2.2.1" />
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/utils/2.2.1/utils-2.2.1.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/utils/2.2.1/utils-2.2.1-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/utils/2.2.1/utils-2.2.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.carrotsearch:hppc:0.8.1" type="java-imported" external-system-id="Maven">
@@ -460,16 +470,16 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.17.1/jackson-datatype-jsr310-2.17.1-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.fasterxml.jackson.module:jackson-module-kotlin:2.17.0" type="java-imported" external-system-id="Maven">
-      <properties groupId="com.fasterxml.jackson.module" artifactId="jackson-module-kotlin" version="2.17.0" />
+    <library name="Maven: com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3" type="java-imported" external-system-id="Maven">
+      <properties groupId="com.fasterxml.jackson.module" artifactId="jackson-module-kotlin" version="2.18.3" baseVersion="2.18.3" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/module/jackson-module-kotlin/2.17.0/jackson-module-kotlin-2.17.0.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/module/jackson-module-kotlin/2.18.3/jackson-module-kotlin-2.18.3.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/module/jackson-module-kotlin/2.17.0/jackson-module-kotlin-2.17.0-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/module/jackson-module-kotlin/2.18.3/jackson-module-kotlin-2.18.3-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/module/jackson-module-kotlin/2.17.0/jackson-module-kotlin-2.17.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/module/jackson-module-kotlin/2.18.3/jackson-module-kotlin-2.18.3-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.fasterxml.jackson.module:jackson-module-parameter-names:2.17.1" type="java-imported" external-system-id="Maven">
@@ -616,16 +626,16 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/failureaccess/1.0.2/failureaccess-1.0.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.google.guava:guava:33.2.1-jre" type="java-imported" external-system-id="Maven">
-      <properties groupId="com.google.guava" artifactId="guava" version="33.2.1-jre" />
+    <library name="Maven: com.google.guava:guava:33.3.1-jre" type="java-imported" external-system-id="Maven">
+      <properties groupId="com.google.guava" artifactId="guava" version="33.3.1-jre" baseVersion="33.3.1-jre" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/33.2.1-jre/guava-33.2.1-jre.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/33.3.1-jre/guava-33.3.1-jre.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/33.2.1-jre/guava-33.2.1-jre-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/33.3.1-jre/guava-33.3.1-jre-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/33.2.1-jre/guava-33.2.1-jre-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/33.3.1-jre/guava-33.3.1-jre-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava" type="java-imported" external-system-id="Maven">
