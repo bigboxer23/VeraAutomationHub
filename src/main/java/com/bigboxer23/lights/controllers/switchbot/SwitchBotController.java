@@ -11,7 +11,8 @@ import com.bigboxer23.switch_bot.data.IApiResponse;
 import com.bigboxer23.utils.command.Command;
 import com.bigboxer23.utils.command.RetryingCommand;
 import com.bigboxer23.utils.environment.EnvironmentUtils;
-import com.bigboxer23.utils.logging.LoggingUtil;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,7 +22,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -150,23 +150,27 @@ public class SwitchBotController {
 				.identifier("Device Status " + getIdentifier(deviceId))
 				.failureCommand(failureCommand(deviceId))
 				.buildAndExecute(() -> getSwitchbotAPI().getDeviceApi().getDeviceStatus(deviceId));
-		try (MDC.MDCCloseable i = LoggingUtil.addDeviceId(device.getDeviceId());
-				MDC.MDCCloseable t = LoggingUtil.addTemperature(
+		try (WrappingCloseable i = LoggingContextBuilder.create()
+				.addDeviceId(device.getDeviceId())
+				.addTemperature(
 						device.getTemperature() != 0
 								? EnvironmentUtils.celciusToFahrenheit(device.getTemperature())
-								: device.getTemperature());
-				MDC.MDCCloseable w = LoggingUtil.addWatts(device.getWatts());
-				MDC.MDCCloseable h = LoggingUtil.addHumidity(device.getHumidity());
-				MDC.MDCCloseable co2 = LoggingUtil.addCO2(device.getCo2());
-				MDC.MDCCloseable s = LoggingUtil.addCommand("status")) {
+								: device.getTemperature())
+				.addWatts(device.getWatts())
+				.addHumidity(device.getHumidity())
+				.addCO2(device.getCo2())
+				.addCommand("status")
+				.build()) {
 			log.info("Device Status: {}", getSwitchbotAPI().getDeviceApi().getDeviceNameFromId(deviceId));
 			return device;
 		}
 	}
 
 	public IApiResponse sendDeviceControlCommands(String deviceId, DeviceCommand command) throws IOException {
-		try (MDC.MDCCloseable i = LoggingUtil.addDeviceId(deviceId);
-				MDC.MDCCloseable t = LoggingUtil.addCommand(command.getCommand())) {
+		try (WrappingCloseable i = LoggingContextBuilder.create()
+				.addDeviceId(deviceId)
+				.addCommand(command.getCommand())
+				.build()) {
 			log.info(
 					"sendDeviceControlCommands: {}",
 					getSwitchbotAPI().getDeviceApi().getDeviceNameFromId(deviceId));

@@ -5,11 +5,11 @@ import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.switch_bot.data.Device;
 import com.bigboxer23.utils.file.FilePersistedBoolean;
-import com.bigboxer23.utils.logging.LoggingUtil;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
 import com.google.gson.GsonBuilder;
+import java.io.Closeable;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 
 /** */
 @Slf4j
@@ -59,9 +59,10 @@ public abstract class AbstractEnvironmentController {
 				&& ((!cluster.isDehumidifier() && averageEnvFactor < cluster.getLow())
 						|| (cluster.isDehumidifier() && averageEnvFactor > cluster.getHigh()));
 
-		try (MDC.MDCCloseable i = LoggingUtil.addDeviceId(cluster.getSwitchId());
-				MDC.MDCCloseable h =
-						LoggingUtil.addHumidity(Double.valueOf(averageEnvFactor).intValue())) {
+		try (Closeable context = LoggingContextBuilder.create()
+				.addDeviceId(cluster.getSwitchId())
+				.addHumidity(Double.valueOf(averageEnvFactor).intValue())
+				.build()) {
 			log.info(switchBotController.getIdentifier(cluster.getSwitchId())
 					+ " "
 					+ cluster.getHigh()
