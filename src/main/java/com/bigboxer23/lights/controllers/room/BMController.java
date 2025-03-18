@@ -6,6 +6,8 @@ import com.bigboxer23.lights.controllers.aggregate.HumidityController;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.utils.file.FilePersistedBoolean;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import com.bigboxer23.utils.time.ITimeConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -61,35 +63,35 @@ public class BMController {
 	}
 
 	@Scheduled(cron = "0 */5 * * * *")
-	public void humidityControl() throws IOException {
+	public void humidityControl() throws IOException, InterruptedException {
 		if (humidityController == null) {
 			humidityController = new HumidityController(switchbotController, emailController, humidifierMap);
 		}
-		humidityController.run();
+		runTraced(() -> humidityController.run());
 	}
 
 	@Scheduled(cron = "0 */5 * * * *")
-	public void incubateControl() throws IOException {
+	public void incubateControl() throws IOException, InterruptedException {
 		if (incubatorController == null) {
 			incubatorController = new HeaterController(switchbotController, emailController, incubatorMap);
 		}
-		incubatorController.run();
+		runTraced(() -> incubatorController.run());
 	}
 
 	@Scheduled(cron = "0 0 8 * * ?")
-	public void lightsOn() throws IOException {
+	public void lightsOn() throws IOException, InterruptedException {
 		if (lightsDisabled.get()) {
 			return;
 		}
-		switchbotController.sendDeviceControlCommands(lightSwitchId, IDeviceCommands.PLUG_MINI_ON);
+		runTraced(() -> switchbotController.sendDeviceControlCommands(lightSwitchId, IDeviceCommands.PLUG_MINI_ON));
 	}
 
 	@Scheduled(cron = "0 0 20 * * ?")
-	public void lightsOff() throws IOException {
+	public void lightsOff() throws IOException, InterruptedException {
 		if (lightsDisabled.get()) {
 			return;
 		}
-		switchbotController.sendDeviceControlCommands(lightSwitchId, IDeviceCommands.PLUG_MINI_OFF);
+		runTraced(() -> switchbotController.sendDeviceControlCommands(lightSwitchId, IDeviceCommands.PLUG_MINI_OFF));
 	}
 
 	@Scheduled(cron = "0 */15 * * * *") // every 15 min
@@ -97,10 +99,12 @@ public class BMController {
 		if (faeDisabled.get()) {
 			return;
 		}
-		switchbotController.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_ON);
-		log.debug("sleeping fan system controller");
-		Thread.sleep(fanDuration * ITimeConstants.MINUTE);
-		switchbotController.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_OFF);
+		runTraced(() -> {
+			switchbotController.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_ON);
+			log.debug("sleeping fan system controller");
+			Thread.sleep(fanDuration * ITimeConstants.MINUTE);
+			switchbotController.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_OFF);
+		});
 	}
 
 	@GetMapping(value = "/S/BMController/FanService/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -112,9 +116,12 @@ public class BMController {
 	public void enableFans(
 			@Parameter(description = "Enable or disable the fan controller from running")
 					@PathVariable(value = "enable")
-					boolean enable) {
-		log.info(enable + " fan system requested via web api");
-		faeDisabled.set(!enable);
+					boolean enable)
+			throws IOException, InterruptedException {
+		runTraced(() -> {
+			log.info(enable + " fan system requested via web api");
+			faeDisabled.set(!enable);
+		});
 	}
 
 	@GetMapping(value = "/S/BMController/Lights/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -125,9 +132,12 @@ public class BMController {
 	})
 	public void enableLights(
 			@Parameter(description = "Enable or disable the bm lights from running") @PathVariable(value = "enable")
-					boolean enable) {
-		log.info(enable + " lights system requested via web api");
-		lightsDisabled.set(!enable);
+					boolean enable)
+			throws IOException, InterruptedException {
+		runTraced(() -> {
+			log.info(enable + " lights system requested via web api");
+			lightsDisabled.set(!enable);
+		});
 	}
 
 	@GetMapping(value = "/S/BMController/IncubationHeater/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -139,9 +149,12 @@ public class BMController {
 	public void enableIncubationHeater(
 			@Parameter(description = "Enable or disable the bm incubation heater from running")
 					@PathVariable(value = "enable")
-					boolean enable) {
-		log.info(enable + " incubation heater system requested via web api");
-		incubatorController.disable(!enable);
+					boolean enable)
+			throws IOException, InterruptedException {
+		runTraced(() -> {
+			log.info(enable + " incubation heater system requested via web api");
+			incubatorController.disable(!enable);
+		});
 	}
 
 	@GetMapping(value = "/S/BMController/Humidity/{enable}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -152,8 +165,19 @@ public class BMController {
 	})
 	public void enableHumidityController(
 			@Parameter(description = "Enable or disable the bm humidity from running") @PathVariable(value = "enable")
-					boolean enable) {
+					boolean enable)
+			throws IOException, InterruptedException {
 		log.info(enable + " humidity system requested via web api");
-		humidityController.disable(!enable);
+		runTraced(() -> humidityController.disable(!enable));
+	}
+
+	private void runTraced(Command command) throws IOException, InterruptedException {
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			command.execute();
+		}
+	}
+
+	public interface Command {
+		void execute() throws IOException, InterruptedException;
 	}
 }

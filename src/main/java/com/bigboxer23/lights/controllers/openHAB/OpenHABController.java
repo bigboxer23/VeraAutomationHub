@@ -3,6 +3,8 @@ package com.bigboxer23.lights.controllers.openHAB;
 import com.bigboxer23.lights.util.GsonUtil;
 import com.bigboxer23.utils.http.OkHttpCallback;
 import com.bigboxer23.utils.http.OkHttpUtil;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -63,16 +65,18 @@ public class OpenHABController {
 			@Parameter(description = "command to run.  Possible values [0-100, ON, OFF]")
 					@PathVariable(value = "command")
 					String command) {
-		OkHttpUtil.post(kOpenHABUrl + "/rest/items/" + deviceId, new OkHttpCallback(), builder -> {
-			try {
-				builder.post(RequestBody.create(URLDecoder.decode(command, StandardCharsets.UTF_8.displayName())
-						.getBytes(StandardCharsets.UTF_8)));
-			} catch (UnsupportedEncodingException theE) {
-				log.warn("OpenHABController:doAction", theE);
-			}
-			return builder;
-		});
-		return null;
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			OkHttpUtil.post(kOpenHABUrl + "/rest/items/" + deviceId, new OkHttpCallback(), builder -> {
+				try {
+					builder.post(RequestBody.create(URLDecoder.decode(command, StandardCharsets.UTF_8.displayName())
+							.getBytes(StandardCharsets.UTF_8)));
+				} catch (UnsupportedEncodingException theE) {
+					log.warn("OpenHABController:doAction", theE);
+				}
+				return builder;
+			});
+			return null;
+		}
 	}
 
 	public OpenHABHouse getItemsByTag(String theTag) {
@@ -112,7 +116,7 @@ public class OpenHABController {
 
 	@Scheduled(fixedDelay = 5000)
 	private void fetchSmartRooms() {
-		try {
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
 			log.debug("Getting Smart Rooms");
 			mySmartRooms = Optional.ofNullable(
 							GsonUtil.fromJson(kOpenHABUrl + "/rest/items?tags=SmartRoom", OpenHABHouse.class))

@@ -3,6 +3,8 @@ package com.bigboxer23.lights.controllers.frontdoor;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.utils.http.OkHttpCallback;
 import com.bigboxer23.utils.http.OkHttpUtil;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -44,27 +46,33 @@ public class FrontDoorController {
 	})
 	public String doAction(
 			@Parameter(description = "time in seconds to pause") @PathVariable(value = "delay") Long delay) {
-		log.info("front door change requested: " + delay);
-		OkHttpUtil.get(myFrontDoorURL + "/pause/" + delay, new OkHttpCallback() {
-			public void onResponseBodyString(Call call, String responseBody) {
-				myFrontDoorPauseTime =
-						Optional.ofNullable(responseBody).map(Integer::parseInt).orElse(0);
-				log.info("front door changed");
-			}
-		});
-		return null;
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			log.info("front door change requested: " + delay);
+			OkHttpUtil.get(myFrontDoorURL + "/pause/" + delay, new OkHttpCallback() {
+				public void onResponseBodyString(Call call, String responseBody) {
+					myFrontDoorPauseTime = Optional.ofNullable(responseBody)
+							.map(Integer::parseInt)
+							.orElse(0);
+					log.info("front door changed");
+				}
+			});
+			return null;
+		}
 	}
 
 	@Scheduled(fixedDelay = 10000)
 	private void fetchFrontDoorStatus() {
-		log.debug("Fetching front door status");
-		OkHttpUtil.get(myFrontDoorURL + "/isPaused", new OkHttpCallback() {
-			@Override
-			public void onResponseBodyString(Call call, String responseBody) {
-				myFrontDoorPauseTime =
-						Optional.ofNullable(responseBody).map(Integer::parseInt).orElse(0);
-				log.debug("Fetched front door status " + myFrontDoorPauseTime);
-			}
-		});
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			log.debug("Fetching front door status");
+			OkHttpUtil.get(myFrontDoorURL + "/isPaused", new OkHttpCallback() {
+				@Override
+				public void onResponseBodyString(Call call, String responseBody) {
+					myFrontDoorPauseTime = Optional.ofNullable(responseBody)
+							.map(Integer::parseInt)
+							.orElse(0);
+					log.debug("Fetched front door status " + myFrontDoorPauseTime);
+				}
+			});
+		}
 	}
 }

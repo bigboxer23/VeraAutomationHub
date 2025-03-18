@@ -5,6 +5,8 @@ import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.lights.data.WeatherData;
 import com.bigboxer23.lights.util.GsonUtil;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -51,12 +53,14 @@ public class GarageController implements ITemperatureController {
 			@Parameter(description = "used with SetAutoCloseDelay. Seconds to set delay for", required = false)
 					@PathVariable(value = "delay", required = false)
 					Long delay) {
-		log.info("Garage Door change requested: " + command);
-		myGarageData =
-				GsonUtil.fromJson(myGarageURL + "/" + command + (delay != null ? "/" + delay : ""), VeraDeviceVO.class);
-		myGarageData.setName("Garage Opener");
-		myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
-		return null;
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			log.info("Garage Door change requested: " + command);
+			myGarageData = GsonUtil.fromJson(
+					myGarageURL + "/" + command + (delay != null ? "/" + delay : ""), VeraDeviceVO.class);
+			myGarageData.setName("Garage Opener");
+			myGarageData.setStatus(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz").format(new Date()));
+			return null;
+		}
 	}
 
 	/**
@@ -80,7 +84,7 @@ public class GarageController implements ITemperatureController {
 
 	@Scheduled(fixedDelay = 5000)
 	private void fetchGarageStatus() {
-		try {
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
 			log.debug("Fetching new garage data");
 			myGarageData = GsonUtil.fromJson(myGarageURL + "/Status2", VeraDeviceVO.class);
 			if (myGarageData == null) {

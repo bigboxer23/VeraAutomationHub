@@ -2,6 +2,8 @@ package com.bigboxer23.lights.controllers.climate.openweathermap;
 
 import com.bigboxer23.utils.http.OkHttpCallback;
 import com.bigboxer23.utils.http.OkHttpUtil;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
@@ -34,36 +36,40 @@ public class OpenWeatherMapController {
 
 	@Scheduled(fixedDelay = 900000) // 15min
 	private void fetchClimateData() {
-		log.debug("Fetching OpenWeatherMap data");
-		OkHttpUtil.get(
-				MessageFormat.format(kOpenWeatherMapUrl, myLatitude, myLongitude, myOpenWeatherMapAPIKey),
-				new OkHttpCallback() {
-					@Override
-					public void onResponseBody(Call call, ResponseBody responseBody) {
-						try {
-							JsonObject weatherData = JsonParser.parseString(responseBody.string())
-									.getAsJsonObject();
-							weatherData = weatherData.get("main").getAsJsonObject();
-							sendDataToOpenHab(
-									"OutsideTemperature",
-									kelvinToFahrenheit(weatherData.get("temp").getAsFloat()));
-							sendDataToOpenHab(
-									"LowTemperature",
-									kelvinToFahrenheit(
-											weatherData.get("temp_min").getAsFloat()));
-							sendDataToOpenHab(
-									"HighTemperature",
-									kelvinToFahrenheit(
-											weatherData.get("temp_max").getAsFloat()));
-							sendDataToOpenHab(
-									"OutsideHumidity",
-									weatherData.get("humidity").getAsFloat());
-							log.debug("OpenWeatherMap data successfully updated");
-						} catch (IOException e) {
-							log.warn("fetchClimateData:", e);
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+
+			log.debug("Fetching OpenWeatherMap data");
+			OkHttpUtil.get(
+					MessageFormat.format(kOpenWeatherMapUrl, myLatitude, myLongitude, myOpenWeatherMapAPIKey),
+					new OkHttpCallback() {
+						@Override
+						public void onResponseBody(Call call, ResponseBody responseBody) {
+							try {
+								JsonObject weatherData = JsonParser.parseString(responseBody.string())
+										.getAsJsonObject();
+								weatherData = weatherData.get("main").getAsJsonObject();
+								sendDataToOpenHab(
+										"OutsideTemperature",
+										kelvinToFahrenheit(
+												weatherData.get("temp").getAsFloat()));
+								sendDataToOpenHab(
+										"LowTemperature",
+										kelvinToFahrenheit(
+												weatherData.get("temp_min").getAsFloat()));
+								sendDataToOpenHab(
+										"HighTemperature",
+										kelvinToFahrenheit(
+												weatherData.get("temp_max").getAsFloat()));
+								sendDataToOpenHab(
+										"OutsideHumidity",
+										weatherData.get("humidity").getAsFloat());
+								log.debug("OpenWeatherMap data successfully updated");
+							} catch (IOException e) {
+								log.warn("fetchClimateData:", e);
+							}
 						}
-					}
-				});
+					});
+		}
 	}
 
 	private void sendDataToOpenHab(String theItemName, float theItemValue) {

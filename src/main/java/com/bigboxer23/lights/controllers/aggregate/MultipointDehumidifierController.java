@@ -58,19 +58,21 @@ public class MultipointDehumidifierController implements InitializingBean {
 
 	@Scheduled(fixedDelay = 300000) // 5min
 	private void checkHumidity() throws IOException {
-		double humidity = getHumidity();
-		try (WrappingCloseable i = LoggingContextBuilder.create()
-				.addDeviceId(dehumidifierId)
-				.addHumidity(Double.valueOf(humidity).intValue())
-				.addMethod("checkHumidity")
-				.build()) {
-			log.info("check humidity");
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			double humidity = getHumidity();
+			try (WrappingCloseable i = LoggingContextBuilder.create()
+					.addDeviceId(dehumidifierId)
+					.addHumidity(Double.valueOf(humidity).intValue())
+					.addMethod("checkHumidity")
+					.build()) {
+				log.info("check humidity");
+			}
+			if (humidityMode) {
+				humidifierImpl(humidity);
+				return;
+			}
+			dehumidifierImpl(humidity);
 		}
-		if (humidityMode) {
-			humidifierImpl(humidity);
-			return;
-		}
-		dehumidifierImpl(humidity);
 	}
 
 	private void humidifierImpl(double humidity) throws IOException {

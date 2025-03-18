@@ -3,6 +3,8 @@ package com.bigboxer23.lights.controllers.climate;
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.lights.util.GsonUtil;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,7 +35,7 @@ public class ClimateController {
 
 	@Scheduled(fixedDelay = 30000)
 	private void fetchClimateData() {
-		try {
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
 			log.debug("Fetching new climate data");
 			myClimateData = GsonUtil.fromJson(myClimateServiceUrl + "/climate", ClimateData.class);
 			if (myClimateData == null) {

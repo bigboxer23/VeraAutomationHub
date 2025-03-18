@@ -13,6 +13,8 @@ import com.bigboxer23.lights.controllers.scene.DaylightController;
 import com.bigboxer23.lights.controllers.scene.WeatherController;
 import com.bigboxer23.lights.controllers.vera.VeraController;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -80,7 +82,9 @@ public class SceneStatusServlet extends HubContext {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public VeraHouseVO getHouseStatusJson() {
-		return getHouseStatus();
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			return getHouseStatus();
+		}
 	}
 
 	private VeraHouseVO getHouseStatus() {
@@ -130,6 +134,8 @@ public class SceneStatusServlet extends HubContext {
 	/** Send to elastic every 5 min */
 	@Scheduled(fixedDelay = 300000)
 	private void updateStatus() {
-		myElasticAnalyticsController.logStatusEvent(getHouseStatus());
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			myElasticAnalyticsController.logStatusEvent(getHouseStatus());
+		}
 	}
 }
