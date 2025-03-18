@@ -8,6 +8,8 @@ import com.bigboxer23.lights.controllers.openHAB.OpenHABItem;
 import com.bigboxer23.lights.controllers.scene.DaylightController;
 import com.bigboxer23.lights.controllers.scene.WeatherController;
 import com.bigboxer23.lights.controllers.vera.VeraController;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -89,19 +91,21 @@ public class NotificationController extends HubContext {
 			@Parameter(description = "optional device id to do a notification to")
 					@PathVariable(value = "deviceId", required = false)
 					String deviceId) {
-		if ((System.currentTimeMillis() - myNotificationGap * 1000 * 60) < myLastNotification) {
-			log.info("Not triggering notification, not enough gap yet.");
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			if ((System.currentTimeMillis() - myNotificationGap * 1000 * 60) < myLastNotification) {
+				log.info("Not triggering notification, not enough gap yet.");
+				return null;
+			}
+			log.info("Notification received.");
+			List<OpenHABItem> anItems = getItems(deviceId);
+			if (anItems == null || anItems.isEmpty()) {
+				log.info("No items to notify.");
+				return null;
+			}
+			log.info("Doing Notification.");
+			doPulseNotification(anItems);
 			return null;
 		}
-		log.info("Notification received.");
-		List<OpenHABItem> anItems = getItems(deviceId);
-		if (anItems == null || anItems.isEmpty()) {
-			log.info("No items to notify.");
-			return null;
-		}
-		log.info("Doing Notification.");
-		doPulseNotification(anItems);
-		return null;
 	}
 
 	private List<OpenHABItem> getItems(String deviceId) {

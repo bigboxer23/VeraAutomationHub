@@ -2,6 +2,8 @@ package com.bigboxer23.lights.controllers.aggregate;
 
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,9 +23,11 @@ public class TempLifterController {
 
 	@Scheduled(cron = "0 0,15 * * * *")
 	public void runFans() throws IOException, InterruptedException {
-		switchbotController.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_ON);
-		log.debug("sleeping lifter system controller");
-		Thread.sleep(30000L);
-		switchbotController.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_OFF);
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			switchbotController.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_ON);
+			log.debug("sleeping lifter system controller");
+			Thread.sleep(30000L);
+			switchbotController.sendDeviceControlCommands(fanSwitchId, IDeviceCommands.PLUG_MINI_OFF);
+		}
 	}
 }

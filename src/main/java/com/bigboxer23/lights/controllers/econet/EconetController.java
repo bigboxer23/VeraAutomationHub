@@ -5,6 +5,8 @@ import com.bigboxer23.eco_net.data.Equipment;
 import com.bigboxer23.eco_net.data.ValueHolder;
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +37,7 @@ public class EconetController {
 
 	@Scheduled(fixedDelay = 300000) // 5min
 	private void fetchWaterHeaterStatus() {
-		try {
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
 			log.debug("Fetching water heater status...");
 			getEcoNetAPI().fetchUserData().ifPresent(data -> {
 				Equipment equipment =

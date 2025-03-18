@@ -4,6 +4,8 @@ import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.utils.http.OkHttpCallback;
 import com.bigboxer23.utils.http.OkHttpUtil;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -92,7 +94,8 @@ public class MeuralController {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public String getOpenAIPrompt() throws IOException {
-		try (Response response = OkHttpUtil.getSynchronous(meuralServer + "/getOpenAIInformation", null)) {
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build();
+				Response response = OkHttpUtil.getSynchronous(meuralServer + "/getOpenAIInformation", null)) {
 			return response.body().string();
 		}
 	}
@@ -196,7 +199,8 @@ public class MeuralController {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public int getSource() throws IOException {
-		try (Response response = OkHttpUtil.getSynchronous(meuralServer + "/getCurrentSource", null)) {
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build();
+				Response response = OkHttpUtil.getSynchronous(meuralServer + "/getCurrentSource", null)) {
 			return OkHttpUtil.getBody(response, MeuralIntegerResponse.class)
 					.map(MeuralIntegerResponse::getResponse)
 					.orElse(-1);
@@ -213,7 +217,8 @@ public class MeuralController {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public boolean isAwake() throws IOException {
-		try (Response response = OkHttpUtil.getSynchronous(meuralServer + "/isAsleep", null)) {
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build();
+				Response response = OkHttpUtil.getSynchronous(meuralServer + "/isAsleep", null)) {
 			return OkHttpUtil.getBody(response, MeuralResponse.class)
 					.map(MeuralResponse::getResponse)
 					.orElse(false);
@@ -247,13 +252,15 @@ public class MeuralController {
 	}
 
 	private void callMeural(String url) {
-		log.info("meural requested: " + url);
-		OkHttpUtil.post(meuralServer + url, new OkHttpCallback());
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			log.info("meural requested: " + url);
+			OkHttpUtil.post(meuralServer + url, new OkHttpCallback());
+		}
 	}
 
 	@Scheduled(fixedDelay = 5000)
 	private void fetchMeuralStatus() {
-		try {
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
 			log.debug("Fetching meural data");
 			boolean isAwake = isAwake();
 			int source = getSource();

@@ -83,7 +83,10 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 			@Parameter(description = "deviceName (for logging only)") @PathVariable(value = "deviceName")
 					String deviceName,
 			@Parameter(description = "deviceModel") @PathVariable(value = "deviceModel") String deviceModel) {
-		try (MDC.MDCCloseable c = LoggingUtil.addDeviceId(deviceId)) {
+		try (WrappingCloseable c = LoggingContextBuilder.create()
+				.addDeviceId(deviceId)
+				.addTraceId()
+				.build()) {
 			log.info(deviceId + " requested via web api");
 			outOfWaterEvent(deviceId, deviceName, deviceModel);
 		}
@@ -91,45 +94,50 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 
 	@Scheduled(fixedDelay = 600000) // 10min
 	public void checkAfterInterval() {
-		log.info("checking cluster humidity");
-		humidifierMap.values().stream()
-				.filter(cluster -> !StringUtils.isEmpty(cluster.getHumiditySensor()))
-				.forEach(cluster -> {
-					try (MDC.MDCCloseable c = LoggingUtil.addMethod("checkAfterInterval")) {
-						int humidity = switchbotController
-								.getDeviceStatus(cluster.getHumiditySensor())
-								.getHumidity();
-						if (humidity < cluster.getLowHumidityPoint()) {
-							float watts = switchbotController
-									.getDeviceStatus(cluster.getOutlet())
-									.getWatts();
-							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
-								return;
+		try (WrappingCloseable a = LoggingContextBuilder.create().addTraceId().build()) {
+			log.info("checking cluster humidity");
+			humidifierMap.values().stream()
+					.filter(cluster -> !StringUtils.isEmpty(cluster.getHumiditySensor()))
+					.forEach(cluster -> {
+						try (MDC.MDCCloseable c = LoggingUtil.addMethod("checkAfterInterval")) {
+							int humidity = switchbotController
+									.getDeviceStatus(cluster.getHumiditySensor())
+									.getHumidity();
+							if (humidity < cluster.getLowHumidityPoint()) {
+								float watts = switchbotController
+										.getDeviceStatus(cluster.getOutlet())
+										.getWatts();
+								if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
+									return;
+								}
+								outOfWaterEvent(
+										cluster.getHumidifier(),
+										goveeController.getDeviceNameFromId(cluster.getHumidifier()),
+										cluster.getHumidifierModel());
+							} else if (humidity > 73) { // Govee seems to have a bug where the
+								// humidifier
+								// doesn't turn off, so we manually cycle again
+								float watts = switchbotController
+										.getDeviceStatus(cluster.getOutlet())
+										.getWatts();
+								if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
+									log.info("humidifier should not be running, humidify is"
+											+ " too high "
+											+ watts
+											+ " "
+											+ humidity);
+									new Thread(new HumidifierResetAction(
+													goveeController,
+													cluster.getHumidifierModel(),
+													cluster.getHumidifier()))
+											.start();
+								}
 							}
-							outOfWaterEvent(
-									cluster.getHumidifier(),
-									goveeController.getDeviceNameFromId(cluster.getHumidifier()),
-									cluster.getHumidifierModel());
-						} else if (humidity > 73) { // Govee seems to have a bug where the humidifier
-							// doesn't turn off, so we manually cycle again
-							float watts = switchbotController
-									.getDeviceStatus(cluster.getOutlet())
-									.getWatts();
-							if (watts > HUMIDIFIER_RUNNING_WATTAGE) {
-								log.info("humidifier should not be running, humidify is too"
-										+ " high "
-										+ watts
-										+ " "
-										+ humidity);
-								new Thread(new HumidifierResetAction(
-												goveeController, cluster.getHumidifierModel(), cluster.getHumidifier()))
-										.start();
-							}
+						} catch (IOException e) {
+							log.error("manualCheck: ", e);
 						}
-					} catch (IOException e) {
-						log.error("manualCheck: ", e);
-					}
-				});
+					});
+		}
 	}
 
 	@Override

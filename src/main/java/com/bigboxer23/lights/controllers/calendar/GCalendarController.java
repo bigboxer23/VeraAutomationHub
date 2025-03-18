@@ -8,6 +8,8 @@ import com.bigboxer23.lights.controllers.openHAB.OpenHABController;
 import com.bigboxer23.lights.controllers.scene.DaylightController;
 import com.bigboxer23.lights.controllers.scene.WeatherController;
 import com.bigboxer23.lights.controllers.vera.VeraController;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -107,8 +109,8 @@ public class GCalendarController extends HubContext {
 
 	@Scheduled(cron = "0 0 0 ? * *") // Run every day at 12am
 	private void fetchCalendarStatus() {
-		log.info("Fetching calendar information");
-		try {
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			log.info("Fetching calendar information");
 			NetHttpTransport aTransport = GoogleNetHttpTransport.newTrustedTransport();
 			Calendar aCalendar = new Calendar.Builder(aTransport, kJSON_FACTORY, getCredentials(aTransport))
 					.setApplicationName("Calendar Fetch")

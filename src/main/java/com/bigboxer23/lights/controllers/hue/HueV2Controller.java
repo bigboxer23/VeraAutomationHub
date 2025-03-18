@@ -5,6 +5,8 @@ import com.bigboxer23.lights.controllers.hue.data.HueResource;
 import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.utils.http.OkHttpUtil;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -55,15 +57,16 @@ public class HueV2Controller {
 					@PathVariable(value = "command")
 					String command)
 			throws IOException {
-		try (Response response = OkHttpUtil.putSynchronous(
-				MessageFormat.format(BASE_URL, HUE_BRIDGE, "resource/scene/" + sceneId),
-				RequestBody.create(
-						"{\"recall\": {\"action\": \"dynamic_palette\"}}", MediaType.parse("application/json")),
-				builder -> {
-					builder.addHeader(AUTH_HEADER, API_KEY);
-					return builder;
-				},
-				HueCompatibleClient.getClient())) {}
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build();
+				Response response = OkHttpUtil.putSynchronous(
+						MessageFormat.format(BASE_URL, HUE_BRIDGE, "resource/scene/" + sceneId),
+						RequestBody.create(
+								"{\"recall\": {\"action\": \"dynamic_palette\"}}", MediaType.parse("application/json")),
+						builder -> {
+							builder.addHeader(AUTH_HEADER, API_KEY);
+							return builder;
+						},
+						HueCompatibleClient.getClient())) {}
 	}
 
 	public void getSceneData(VeraHouseVO house) {

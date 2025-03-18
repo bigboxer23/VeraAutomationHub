@@ -1,6 +1,8 @@
 package com.bigboxer23.lights.servlets;
 
 import com.bigboxer23.lights.data.TokenResponse;
+import com.bigboxer23.utils.logging.LoggingContextBuilder;
+import com.bigboxer23.utils.logging.WrappingCloseable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -60,8 +62,10 @@ public class TokenDistributionServlet {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public void enableTokenRequest(HttpServletRequest theRequest) {
-		myTokenValidTime = System.currentTimeMillis();
-		log.error("Enabling token access, requested by " + theRequest.getRemoteAddr());
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			myTokenValidTime = System.currentTimeMillis();
+			log.error("Enabling token access, requested by " + theRequest.getRemoteAddr());
+		}
 	}
 
 	/**
@@ -84,17 +88,19 @@ public class TokenDistributionServlet {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public TokenResponse getToken(HttpServletResponse theResponse, HttpServletRequest theRequest) throws IOException {
-		if (myTokenValidTime + kTokenValidTime > System.currentTimeMillis()) {
-			log.warn("Token distributed to " + theRequest.getRemoteAddr());
-			Cookie anAuthCookie = new Cookie("t", myToken);
-			anAuthCookie.setHttpOnly(true);
-			anAuthCookie.setSecure(true);
-			anAuthCookie.setMaxAge(60 * 60 * 24 * 365 * 5); // Store cookie for 5 year
-			theResponse.addCookie(anAuthCookie); // put cookie in response
-			myTokenValidTime = -1;
-			return new TokenResponse(myToken);
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			if (myTokenValidTime + kTokenValidTime > System.currentTimeMillis()) {
+				log.warn("Token distributed to " + theRequest.getRemoteAddr());
+				Cookie anAuthCookie = new Cookie("t", myToken);
+				anAuthCookie.setHttpOnly(true);
+				anAuthCookie.setSecure(true);
+				anAuthCookie.setMaxAge(60 * 60 * 24 * 365 * 5); // Store cookie for 5 year
+				theResponse.addCookie(anAuthCookie); // put cookie in response
+				myTokenValidTime = -1;
+				return new TokenResponse(myToken);
+			}
+			theResponse.sendError(HttpURLConnection.HTTP_UNAUTHORIZED);
+			return null;
 		}
-		theResponse.sendError(HttpURLConnection.HTTP_UNAUTHORIZED);
-		return null;
 	}
 }

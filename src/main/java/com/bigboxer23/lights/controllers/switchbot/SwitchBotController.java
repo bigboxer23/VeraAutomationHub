@@ -87,16 +87,18 @@ public class SwitchBotController {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public void openCurtains() throws IOException {
-		for (String curtainId : getCurtains()) {
-			RetryingCommand.builder()
-					.identifier("Open " + getIdentifier(curtainId))
-					.failureCommand(failureCommand(curtainId))
-					.buildAndExecute(() -> {
-						getSwitchbotAPI()
-								.getDeviceApi()
-								.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_OPEN);
-						return null;
-					});
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			for (String curtainId : getCurtains()) {
+				RetryingCommand.builder()
+						.identifier("Open " + getIdentifier(curtainId))
+						.failureCommand(failureCommand(curtainId))
+						.buildAndExecute(() -> {
+							getSwitchbotAPI()
+									.getDeviceApi()
+									.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_OPEN);
+							return null;
+						});
+			}
 		}
 	}
 
@@ -107,16 +109,18 @@ public class SwitchBotController {
 		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
 	})
 	public void closeCurtains() throws IOException {
-		for (String curtainId : getCurtains()) {
-			RetryingCommand.builder()
-					.identifier("Close " + getIdentifier(curtainId))
-					.failureCommand(failureCommand(curtainId))
-					.buildAndExecute(() -> {
-						getSwitchbotAPI()
-								.getDeviceApi()
-								.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_CLOSE);
-						return null;
-					});
+		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			for (String curtainId : getCurtains()) {
+				RetryingCommand.builder()
+						.identifier("Close " + getIdentifier(curtainId))
+						.failureCommand(failureCommand(curtainId))
+						.buildAndExecute(() -> {
+							getSwitchbotAPI()
+									.getDeviceApi()
+									.sendDeviceControlCommands(curtainId, IDeviceCommands.CURTAIN_CLOSE);
+							return null;
+						});
+			}
 		}
 	}
 
@@ -170,6 +174,7 @@ public class SwitchBotController {
 		try (WrappingCloseable i = LoggingContextBuilder.create()
 				.addDeviceId(deviceId)
 				.addCommand(command.getCommand())
+				.addTraceId()
 				.build()) {
 			log.info(
 					"sendDeviceControlCommands: {}",
