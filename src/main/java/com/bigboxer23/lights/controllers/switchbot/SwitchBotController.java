@@ -8,8 +8,8 @@ import com.bigboxer23.switch_bot.SwitchBotApi;
 import com.bigboxer23.switch_bot.data.Device;
 import com.bigboxer23.switch_bot.data.DeviceCommand;
 import com.bigboxer23.switch_bot.data.IApiResponse;
-import com.bigboxer23.utils.command.Command;
 import com.bigboxer23.utils.command.RetryingCommand;
+import com.bigboxer23.utils.command.VoidCommand;
 import com.bigboxer23.utils.environment.EnvironmentUtils;
 import com.bigboxer23.utils.logging.LoggingContextBuilder;
 import com.bigboxer23.utils.logging.WrappingCloseable;
@@ -141,12 +141,9 @@ public class SwitchBotController {
 				"on".equalsIgnoreCase(command) ? IDeviceCommands.PLUG_MINI_ON : IDeviceCommands.PLUG_MINI_OFF);
 	}
 
-	public Command<Void> failureCommand(String deviceId) {
-		return () -> {
-			emailController.sendMessageThrottled(
-					deviceId, getIdentifier(deviceId), IErrorConstants.emailSubject, IErrorConstants.emailBody);
-			return null;
-		};
+	public VoidCommand failureCommand(String deviceId) {
+		return () -> emailController.sendMessageThrottled(
+				deviceId, getIdentifier(deviceId), IErrorConstants.emailSubject, IErrorConstants.emailBody);
 	}
 
 	public Device getDeviceStatus(String deviceId) throws IOException {

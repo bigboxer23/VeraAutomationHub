@@ -43,7 +43,7 @@ public class EconetController {
 				Equipment equipment =
 						data.getResults().getLocations().get(0).getEquipments().get(0);
 				waterHeaterData.setHumidity(equipment.getTankStatus());
-				waterHeaterData.setLevel(equipment.getCompressorStatus());
+				waterHeaterData.setStatus(equipment.getCompressorStatus());
 				waterHeaterData.setTemperature(equipment.getSetpoint().getValue() + "");
 				LocalDate today = LocalDate.now();
 				getEcoNetAPI()
