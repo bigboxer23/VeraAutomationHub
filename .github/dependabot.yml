@@ -16,3 +16,11 @@ updates:
       - maven-github
     schedule:
       interval: "weekly"
+    groups:
+      minor-patch-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
+      major-dependencies:
+        update-types:
+          - "major"
