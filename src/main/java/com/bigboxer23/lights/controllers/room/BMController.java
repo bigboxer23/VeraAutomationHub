@@ -6,8 +6,6 @@ import com.bigboxer23.lights.controllers.aggregate.HumidityController;
 import com.bigboxer23.lights.controllers.switchbot.SwitchBotController;
 import com.bigboxer23.switch_bot.IDeviceCommands;
 import com.bigboxer23.utils.file.FilePersistedBoolean;
-import com.bigboxer23.utils.logging.LoggingContextBuilder;
-import com.bigboxer23.utils.logging.WrappingCloseable;
 import com.bigboxer23.utils.time.ITimeConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,6 +20,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
+import static com.bigboxer23.utils.logging.LoggingUtil.runTraced;
 
 /** */
 @Slf4j
@@ -169,15 +169,5 @@ public class BMController {
 			throws IOException, InterruptedException {
 		log.info(enable + " humidity system requested via web api");
 		runTraced(() -> humidityController.disable(!enable));
-	}
-
-	private void runTraced(Command command) throws IOException, InterruptedException {
-		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
-			command.execute();
-		}
-	}
-
-	public interface Command {
-		void execute() throws IOException, InterruptedException;
 	}
 }
