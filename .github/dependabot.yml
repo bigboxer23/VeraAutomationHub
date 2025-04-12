@@ -16,6 +16,9 @@ updates:
       - maven-github
     schedule:
       interval: "weekly"
+    auto-merge: true
+    commit-message:
+      prefix: "deps"
     groups:
       minor-patch-dependencies:
         update-types:
