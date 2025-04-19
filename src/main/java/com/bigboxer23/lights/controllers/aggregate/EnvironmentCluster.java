@@ -6,13 +6,21 @@ import lombok.Data;
 /** */
 @Data
 public class EnvironmentCluster {
-	private int low;
+	private int range = 2;
 
-	private int high;
+	private int target;
 
 	private String switchId;
 
 	private List<String> environmentDevices;
 
 	private boolean isDehumidifier = false;
+
+	public double getHigh() {
+		return target + range;
+	}
+
+	public double getLow() {
+		return target - range;
+	}
 }

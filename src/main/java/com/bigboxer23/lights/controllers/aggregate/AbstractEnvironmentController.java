@@ -65,9 +65,7 @@ public abstract class AbstractEnvironmentController {
 				.build()) {
 			log.info(switchBotController.getIdentifier(cluster.getSwitchId())
 					+ " "
-					+ cluster.getHigh()
-					+ " "
-					+ cluster.getLow()
+					+ cluster.getTarget()
 					+ " "
 					+ shouldTurnOff
 					+ " "
