@@ -1,5 +1,7 @@
 package com.bigboxer23.lights.controllers.room;
 
+import static com.bigboxer23.utils.logging.LoggingUtil.runTraced;
+
 import com.bigboxer23.lights.controllers.EmailController;
 import com.bigboxer23.lights.controllers.aggregate.HeaterController;
 import com.bigboxer23.lights.controllers.aggregate.HumidityController;
@@ -20,8 +22,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
-import static com.bigboxer23.utils.logging.LoggingUtil.runTraced;
 
 /** */
 @Slf4j
