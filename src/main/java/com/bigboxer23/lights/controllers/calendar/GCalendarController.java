@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
 public class GCalendarController extends HubContext {
 	private static final JsonFactory kJSON_FACTORY = GsonFactory.getDefaultInstance();
 
-	private static List<String> kVacationKeywords = new ArrayList<>() {
+	protected static List<String> kVacationKeywords = new ArrayList<>() {
 		{
 			add("vacation");
 			add("paternity");
@@ -60,7 +60,13 @@ public class GCalendarController extends HubContext {
 		}
 	};
 
-	private static List<String> kPTOKeywords = new ArrayList<>() {
+	protected static List<String> SafeWords = new ArrayList<>() {
+		{
+			add("field trip");
+		}
+	};
+
+	protected static List<String> kPTOKeywords = new ArrayList<>() {
 		{
 			add("pto");
 			add("no work");
@@ -82,7 +88,9 @@ public class GCalendarController extends HubContext {
 				daylightController,
 				veraController,
 				openHABController);
-		fetchCalendarStatus();
+		if (openHABController != null) {
+			fetchCalendarStatus();
+		}
 	}
 
 	private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
@@ -140,19 +148,23 @@ public class GCalendarController extends HubContext {
 		}
 	}
 
-	private boolean findMatchingEvents(String theType, Events theEvents, List<String> theKeywords) {
-		return theEvents.getItems().stream()
-				.anyMatch(theEvent -> theKeywords.stream().anyMatch(theWord -> {
-					log.debug(theEvent.getSummary());
-					boolean aFound = (theEvent.getSummary() != null
-									&& theEvent.getSummary().toLowerCase().contains(theWord))
-							|| (theEvent.getDescription() != null
-									&& theEvent.getDescription().toLowerCase().contains(theWord));
-					if (aFound) {
-						log.warn(theType + " enabled: " + theEvent.getSummary());
-					}
-					return aFound;
-				}));
+	boolean findMatchingEvents(String type, Events events, List<String> keywords) {
+		return events.getItems().stream().anyMatch(event -> {
+			String summary = event.getSummary() != null ? event.getSummary().toLowerCase() : "";
+			String description =
+					event.getDescription() != null ? event.getDescription().toLowerCase() : "";
+			log.debug(event.getSummary());
+			return keywords.stream().anyMatch(word -> {
+				boolean found = summary.contains(word) || description.contains(word);
+				if (found && SafeWords.stream().anyMatch(safe -> summary.contains(safe) || description.contains(safe))) {
+					return false;
+				}
+				if (found) {
+					log.warn(type + " enabled: " + event.getSummary());
+				}
+				return found;
+			});
+		});
 	}
 
 	private boolean findLateEvents(Events events) {
