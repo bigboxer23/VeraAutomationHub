@@ -340,28 +340,28 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/switchbotapi-java/1.1.6/switchbotapi-java-1.1.6-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.bigboxer23:utils:2.0.32" type="java-imported" external-system-id="Maven">
-      <properties groupId="com.bigboxer23" artifactId="utils" version="2.0.32" />
+    <library name="Maven: com.bigboxer23:switchbotapi-java:1.2.5" type="java-imported" external-system-id="Maven">
+      <properties groupId="com.bigboxer23" artifactId="switchbotapi-java" version="1.2.5" baseVersion="1.2.5" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/utils/2.0.32/utils-2.0.32.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/switchbotapi-java/1.2.5/switchbotapi-java-1.2.5.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/utils/2.0.32/utils-2.0.32-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/switchbotapi-java/1.2.5/switchbotapi-java-1.2.5-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/switchbotapi-java/1.2.0/switchbotapi-java-1.2.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/switchbotapi-java/1.2.5/switchbotapi-java-1.2.5-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.bigboxer23:utils:2.2.1" type="java-imported" external-system-id="Maven">
-      <properties groupId="com.bigboxer23" artifactId="utils" version="2.2.1" baseVersion="2.2.1" />
+    <library name="Maven: com.bigboxer23:utils:2.2.9" type="java-imported" external-system-id="Maven">
+      <properties groupId="com.bigboxer23" artifactId="utils" version="2.2.9" baseVersion="2.2.9" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/utils/2.2.1/utils-2.2.1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/utils/2.2.9/utils-2.2.9.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/utils/2.2.1/utils-2.2.1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/utils/2.2.9/utils-2.2.9-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/utils/2.2.1/utils-2.2.1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/bigboxer23/utils/2.2.9/utils-2.2.9-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.carrotsearch:hppc:0.8.1" type="java-imported" external-system-id="Maven">
@@ -784,16 +784,16 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/squareup/okhttp3/okhttp/4.12.0/okhttp-4.12.0-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.squareup.okio:okio-jvm:3.7.0" type="java-imported" external-system-id="Maven">
-      <properties groupId="com.squareup.okio" artifactId="okio-jvm" version="3.7.0" />
+    <library name="Maven: com.squareup.okio:okio-jvm:3.16.0" type="java-imported" external-system-id="Maven">
+      <properties groupId="com.squareup.okio" artifactId="okio-jvm" version="3.16.0" baseVersion="3.16.0" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/squareup/okio/okio-jvm/3.7.0/okio-jvm-3.7.0.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/squareup/okio/okio-jvm/3.16.0/okio-jvm-3.16.0.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/squareup/okio/okio-jvm/3.7.0/okio-jvm-3.7.0-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/squareup/okio/okio-jvm/3.16.0/okio-jvm-3.16.0-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/squareup/okio/okio-jvm/3.7.0/okio-jvm-3.7.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/squareup/okio/okio-jvm/3.16.0/okio-jvm-3.16.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.squareup.okio:okio:3.6.0" type="java-imported" external-system-id="Maven">
@@ -1036,40 +1036,40 @@
         <root url="jar://$MAVEN_REPOSITORY$/io/reactivex/rxjava2/rxjava/2.2.21/rxjava-2.2.21-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: io.swagger.core.v3:swagger-annotations-jakarta:2.2.22" type="java-imported" external-system-id="Maven">
-      <properties groupId="io.swagger.core.v3" artifactId="swagger-annotations-jakarta" version="2.2.22" />
+    <library name="Maven: io.swagger.core.v3:swagger-annotations-jakarta:2.2.36" type="java-imported" external-system-id="Maven">
+      <properties groupId="io.swagger.core.v3" artifactId="swagger-annotations-jakarta" version="2.2.36" baseVersion="2.2.36" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-annotations-jakarta/2.2.22/swagger-annotations-jakarta-2.2.22.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-annotations-jakarta/2.2.36/swagger-annotations-jakarta-2.2.36.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-annotations-jakarta/2.2.22/swagger-annotations-jakarta-2.2.22-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-annotations-jakarta/2.2.36/swagger-annotations-jakarta-2.2.36-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-annotations-jakarta/2.2.22/swagger-annotations-jakarta-2.2.22-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-annotations-jakarta/2.2.36/swagger-annotations-jakarta-2.2.36-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: io.swagger.core.v3:swagger-core-jakarta:2.2.22" type="java-imported" external-system-id="Maven">
-      <properties groupId="io.swagger.core.v3" artifactId="swagger-core-jakarta" version="2.2.22" />
+    <library name="Maven: io.swagger.core.v3:swagger-core-jakarta:2.2.36" type="java-imported" external-system-id="Maven">
+      <properties groupId="io.swagger.core.v3" artifactId="swagger-core-jakarta" version="2.2.36" baseVersion="2.2.36" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-core-jakarta/2.2.22/swagger-core-jakarta-2.2.22.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-core-jakarta/2.2.36/swagger-core-jakarta-2.2.36.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-core-jakarta/2.2.22/swagger-core-jakarta-2.2.22-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-core-jakarta/2.2.36/swagger-core-jakarta-2.2.36-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-core-jakarta/2.2.22/swagger-core-jakarta-2.2.22-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-core-jakarta/2.2.36/swagger-core-jakarta-2.2.36-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: io.swagger.core.v3:swagger-models-jakarta:2.2.22" type="java-imported" external-system-id="Maven">
-      <properties groupId="io.swagger.core.v3" artifactId="swagger-models-jakarta" version="2.2.22" />
+    <library name="Maven: io.swagger.core.v3:swagger-models-jakarta:2.2.36" type="java-imported" external-system-id="Maven">
+      <properties groupId="io.swagger.core.v3" artifactId="swagger-models-jakarta" version="2.2.36" baseVersion="2.2.36" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-models-jakarta/2.2.22/swagger-models-jakarta-2.2.22.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-models-jakarta/2.2.36/swagger-models-jakarta-2.2.36.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-models-jakarta/2.2.22/swagger-models-jakarta-2.2.22-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-models-jakarta/2.2.36/swagger-models-jakarta-2.2.36-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-models-jakarta/2.2.22/swagger-models-jakarta-2.2.22-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-models-jakarta/2.2.36/swagger-models-jakarta-2.2.36-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: jakarta.activation:jakarta.activation-api:2.1.2" type="java-imported" external-system-id="Maven">
@@ -2032,40 +2032,40 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/jul-to-slf4j/2.0.13/jul-to-slf4j-2.0.13-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.slf4j:slf4j-api:2.0.13" type="java-imported" external-system-id="Maven">
-      <properties groupId="org.slf4j" artifactId="slf4j-api" version="2.0.13" />
+    <library name="Maven: org.springdoc:springdoc-openapi-starter-common:2.8.13" type="java-imported" external-system-id="Maven">
+      <properties groupId="org.springdoc" artifactId="springdoc-openapi-starter-common" version="2.8.13" baseVersion="2.8.13" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-common/2.8.13/springdoc-openapi-starter-common-2.8.13.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-common/2.8.13/springdoc-openapi-starter-common-2.8.13-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-common/2.8.13/springdoc-openapi-starter-common-2.8.13-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.springdoc:springdoc-openapi-starter-common:2.6.0" type="java-imported" external-system-id="Maven">
-      <properties groupId="org.springdoc" artifactId="springdoc-openapi-starter-common" version="2.6.0" />
+    <library name="Maven: org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.13" type="java-imported" external-system-id="Maven">
+      <properties groupId="org.springdoc" artifactId="springdoc-openapi-starter-webmvc-api" version="2.8.13" baseVersion="2.8.13" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-common/2.6.0/springdoc-openapi-starter-common-2.6.0.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-webmvc-api/2.8.13/springdoc-openapi-starter-webmvc-api-2.8.13.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-common/2.6.0/springdoc-openapi-starter-common-2.6.0-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-webmvc-api/2.8.13/springdoc-openapi-starter-webmvc-api-2.8.13-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-common/2.6.0/springdoc-openapi-starter-common-2.6.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-webmvc-api/2.8.13/springdoc-openapi-starter-webmvc-api-2.8.13-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.springdoc:springdoc-openapi-starter-webmvc-api:2.6.0" type="java-imported" external-system-id="Maven">
-      <properties groupId="org.springdoc" artifactId="springdoc-openapi-starter-webmvc-api" version="2.6.0" />
+    <library name="Maven: org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13" type="java-imported" external-system-id="Maven">
+      <properties groupId="org.springdoc" artifactId="springdoc-openapi-starter-webmvc-ui" version="2.8.13" baseVersion="2.8.13" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-webmvc-api/2.6.0/springdoc-openapi-starter-webmvc-api-2.6.0.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-webmvc-ui/2.8.13/springdoc-openapi-starter-webmvc-ui-2.8.13.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-webmvc-api/2.6.0/springdoc-openapi-starter-webmvc-api-2.6.0-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-webmvc-ui/2.8.13/springdoc-openapi-starter-webmvc-ui-2.8.13-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-webmvc-api/2.6.0/springdoc-openapi-starter-webmvc-api-2.6.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-webmvc-ui/2.8.13/springdoc-openapi-starter-webmvc-ui-2.8.13-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0" type="java-imported" external-system-id="Maven">
@@ -2356,16 +2356,16 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-webmvc/6.1.10/spring-webmvc-6.1.10-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.webjars:swagger-ui:5.17.14" type="java-imported" external-system-id="Maven">
-      <properties groupId="org.webjars" artifactId="swagger-ui" version="5.17.14" />
+    <library name="Maven: org.webjars:swagger-ui:5.28.1" type="java-imported" external-system-id="Maven">
+      <properties groupId="org.webjars" artifactId="swagger-ui" version="5.28.1" baseVersion="5.28.1" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/swagger-ui/5.17.14/swagger-ui-5.17.14.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/swagger-ui/5.28.1/swagger-ui-5.28.1.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/swagger-ui/5.17.14/swagger-ui-5.17.14-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/swagger-ui/5.28.1/swagger-ui-5.28.1-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/swagger-ui/5.17.14/swagger-ui-5.17.14-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/swagger-ui/5.28.1/swagger-ui-5.28.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.xmlunit:xmlunit-core:2.9.1" type="java-imported" external-system-id="Maven">
