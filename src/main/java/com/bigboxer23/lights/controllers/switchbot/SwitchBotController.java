@@ -124,6 +124,19 @@ public class SwitchBotController {
 		}
 	}
 
+	@GetMapping(value = "/S/switchbot/setPosition/{deviceId}/{command}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "control plug mini", description = "call switchbot api to set device position")
+	@ApiResponses({
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_BAD_REQUEST + "", description = "Bad request"),
+		@ApiResponse(responseCode = HttpURLConnection.HTTP_OK + "", description = "success")
+	})
+	public void setPosition(
+			@Parameter(description = "deviceId to run command on") @PathVariable(value = "deviceId") String deviceId,
+			@Parameter(description = "Possible values [0-100]") @PathVariable(value = "command") int command)
+			throws IOException {
+		sendDeviceControlCommands(deviceId, IDeviceCommands.rollerShadePosition(command));
+	}
+
 	@GetMapping(value = "/S/switchbot/plugmini/{deviceId}/{command}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "control plug mini", description = "call switchbot api to control plug mini")
 	@ApiResponses({
