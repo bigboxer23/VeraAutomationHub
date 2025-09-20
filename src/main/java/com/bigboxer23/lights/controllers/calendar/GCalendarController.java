@@ -156,7 +156,7 @@ public class GCalendarController extends HubContext {
 			log.debug(event.getSummary());
 			return keywords.stream().anyMatch(word -> {
 				boolean found = summary.contains(word) || description.contains(word);
- 				if (found
+				if (found
 						&& SafeWords.stream().anyMatch(safe -> summary.contains(safe) || description.contains(safe))) {
 					return false;
 				}

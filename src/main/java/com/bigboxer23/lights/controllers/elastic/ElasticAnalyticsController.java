@@ -4,18 +4,24 @@ import com.bigboxer23.lights.controllers.vera.VeraDeviceVO;
 import com.bigboxer23.lights.controllers.vera.VeraHouseVO;
 import com.bigboxer23.lights.controllers.vera.VeraRoomVO;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.GetIndexResponse;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /** Send statistics about house status to an elasticsearch backend */
@@ -197,6 +203,32 @@ public class ElasticAnalyticsController implements DisposableBean {
 			return Double.parseDouble(aLevel);
 		} catch (NumberFormatException aNFE) {
 			return -99;
+		}
+	}
+
+	@Scheduled(cron = "0 0 2 15 * ?")
+	public void deleteOldMetricbeatIndices() {
+		try {
+			LocalDate cutoffDate = LocalDate.now().minusMonths(4);
+			String cutoffDateStr = cutoffDate.format(DateTimeFormatter.ofPattern("yyyy.MM"));
+
+			GetIndexRequest getIndexRequest = new GetIndexRequest("metricbeat-*" + cutoffDateStr + ".*");
+			GetIndexResponse getIndexResponse = getClient().indices().get(getIndexRequest, RequestOptions.DEFAULT);
+
+			String[] indicesToDelete = getIndexResponse.getIndices();
+
+			if (indicesToDelete.length > 0) {
+				log.info("Deleting {} old metricbeat indices older than {}", indicesToDelete.length, cutoffDateStr);
+				for (String indexToDelete : indicesToDelete) {
+					getClient().indices().delete(new DeleteIndexRequest(indexToDelete), RequestOptions.DEFAULT);
+					log.info("Deleted index: {}", indexToDelete);
+				}
+				log.info("Successfully deleted {} old metricbeat indices", indicesToDelete.length);
+			} else {
+				log.info("No old metricbeat indices found to delete");
+			}
+		} catch (Exception e) {
+			log.error("Error deleting old metricbeat indices", e);
 		}
 	}
 
