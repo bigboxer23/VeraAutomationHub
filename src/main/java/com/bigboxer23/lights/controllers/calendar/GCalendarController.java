@@ -63,6 +63,9 @@ public class GCalendarController extends HubContext {
 	protected static List<String> SafeWords = new ArrayList<>() {
 		{
 			add("field trip");
+			add("fair");
+			add("sea");
+			add("meeting");
 		}
 	};
 
