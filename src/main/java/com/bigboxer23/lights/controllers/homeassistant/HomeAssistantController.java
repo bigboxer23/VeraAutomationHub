@@ -42,6 +42,20 @@ public class HomeAssistantController {
 		callService(TURN_OFF_SERVICE, entityId);
 	}
 
+	/**
+	 * Toggle a boolean input based on the provided state
+	 *
+	 * @param entityId the entity ID of the input_boolean
+	 * @param turnOn true to turn on, false to turn off
+	 */
+	public void setState(String entityId, boolean turnOn) {
+		if (turnOn) {
+			turnOn(entityId);
+		} else {
+			turnOff(entityId);
+		}
+	}
+
 	private void callService(String service, String entityId) {
 		String url = homeAssistantUrl + SERVICES_ENDPOINT + INPUT_BOOLEAN_DOMAIN + "/" + service;
 		String payload = String.format("{\"entity_id\": \"input_boolean.%s\"}", entityId);

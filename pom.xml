@@ -22,6 +22,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>17</java.version>
+    <lombok.version>1.18.42</lombok.version>
     <outputFolder>${project.build.directory}/${project.artifactId}</outputFolder>
   </properties>
 
@@ -43,7 +44,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.38</version>
+      <version>${lombok.version}</version>
     </dependency>
     <dependency>
       <groupId>net.logstash.logback</groupId>
@@ -151,7 +152,7 @@
             <path>
               <groupId>org.projectlombok</groupId>
               <artifactId>lombok</artifactId>
-              <version>1.18.38</version>
+              <version>${lombok.version}</version>
             </path>
           </annotationProcessorPaths>
         </configuration>

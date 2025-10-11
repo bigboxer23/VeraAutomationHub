@@ -4,6 +4,7 @@ import com.bigboxer23.lights.HubContext;
 import com.bigboxer23.lights.controllers.NotificationController;
 import com.bigboxer23.lights.controllers.frontdoor.FrontDoorController;
 import com.bigboxer23.lights.controllers.garage.GarageController;
+import com.bigboxer23.lights.controllers.homeassistant.HomeAssistantController;
 import com.bigboxer23.lights.controllers.openHAB.OpenHABController;
 import com.bigboxer23.lights.controllers.scene.DaylightController;
 import com.bigboxer23.lights.controllers.scene.WeatherController;
@@ -33,6 +34,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -76,6 +78,9 @@ public class GCalendarController extends HubContext {
 		}
 	};
 
+	@Value("${homeAssistantVacationModeEntity}")
+	private String homeAssistantVacationModeEntity;
+
 	protected GCalendarController(
 			GarageController garageController,
 			FrontDoorController frontDoorController,
@@ -83,14 +88,16 @@ public class GCalendarController extends HubContext {
 			DaylightController daylightController,
 			NotificationController notificationController,
 			VeraController veraController,
-			OpenHABController openHABController) {
+			OpenHABController openHABController,
+			HomeAssistantController homeAssistantController) {
 		super(
 				garageController,
 				frontDoorController,
 				weatherController,
 				daylightController,
 				veraController,
-				openHABController);
+				openHABController,
+				homeAssistantController);
 		if (openHABController != null) {
 			fetchCalendarStatus();
 		}
@@ -142,9 +149,13 @@ public class GCalendarController extends HubContext {
 					.setOrderBy("startTime")
 					.setSingleEvents(true)
 					.execute();
-			myOpenHABController.setVacationMode(findMatchingEvents("Vacation", events, kVacationKeywords));
-			myOpenHABController.setPTOMode(findMatchingEvents("PTO", events, kPTOKeywords));
-			myOpenHABController.setExtendedEveningMode(findLateEvents(events));
+			boolean vacationMode = findMatchingEvents("Vacation", events, kVacationKeywords);
+			getOpenHABController().setVacationMode(vacationMode);
+			getOpenHABController().setPTOMode(findMatchingEvents("PTO", events, kPTOKeywords));
+			getOpenHABController().setExtendedEveningMode(findLateEvents(events));
+			if (homeAssistantVacationModeEntity != null) {
+				getHomeAssistantController().setState(homeAssistantVacationModeEntity, vacationMode);
+			}
 			log.info("Calendar information fetched and parsed");
 		} catch (GeneralSecurityException | IOException e) {
 			log.error("fetchCalendarStatus:", e);
