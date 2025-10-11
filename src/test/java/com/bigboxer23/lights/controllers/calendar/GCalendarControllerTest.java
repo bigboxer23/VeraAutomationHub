@@ -9,7 +9,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class GCalendarControllerTest {
-	private final GCalendarController controller = new GCalendarController(null, null, null, null, null, null, null);
+	private final GCalendarController controller =
+			new GCalendarController(null, null, null, null, null, null, null, null);
 
 	@Test
 	void testFindMatchingEvents_found() {

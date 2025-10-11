@@ -3,28 +3,33 @@ package com.bigboxer23.lights;
 import com.bigboxer23.lights.controllers.NotificationController;
 import com.bigboxer23.lights.controllers.frontdoor.FrontDoorController;
 import com.bigboxer23.lights.controllers.garage.GarageController;
+import com.bigboxer23.lights.controllers.homeassistant.HomeAssistantController;
 import com.bigboxer23.lights.controllers.openHAB.OpenHABController;
 import com.bigboxer23.lights.controllers.scene.DaylightController;
 import com.bigboxer23.lights.controllers.scene.WeatherController;
 import com.bigboxer23.lights.controllers.vera.VeraController;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
 /** Config controlling class. Reads JSON data from file, initializes scenes from file's contents */
+@Data
 public class HubContext {
-	protected GarageController myGarageController;
+	private GarageController garageController;
 
-	protected FrontDoorController myFrontDoorController;
+	private FrontDoorController frontDoorController;
 
-	protected WeatherController myWeatherController;
+	private WeatherController weatherController;
 
-	protected DaylightController myDaylightController;
+	private DaylightController daylightController;
 
-	protected NotificationController myNotificationController;
+	private NotificationController notificationController;
 
-	protected VeraController myVeraController;
+	private VeraController veraController;
 
-	protected OpenHABController myOpenHABController;
+	private OpenHABController openHABController;
+
+	private HomeAssistantController homeAssistantController;
 
 	protected HubContext(
 			GarageController garageController,
@@ -32,17 +37,19 @@ public class HubContext {
 			WeatherController weatherController,
 			DaylightController daylightController,
 			VeraController veraController,
-			OpenHABController openHABController) {
-		myGarageController = garageController;
-		myFrontDoorController = frontDoorController;
-		myWeatherController = weatherController;
-		myDaylightController = daylightController;
-		myVeraController = veraController;
-		myOpenHABController = openHABController;
+			OpenHABController openHABController,
+			HomeAssistantController homeAssistantController) {
+		setGarageController(garageController);
+		setFrontDoorController(frontDoorController);
+		setWeatherController(weatherController);
+		setDaylightController(daylightController);
+		setVeraController(veraController);
+		setOpenHABController(openHABController);
+		setHomeAssistantController(homeAssistantController);
 	}
 
 	@Autowired
-	public void setNotificationController(@Lazy NotificationController theNotificationController) {
-		myNotificationController = theNotificationController;
+	public void setNotificationController(@Lazy NotificationController notificationController) {
+		this.notificationController = notificationController;
 	}
 }

@@ -56,6 +56,30 @@ class HomeAssistantControllerTest {
 	}
 
 	@Test
+	void testSetStateTrue() {
+		try (MockedStatic<OkHttpUtil> mockedStatic = mockStatic(OkHttpUtil.class)) {
+			controller.setState(TEST_ENTITY_ID, true);
+
+			mockedStatic.verify(() -> OkHttpUtil.post(
+					eq(TEST_URL + "/api/services/input_boolean/turn_on"),
+					any(OkHttpCallback.class),
+					any(RequestBuilderCallback.class)));
+		}
+	}
+
+	@Test
+	void testSetStateFalse() {
+		try (MockedStatic<OkHttpUtil> mockedStatic = mockStatic(OkHttpUtil.class)) {
+			controller.setState(TEST_ENTITY_ID, false);
+
+			mockedStatic.verify(() -> OkHttpUtil.post(
+					eq(TEST_URL + "/api/services/input_boolean/turn_off"),
+					any(OkHttpCallback.class),
+					any(RequestBuilderCallback.class)));
+		}
+	}
+
+	@Test
 	void testCallServiceWithCorrectHeaders() {
 		try (MockedStatic<OkHttpUtil> mockedStatic = mockStatic(OkHttpUtil.class)) {
 			mockedStatic

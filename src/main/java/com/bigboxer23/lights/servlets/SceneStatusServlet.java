@@ -6,6 +6,7 @@ import com.bigboxer23.lights.controllers.econet.EconetController;
 import com.bigboxer23.lights.controllers.elastic.ElasticAnalyticsController;
 import com.bigboxer23.lights.controllers.frontdoor.FrontDoorController;
 import com.bigboxer23.lights.controllers.garage.GarageController;
+import com.bigboxer23.lights.controllers.homeassistant.HomeAssistantController;
 import com.bigboxer23.lights.controllers.hue.HueV2Controller;
 import com.bigboxer23.lights.controllers.meural.MeuralController;
 import com.bigboxer23.lights.controllers.openHAB.OpenHABController;
@@ -58,14 +59,16 @@ public class SceneStatusServlet extends HubContext {
 			ElasticAnalyticsController elasticAnalyticsController,
 			ClimateController climateController,
 			HueV2Controller hueController,
-			EconetController econetController) {
+			EconetController econetController,
+			HomeAssistantController homeAssistantController) {
 		super(
 				garageController,
 				frontDoorController,
 				weatherController,
 				daylightController,
 				veraController,
-				openHABController);
+				openHABController,
+				homeAssistantController);
 		this.meuralController = meuralController;
 		myElasticAnalyticsController = elasticAnalyticsController;
 		myClimateController = climateController;
@@ -88,11 +91,11 @@ public class SceneStatusServlet extends HubContext {
 	}
 
 	private VeraHouseVO getHouseStatus() {
-		VeraHouseVO aHouseStatus = new VeraHouseVO(myOpenHABController.getStatus());
+		VeraHouseVO aHouseStatus = new VeraHouseVO(getOpenHABController().getStatus());
 		fillMotionOverrides(aHouseStatus);
-		myGarageController.getStatus(aHouseStatus);
+		getGarageController().getStatus(aHouseStatus);
 		myClimateController.getClimateData(aHouseStatus);
-		myFrontDoorController.getStatus(aHouseStatus);
+		getFrontDoorController().getStatus(aHouseStatus);
 		meuralController.getStatus(aHouseStatus);
 		hueController.getSceneData(aHouseStatus);
 		econetController.getStatus(aHouseStatus);
@@ -102,7 +105,7 @@ public class SceneStatusServlet extends HubContext {
 
 	private void fillSmartRooms(VeraHouseVO theHouse) {
 		theHouse.getRooms().forEach(theVeraRoomVO -> {
-			theVeraRoomVO.setSmart(myOpenHABController.getSmartRooms().contains("Smart" + theVeraRoomVO.getId()));
+			theVeraRoomVO.setSmart(getOpenHABController().getSmartRooms().contains("Smart" + theVeraRoomVO.getId()));
 		});
 	}
 

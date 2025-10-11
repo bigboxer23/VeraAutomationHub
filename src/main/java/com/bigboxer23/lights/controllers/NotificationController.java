@@ -3,6 +3,7 @@ package com.bigboxer23.lights.controllers;
 import com.bigboxer23.lights.HubContext;
 import com.bigboxer23.lights.controllers.frontdoor.FrontDoorController;
 import com.bigboxer23.lights.controllers.garage.GarageController;
+import com.bigboxer23.lights.controllers.homeassistant.HomeAssistantController;
 import com.bigboxer23.lights.controllers.openHAB.OpenHABController;
 import com.bigboxer23.lights.controllers.openHAB.OpenHABItem;
 import com.bigboxer23.lights.controllers.scene.DaylightController;
@@ -58,14 +59,16 @@ public class NotificationController extends HubContext {
 			WeatherController weatherController,
 			DaylightController daylightController,
 			VeraController veraController,
-			OpenHABController openHABController) {
+			OpenHABController openHABController,
+			HomeAssistantController homeAssistantController) {
 		super(
 				garageController,
 				frontDoorController,
 				weatherController,
 				daylightController,
 				veraController,
-				openHABController);
+				openHABController,
+				homeAssistantController);
 	}
 
 	private ThreadPoolExecutor getExecutors() {
@@ -109,7 +112,8 @@ public class NotificationController extends HubContext {
 	}
 
 	private List<OpenHABItem> getItems(String deviceId) {
-		return myOpenHABController.getItemsByTag(deviceId == null || deviceId.isEmpty() ? kNotificationTag : deviceId);
+		return getOpenHABController()
+				.getItemsByTag(deviceId == null || deviceId.isEmpty() ? kNotificationTag : deviceId);
 	}
 
 	/**
@@ -128,11 +132,11 @@ public class NotificationController extends HubContext {
 					log.info(theDevice.getName() + " " + theDevice.getLevel());
 					getExecutors().execute(() -> {
 						try {
-							myOpenHABController.setLevel(theDevice.getName(), theDevice.getIntLevel() / 2);
+							getOpenHABController().setLevel(theDevice.getName(), theDevice.getIntLevel() / 2);
 							Thread.sleep(kZWaveTiming);
-							myOpenHABController.setLevel(theDevice.getName(), theDevice.getIntLevel());
+							getOpenHABController().setLevel(theDevice.getName(), theDevice.getIntLevel());
 							Thread.sleep(kZWaveTiming * 8);
-							myOpenHABController.setLevel(theDevice.getName(), theDevice.getIntLevel());
+							getOpenHABController().setLevel(theDevice.getName(), theDevice.getIntLevel());
 						} catch (InterruptedException theE) {
 							log.warn("doPulseNotification", theE);
 							theE.printStackTrace();
