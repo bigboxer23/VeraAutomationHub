@@ -25,7 +25,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfiguration {
-	private static final List<String> protectedUrlStrings = new ArrayList<String>() {
+	private static final List<String> protectedUrlStrings = new ArrayList<>() {
 		{
 			add("/SceneStatus");
 			add("/S/**");
