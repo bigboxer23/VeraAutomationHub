@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -80,6 +81,12 @@ public class GCalendarController extends HubContext {
 
 	@Value("${homeAssistantVacationModeEntity}")
 	private String homeAssistantVacationModeEntity;
+
+	@Value("${homeAssistantPTOModeEntity}")
+	private String homeAssistantPTOModeEntity;
+
+	@Value("${homeAssistantExtendedEveningModeEntity}")
+	private String homeAssistantExtendedEveningModeEntity;
 
 	protected GCalendarController(
 			GarageController garageController,
@@ -149,16 +156,28 @@ public class GCalendarController extends HubContext {
 					.setOrderBy("startTime")
 					.setSingleEvents(true)
 					.execute();
-			boolean vacationMode = findMatchingEvents("Vacation", events, kVacationKeywords);
-			getOpenHABController().setVacationMode(vacationMode);
-			getOpenHABController().setPTOMode(findMatchingEvents("PTO", events, kPTOKeywords));
-			getOpenHABController().setExtendedEveningMode(findLateEvents(events));
-			if (homeAssistantVacationModeEntity != null) {
-				getHomeAssistantController().setState(homeAssistantVacationModeEntity, vacationMode);
-			}
+			updateModeStatus(
+					findMatchingEvents("Vacation", events, kVacationKeywords),
+					homeAssistantVacationModeEntity,
+					getOpenHABController()::setVacationMode);
+			updateModeStatus(
+					findMatchingEvents("PTO", events, kPTOKeywords),
+					homeAssistantPTOModeEntity,
+					getOpenHABController()::setPTOMode);
+			updateModeStatus(
+					findLateEvents(events),
+					homeAssistantExtendedEveningModeEntity,
+					getOpenHABController()::setExtendedEveningMode);
 			log.info("Calendar information fetched and parsed");
 		} catch (GeneralSecurityException | IOException e) {
 			log.error("fetchCalendarStatus:", e);
+		}
+	}
+
+	private void updateModeStatus(boolean mode, String homeAssistantEntity, Consumer<Boolean> openHABSetter) {
+		openHABSetter.accept(mode);
+		if (homeAssistantEntity != null) {
+			getHomeAssistantController().setState(homeAssistantEntity, mode);
 		}
 	}
 
