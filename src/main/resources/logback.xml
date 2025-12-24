@@ -14,7 +14,11 @@
 	</appender>
 	<logger name="com.bigboxer23" level="INFO"/>
 	<root level="INFO">
-		<!--<appender-ref ref="STDOUT" />-->
-		<appender-ref ref="stash" />
+		<springProfile name="local">
+			<appender-ref ref="STDOUT" />
+		</springProfile>
+		<springProfile name="!local">
+			<appender-ref ref="stash" />
+		</springProfile>
 	</root>
 </configuration>

@@ -2,7 +2,7 @@ package com.bigboxer23.lights.servlets;
 
 import com.bigboxer23.lights.HubContext;
 import com.bigboxer23.lights.controllers.climate.ClimateController;
-import com.bigboxer23.lights.controllers.econet.EconetController;
+import com.bigboxer23.lights.controllers.econet.WaterHeaterController;
 import com.bigboxer23.lights.controllers.elastic.ElasticAnalyticsController;
 import com.bigboxer23.lights.controllers.frontdoor.FrontDoorController;
 import com.bigboxer23.lights.controllers.garage.GarageController;
@@ -46,7 +46,7 @@ public class SceneStatusServlet extends HubContext {
 
 	private HueV2Controller hueController;
 
-	private EconetController econetController;
+	private WaterHeaterController waterHeaterController;
 
 	protected SceneStatusServlet(
 			GarageController garageController,
@@ -59,7 +59,7 @@ public class SceneStatusServlet extends HubContext {
 			ElasticAnalyticsController elasticAnalyticsController,
 			ClimateController climateController,
 			HueV2Controller hueController,
-			EconetController econetController,
+			WaterHeaterController waterHeaterController,
 			HomeAssistantController homeAssistantController) {
 		super(
 				garageController,
@@ -73,7 +73,7 @@ public class SceneStatusServlet extends HubContext {
 		myElasticAnalyticsController = elasticAnalyticsController;
 		myClimateController = climateController;
 		this.hueController = hueController;
-		this.econetController = econetController;
+		this.waterHeaterController = waterHeaterController;
 	}
 
 	@GetMapping(value = "/SceneStatus", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -98,7 +98,7 @@ public class SceneStatusServlet extends HubContext {
 		getFrontDoorController().getStatus(aHouseStatus);
 		meuralController.getStatus(aHouseStatus);
 		hueController.getSceneData(aHouseStatus);
-		econetController.getStatus(aHouseStatus);
+		waterHeaterController.getStatus(aHouseStatus);
 		fillSmartRooms(aHouseStatus);
 		return aHouseStatus;
 	}
