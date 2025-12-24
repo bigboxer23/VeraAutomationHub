@@ -35,6 +35,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -79,13 +80,13 @@ public class GCalendarController extends HubContext {
 		}
 	};
 
-	@Value("${homeAssistantVacationModeEntity}")
+	@Value("${homeAssistantVacationModeEntity:}")
 	private String homeAssistantVacationModeEntity;
 
-	@Value("${homeAssistantPTOModeEntity}")
+	@Value("${homeAssistantPTOModeEntity:}")
 	private String homeAssistantPTOModeEntity;
 
-	@Value("${homeAssistantExtendedEveningModeEntity}")
+	@Value("${homeAssistantExtendedEveningModeEntity:}")
 	private String homeAssistantExtendedEveningModeEntity;
 
 	protected GCalendarController(
@@ -176,7 +177,7 @@ public class GCalendarController extends HubContext {
 
 	private void updateModeStatus(boolean mode, String homeAssistantEntity, Consumer<Boolean> openHABSetter) {
 		openHABSetter.accept(mode);
-		if (homeAssistantEntity != null) {
+		if (!StringUtils.isEmpty(homeAssistantEntity)) {
 			getHomeAssistantController().setState(homeAssistantEntity, mode);
 		}
 	}
