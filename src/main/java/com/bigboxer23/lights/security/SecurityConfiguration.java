@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
@@ -42,33 +43,25 @@ public class SecurityConfiguration {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, TokenAuthenticationFilter filter) throws Exception {
-		http.sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and()
-				.exceptionHandling()
-				.defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(UNAUTHORIZED), kProtectedUrls)
-				.and()
+		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.exceptionHandling(exceptions -> exceptions.defaultAuthenticationEntryPointFor(
+						new HttpStatusEntryPoint(UNAUTHORIZED), kProtectedUrls))
 				.authenticationProvider(new TokenAuthenticationProvider())
 				.addFilterBefore(filter, AnonymousAuthenticationFilter.class)
 				.authorizeHttpRequests(auth -> auth.requestMatchers(protectedUrlStrings.toArray(new String[0]))
 						.authenticated())
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/**").anonymous())
-				.formLogin()
-				.disable()
-				.httpBasic()
-				.disable()
-				.logout()
-				.disable()
-				.csrf()
-				.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler())
-				.csrfTokenRepository(getCSRFRepo());
+				.formLogin(AbstractHttpConfigurer::disable)
+				.httpBasic(AbstractHttpConfigurer::disable)
+				.logout(AbstractHttpConfigurer::disable)
+				.csrf(csrf -> csrf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler())
+						.csrfTokenRepository(getCSRFRepo()));
 		return http.build();
 	}
 
 	private CookieCsrfTokenRepository getCSRFRepo() {
 		CookieCsrfTokenRepository csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
-		csrfRepo.setSecure(true);
-		csrfRepo.setCookieMaxAge(60 * 60); // Store cookie for 1 min
+		csrfRepo.setCookieCustomizer(cookie -> cookie.secure(true).maxAge(60 * 60)); // Store cookie for 1 hour
 		return csrfRepo;
 	}
 
