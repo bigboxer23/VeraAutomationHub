@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -37,9 +37,8 @@ public class SecurityConfiguration {
 	};
 
 	private static final RequestMatcher kProtectedUrls = new OrRequestMatcher(protectedUrlStrings.stream()
-			.map(AntPathRequestMatcher::new)
-			.toList()
-			.toArray(new AntPathRequestMatcher[0]));
+			.map(PathPatternRequestMatcher.withDefaults()::matcher)
+			.toArray(RequestMatcher[]::new));
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, TokenAuthenticationFilter filter) throws Exception {
