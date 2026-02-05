@@ -13,12 +13,14 @@
 		<encoder class="net.logstash.logback.encoder.LogstashEncoder" />
 	</appender>
 	<logger name="com.bigboxer23" level="INFO"/>
-	<root level="INFO">
-		<springProfile name="local">
+	<springProfile name="local">
+		<root level="INFO">
 			<appender-ref ref="STDOUT" />
-		</springProfile>
-		<springProfile name="!local">
+		</root>
+	</springProfile>
+	<springProfile name="!local">
+		<root level="INFO">
 			<appender-ref ref="stash" />
-		</springProfile>
-	</root>
+		</root>
+	</springProfile>
 </configuration>
