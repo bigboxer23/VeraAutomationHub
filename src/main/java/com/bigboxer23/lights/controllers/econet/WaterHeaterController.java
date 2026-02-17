@@ -28,12 +28,20 @@ public class WaterHeaterController {
 
 	private VeraDeviceVO waterHeaterData;
 
+	private long lastActiveTime;
+
+	private long lastFetchTime;
+
 	private final HomeAssistantController homeAssistantController;
 
 	public WaterHeaterController(HomeAssistantController homeAssistantController) {
 		this.homeAssistantController = homeAssistantController;
 		waterHeaterData = new VeraDeviceVO("Water Heater", -1);
 		log.debug("WaterHeaterController initialized");
+	}
+
+	public void notifyActive() {
+		lastActiveTime = System.currentTimeMillis();
 	}
 
 	private EcoNetAPI getEcoNetAPI() {
@@ -89,9 +97,17 @@ public class WaterHeaterController {
 		}
 	}
 
-	@Scheduled(fixedDelay = 300000) // 5min
+	/** 30s, but skips fetch when UI is idle and last fetch was < 5min ago */
+	@Scheduled(fixedDelay = 30000)
 	private void fetchWaterHeaterStatus() {
+		long now = System.currentTimeMillis();
+		boolean uiIdle = (now - lastActiveTime) > 120000; // 2 minutes
+		boolean recentFetch = (now - lastFetchTime) < 300000; // 5 minutes
+		if (uiIdle && recentFetch) {
+			return;
+		}
 		try (WrappingCloseable c = LoggingContextBuilder.create().addTraceId().build()) {
+			lastFetchTime = now;
 			log.debug("Fetching water heater status...");
 			Map<String, HomeAssistantEntity> waterHeaterEntities = homeAssistantController.getAllStates().stream()
 					.filter(e -> e.getEntityId().startsWith("sensor.econet_hpwh")
@@ -111,28 +127,6 @@ public class WaterHeaterController {
 			setEntityState(waterHeaterEntities, "sensor.hot_water_utility", waterHeaterData::setLevel);
 			setEntityState(
 					waterHeaterEntities, "sensor.econet_hpwh_upper_tank_temperature", waterHeaterData::setCategory);
-
-			/*getEcoNetAPI().fetchUserData().ifPresent(data -> {
-				Equipment equipment =
-						data.getResults().getLocations().get(0).getEquipments().get(0);
-				waterHeaterData.setHumidity(equipment.getTankStatus());
-				waterHeaterData.setStatus(equipment.getCompressorStatus());
-				waterHeaterData.setTemperature(equipment.getSetpoint().getValue() + "");
-				LocalDate today = LocalDate.now();
-				getEcoNetAPI()
-						.fetchEnergyUsage(
-								equipment.getDeviceName(),
-								equipment.getSerialNumber(),
-								today.getDayOfMonth(),
-								today.getMonthValue(),
-								today.getYear())
-						.ifPresent(energyUsage -> {
-							float kwh = energyUsage.getResults().getEnergyUsage().getData().stream()
-									.map(ValueHolder::getValue)
-									.reduce(0.0f, Float::sum);
-							waterHeaterData.setLevel(kwh + "");
-						});
-			});*/
 			log.debug("Fetched water heater status...");
 		} catch (Exception e) {
 			log.error("fetchWaterHeaterStatus", e);

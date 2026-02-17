@@ -98,6 +98,7 @@ public class SceneStatusServlet extends HubContext {
 		getFrontDoorController().getStatus(aHouseStatus);
 		meuralController.getStatus(aHouseStatus);
 		hueController.getSceneData(aHouseStatus);
+		waterHeaterController.notifyActive();
 		waterHeaterController.getStatus(aHouseStatus);
 		fillSmartRooms(aHouseStatus);
 		return aHouseStatus;
