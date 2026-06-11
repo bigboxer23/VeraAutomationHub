@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.6</version>
+    <version>4.1.0</version>
     <relativePath/>
     <!-- lookup parent from repository -->
   </parent>
@@ -63,17 +63,17 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
-      <version>7.0.5</version>
+      <version>7.1.0</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-config</artifactId>
-      <version>7.0.5</version>
+      <version>7.1.0</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
-      <version>7.0.5</version>
+      <version>7.1.0</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
