@@ -103,7 +103,7 @@
     <dependency>
       <groupId>com.bigboxer23</groupId>
       <artifactId>utils</artifactId>
-      <version>2.3.0</version>
+      <version>2.4.0</version>
     </dependency>
     <dependency>
       <groupId>com.bigboxer23</groupId>
@@ -220,13 +220,8 @@
         <version>3.8.0</version>
         <configuration>
           <java>
-            <googleJavaFormat>
-              <version>1.25.2</version>
-              <style>AOSP</style>
-              <reflowLongStrings>true</reflowLongStrings>
-            </googleJavaFormat>
             <palantirJavaFormat>
-              <version>2.59.0</version>
+              <version>2.96.0</version>
             </palantirJavaFormat>
             <indent>
               <tabs>true</tabs>
