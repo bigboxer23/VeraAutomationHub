@@ -72,19 +72,20 @@ public class HueV2Controller {
 	public void getSceneData(VeraHouseVO house) {
 		List<HueResource> zones = getZones();
 		List<HueResource> scenes = getScenes();
-		house.getRooms().forEach(room -> zones.stream()
-				.filter(zone -> zone.getMetadata().getName().equalsIgnoreCase(room.getName()))
-				.forEach(zone -> {
-					scenes.stream()
-							.filter(scene -> scene.getGroup().getRid().equalsIgnoreCase(zone.getId()))
-							.forEach(scene -> {
-								VeraDeviceVO sceneDevice =
-										new VeraDeviceVO(scene.getMetadata().getName(), -1);
-								sceneDevice.setId(scene.getId());
-								sceneDevice.setCategory("hc");
-								room.addDevice(sceneDevice);
-							});
-				}));
+		house.getRooms()
+				.forEach(room -> zones.stream()
+						.filter(zone -> zone.getMetadata().getName().equalsIgnoreCase(room.getName()))
+						.forEach(zone -> {
+							scenes.stream()
+									.filter(scene -> scene.getGroup().getRid().equalsIgnoreCase(zone.getId()))
+									.forEach(scene -> {
+										VeraDeviceVO sceneDevice = new VeraDeviceVO(
+												scene.getMetadata().getName(), -1);
+										sceneDevice.setId(scene.getId());
+										sceneDevice.setCategory("hc");
+										room.addDevice(sceneDevice);
+									});
+						}));
 	}
 
 	public List<HueResource> getZones() {
