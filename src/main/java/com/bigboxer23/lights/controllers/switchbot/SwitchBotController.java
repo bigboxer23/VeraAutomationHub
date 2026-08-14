@@ -49,7 +49,7 @@ public class SwitchBotController {
 		this.emailController = emailController;
 	}
 
-	public SwitchBotApi getSwitchbotAPI() throws IOException {
+	public synchronized SwitchBotApi getSwitchbotAPI() throws IOException {
 		if (api == null) {
 			log.info("initializing switchbot API");
 			api = SwitchBotApi.getInstance(token, secret);

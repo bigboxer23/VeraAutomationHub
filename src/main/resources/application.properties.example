@@ -1,5 +1,7 @@
 #port for this to deploy on
 server.port:8080
+#scheduled tasks share this pool, the default of 1 lets a slow http call stall every other poller
+spring.task.scheduling.pool.size=5
 #vera url
 veraUrl=http://192.168.0.xxx:3480
 #open hab server location
