@@ -114,7 +114,8 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 										cluster.getHumidifier(),
 										goveeController.getDeviceNameFromId(cluster.getHumidifier()),
 										cluster.getHumidifierModel());
-							} else if (humidity > 73) { // Govee seems to have a bug where the
+							} else if (humidity
+									> cluster.getDesiredHumidity() - 5) { // Govee seems to have a bug where the
 								// humidifier
 								// doesn't turn off, so we manually cycle again
 								float watts = switchbotController
@@ -129,7 +130,8 @@ public class HumiditySystemController implements InitializingBean, IHumidityEven
 									new Thread(new HumidifierResetAction(
 													goveeController,
 													cluster.getHumidifierModel(),
-													cluster.getHumidifier()))
+													cluster.getHumidifier(),
+													cluster.getDesiredHumidity()))
 											.start();
 								}
 							}

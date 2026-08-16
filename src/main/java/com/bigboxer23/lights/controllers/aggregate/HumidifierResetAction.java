@@ -16,11 +16,14 @@ public class HumidifierResetAction implements Runnable {
 
 	private final String humidifierModel;
 	private final String humidifierId;
+	private final int desiredHumidity;
 
-	public HumidifierResetAction(GoveeHumidifierController govee, String humidifierModel, String humidifierId) {
+	public HumidifierResetAction(
+			GoveeHumidifierController govee, String humidifierModel, String humidifierId, int desiredHumidity) {
 		goveeController = govee;
 		this.humidifierModel = humidifierModel;
 		this.humidifierId = humidifierId;
+		this.desiredHumidity = desiredHumidity;
 	}
 
 	@Override
@@ -35,10 +38,10 @@ public class HumidifierResetAction implements Runnable {
 					});
 			Thread.sleep(5 * 1000);
 			RetryingCommand.builder()
-					.identifier("Set 70% " + goveeController.getIdentifier(humidifierId))
+					.identifier("Set " + desiredHumidity + "% " + goveeController.getIdentifier(humidifierId))
 					.buildAndExecute(() -> {
-						goveeController.sendDeviceCommand(
-								IHumidifierCommands.setAutoHumidityTargetPercent(humidifierModel, humidifierId, 70));
+						goveeController.sendDeviceCommand(IHumidifierCommands.setAutoHumidityTargetPercent(
+								humidifierModel, humidifierId, desiredHumidity));
 						return null;
 					});
 		} catch (InterruptedException | IOException e) {
