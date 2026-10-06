@@ -182,14 +182,15 @@
             <phase>package</phase>
             <configuration>
               <target>
-                <exec executable="scp">
+                <!-- copy to a temp name then mv, so the running app's jar is never overwritten in place -->
+                <exec executable="scp" failonerror="true">
                   <arg value="target/VeraAutomationHub-2.0.0.jar"/>
-                  <arg value="pi@${host}:/home/pi/com/bigboxer23/VeraAutomationHub/2.0.0"/>
+                  <arg value="pi@${host}:/home/pi/com/bigboxer23/VeraAutomationHub/2.0.0/VeraAutomationHub-2.0.0.jar.new"/>
                 </exec>
                 <exec executable="ssh">
                   <arg value="-tt"/>
                   <arg value="pi@${host}"/>
-                  <arg value="sudo systemctl restart automation-hub.service"/>
+                  <arg value="cd /home/pi/com/bigboxer23/VeraAutomationHub/2.0.0 &amp;&amp; mv VeraAutomationHub-2.0.0.jar.new VeraAutomationHub-2.0.0.jar &amp;&amp; sudo systemctl restart automation-hub.service"/>
                 </exec>
               </target>
             </configuration>
