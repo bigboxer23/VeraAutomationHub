@@ -33,7 +33,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           java-version: 17
-          distribution: 'adopt'
+          distribution: 'temurin'
       -   name: maven-settings
           uses: s4u/maven-settings-action@v4.0.0
           with:
