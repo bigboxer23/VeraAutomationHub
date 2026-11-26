@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.1.2</version>
+    <version>4.2.0</version>
     <relativePath/>
     <!-- lookup parent from repository -->
   </parent>
@@ -34,7 +34,7 @@
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-      <version>3.2.0</version>
+      <version>3.2.1</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.module</groupId>
@@ -63,17 +63,17 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
-      <version>7.1.2</version>
+      <version>7.2.0</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-config</artifactId>
-      <version>7.1.2</version>
+      <version>7.2.0</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
-      <version>7.1.2</version>
+      <version>7.2.0</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
@@ -218,7 +218,7 @@
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
-        <version>3.11.0</version>
+        <version>3.12.0</version>
         <configuration>
           <java>
             <palantirJavaFormat>
